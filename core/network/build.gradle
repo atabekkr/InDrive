@@ -34,6 +34,11 @@ android {
 dependencies {
     testImplementation libs.junit
 
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.converter.gson)
+
     // Dagger-Hilt
     implementation(libs.dagger)
     ksp(libs.dagger.compiler)
