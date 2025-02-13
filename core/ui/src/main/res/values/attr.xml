@@ -54,4 +54,17 @@
         <attr name="buttonColor" format="color"/>
     </declare-styleable>
 
+    <declare-styleable name="SlideFinishButton">
+        <attr name="slideFinishButtonText" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="SlideButton">
+        <attr name="SlideButtonText" format="string"/>
+        <attr name="SlideButtonTextSize" format="dimension"/>
+        <attr name="SlideButtonTextColor" format="integer"/>
+        <attr name="thumbOffset" format="dimension"/>
+        <attr name="thumb" format="integer"/>
+        <attr name="sliderBackground" format="integer"/>
+    </declare-styleable>
+
 </resources>

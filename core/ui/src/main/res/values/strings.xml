@@ -8,6 +8,7 @@
     <string name="drawer_closed">Closed</string>
 
     <string name="app_name">In Drive</string>
+    <string name="app_name_driver">In Drive Driver</string>
     <string name="label_continue">Dawam etiw</string>
     <string name="label_save">Saqlaw</string>
     <string name="label_send">Jollaw</string>
@@ -16,6 +17,8 @@
     <string name="label_confirm_description">Siz kiritken  <b>%1$s</b> telefon nomerine tastıyıqlaw kodı jiberildi</string>
     <string name="label_taxi_service">Taksi xizmeti</string>
     <string name="label_taxi_service_description">Mánzilińizge ańsat hám qolaylı bahada jetip alıń. Buyırtpa beriwdi házir-aq baslań.</string>
+    <string name="label_welcome">Xosh keldińiz</string>
+    <string name="label_welcome_description">Óz jeke avtomashinańızda taksi xızmetlerin kórsetip, buyırtpalar alıń. Qolaylı waqıttı tańlań hám dáramatlarıńızdı basqarıń.</string>
     <string name="label_start">Baslaw</string>
     <string name="label_information">Maǵlıwmatlar</string>
 

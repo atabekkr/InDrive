@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="@dimen/padding_small">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="@dimen/padding_small"
+            android:text="Filter"
+            android:textAppearance="@style/TextAppearance.InDrive.TitleSmall" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:padding="@dimen/padding_small"
+            android:text="Tazalaw"
+            android:textAppearance="@style/TextAppearance.InDrive.TitleGroup"
+            android:textColor="@color/color_interactive_accent" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/padding_medium"
+        android:text="Buyırtpalardı tek usı radiustaǵı aralıqtan alıw:"
+        android:textAppearance="@style/TextAppearance.InDrive.TitleGroup" />
+
+    <TextView
+        android:id="@+id/tv_radius"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/padding_small"
+        android:text="1 km"
+        android:textAppearance="@style/TextAppearance.InDrive.Text.Title" />
+
+    <com.aralhub.ui.components.Material3SliderView
+        android:id="@+id/slider"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginHorizontal="@dimen/margin_medium" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAppearance="@style/TextAppearance.InDrive.TitleSmall"
+            android:text="1 km" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.InDrive.TitleSmall"
+            android:text="2 km" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="3 km"
+            android:textAppearance="@style/TextAppearance.InDrive.TitleSmall" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.InDrive.TitleSmall"
+            android:text="4 km" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="5 km"
+            android:textAppearance="@style/TextAppearance.InDrive.TitleSmall" />
+
+
+    </LinearLayout>
+
+
+    <Button
+        style="@style/Widget.InDrive.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_small"
+        android:text="Qollanıw" />
+
+</LinearLayout>

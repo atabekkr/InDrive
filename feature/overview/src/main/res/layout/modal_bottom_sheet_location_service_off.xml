@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        style="@style/Widget.InDrive.BottomSheet.DragHandle"/>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/bg_location"
+        android:paddingVertical="@dimen/padding_small"
+        />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Geolokaciya xızmeti óshik"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.InDrive.Text.Title"/>
+
+    <TextView
+        android:id="@+id/tv_time"
+        android:padding="@dimen/padding_small"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Buyırtpalardı qabıllap baslaw ushın, qurılmańızda geolokaciya xızmetin qosıp qoyıń."
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.InDrive.Text"/>
+
+
+    <Button
+        style="@style/Widget.InDrive.Button.Primary"
+        android:id="@+id/btn_clear"
+        android:text="Qosıw"
+        android:layout_margin="@dimen/margin_small"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

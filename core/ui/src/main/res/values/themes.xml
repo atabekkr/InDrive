@@ -26,6 +26,7 @@
     <style name="Theme.InDrive.BottomSheetDialog" parent="Theme.Design.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/MyBottomSheetStyle</item>
         <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:statusBarColor">@color/white</item>
         <item name="android:navigationBarColor">@color/white</item>
         <item name="android:textAppearance">@style/TextAppearance.InDrive.BodyLarge</item>
         <item name="editTextBackground">@drawable/selector_edit_text_auth</item>

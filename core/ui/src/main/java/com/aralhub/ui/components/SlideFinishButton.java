@@ -2,6 +2,7 @@ package com.aralhub.ui.components;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -17,7 +18,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.ColorUtils;
 
+import com.aralhub.ui.R;
+
 public class SlideFinishButton extends View {
+
+    private final Paint chevronBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final RectF chevronCircleRect = new RectF();  // For drawing the circle
     private final Paint backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint iconPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -33,12 +39,12 @@ public class SlideFinishButton extends View {
     private ValueAnimator resetAnimator;
     private ValueAnimator completeAnimator;
 
-    private static final int BUTTON_COLOR = 0xFFEEEEEE;
-    private static final int PROGRESS_COLOR = 0xFF9ED4B5;
-    private static final String BUTTON_TEXT = "Finish";
+    private static final int BUTTON_COLOR = 0xFFBCCDB3;
+    private static final int PROGRESS_COLOR =0xFF28A745;
+    private static String BUTTON_TEXT = "Finish";
     private static final float THRESHOLD = 0.6f; // 60% threshold
 
-    private static final int DEFAULT_TEXT_COLOR = Color.BLACK;
+    private static final int DEFAULT_TEXT_COLOR = Color.WHITE;
     private static final int COMPLETED_TEXT_COLOR = Color.WHITE;  // Or any color you like
 
     public interface OnSlideCompleteListener {
@@ -47,15 +53,15 @@ public class SlideFinishButton extends View {
 
     public SlideFinishButton(Context context) {
         super(context);
-        init();
+        init(context);
     }
 
     public SlideFinishButton(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
-    private void init() {
+    private void init(Context context) {
         backgroundPaint.setColor(BUTTON_COLOR);
         progressPaint.setColor(PROGRESS_COLOR);
         textPaint.setColor(DEFAULT_TEXT_COLOR);
@@ -64,6 +70,16 @@ public class SlideFinishButton extends View {
         iconPaint.setColor(PROGRESS_COLOR);
         iconPaint.setStyle(Paint.Style.FILL);
         iconPaint.setStrokeWidth(4f);
+        chevronBackgroundPaint.setColor(PROGRESS_COLOR);
+        chevronBackgroundPaint.setStyle(Paint.Style.FILL);
+
+        TypedArray typedArray = context.obtainStyledAttributes(R.styleable.SlideFinishButton);
+        if (typedArray.getString(R.styleable.SlideFinishButton_slideFinishButtonText) != null) {
+            BUTTON_TEXT = typedArray.getString(R.styleable.SlideFinishButton_slideFinishButtonText);
+            invalidate();
+        }
+
+        typedArray.recycle();
 
         setupAnimations();
     }
@@ -113,24 +129,36 @@ public class SlideFinishButton extends View {
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
-        float cornerRadius = getHeight() / 4f;
+        float cornerRadius = getHeight() / 2f;
         canvas.drawRoundRect(buttonRect, cornerRadius, cornerRadius, backgroundPaint);
 
         progressRect.set(buttonRect);
         progressRect.right = buttonRect.left + (buttonRect.width() * slideProgress);
         canvas.drawRoundRect(progressRect, cornerRadius, cornerRadius, progressPaint);
 
-        // Draw chevron icon
+        // Draw chevron with circular background
         canvas.save();
-        canvas.translate(slideProgress * (getWidth() - getHeight() / 2), 0);
-        iconPaint.setColor(slideProgress > 0.5f ? Color.WHITE : PROGRESS_COLOR);
+        float translation = slideProgress * (getWidth() - getHeight());  // Modified this
+        canvas.translate(translation, 0);
+
+        // Draw the circular background to match full height
+        float circleRadius = getHeight() / 2f;
+        chevronCircleRect.set(
+                0,                  // Left matches view edge
+                0,                  // Top matches view edge
+                getHeight(),        // Width equals height for perfect circle
+                getHeight()         // Full height of view
+        );
+        chevronBackgroundPaint.setColor(PROGRESS_COLOR);
+        canvas.drawOval(chevronCircleRect, chevronBackgroundPaint);
+
+        // Draw the chevron in white
+        iconPaint.setColor(Color.WHITE);
         canvas.drawPath(chevronPath, iconPaint);
         canvas.restore();
 
-        // Set dynamic text color based on slide progress
-        textPaint.setColor(getTextColorBasedOnProgress(slideProgress));
-
         // Draw text
+        textPaint.setColor(getTextColorBasedOnProgress(slideProgress));
         float textX = getWidth() / 2f;
         float textY = getHeight() / 2f - ((textPaint.descent() + textPaint.ascent()) / 2f);
         canvas.drawText(BUTTON_TEXT, textX, textY, textPaint);

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/logoFragment">
+
+    <fragment
+        android:id="@+id/logoFragment"
+        android:name="com.aralhub.indrive.driver.driver_auth.LogoFragment"
+        tools:layout="@layout/fragment_logo">
+        <action
+            android:id="@+id/action_logoFragment_to_addPhoneFragment"
+            app:destination="@id/addPhoneFragment" />
+
+        <action
+            android:id="@+id/action_logoFragment_to_overviewFragment"
+            app:destination="@id/overviewFragment" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/addPhoneFragment"
+        android:name="com.aralhub.indrive.driver.driver_auth.AddPhoneFragment"
+        tools:layout="@layout/fragment_add_phone">
+
+        <action
+            android:id="@+id/action_addPhoneFragment_to_addSmsFragment"
+            app:destination="@id/addSmsFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/addSmsFragment"
+        android:name="com.aralhub.indrive.driver.driver_auth.AddSMSFragment"
+        tools:layout="@layout/fragment_add_sms">
+
+        <action
+            android:id="@+id/action_addSmsFragment_to_overviewFragment"
+            app:destination="@id/overviewFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/overviewFragment"
+        android:name="com.aralhub.overview.OverviewFragment"
+        tools:layout="@layout/fragment_overview">
+
+        <action
+            android:id="@+id/action_overviewFragment_to_ordersFragment"
+            app:destination="@id/ordersFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/ordersFragment"
+        android:name="com.aralhub.indrive.driver.orders.OrdersFragment"
+        tools:layout="@layout/fragment_orders" />
+
+</navigation>

@@ -102,6 +102,7 @@ class OffersFragment : Fragment(R.layout.fragment_offers) {
         offerItemAdapter.setOnItemAcceptClickListener {
             featureOffersNavigation.goToRideFragment()
         }
+
     }
 
     private fun initBottomNavController() {

@@ -27,5 +27,7 @@
     <color name="color_success_crouton">#1FCE47</color>
 
     <color name="color_status_error">#E33D3D</color>
+    
+    <color name="slide_button_disabled_filter">#92ffffff</color>
 
 </resources>

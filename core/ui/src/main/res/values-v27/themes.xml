@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.InDrive.BottomSheetDialog" parent="Theme.Design.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/MyBottomSheetStyle</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:navigationBarColor">@color/white</item>
+        <item name="android:textAppearance">@style/TextAppearance.InDrive.BodyLarge</item>
+        <item name="editTextBackground">@drawable/selector_edit_text_auth</item>
+        <item name="android:windowSoftInputMode">adjustResize|stateAlwaysVisible</item>
+
+    </style>
+</resources>

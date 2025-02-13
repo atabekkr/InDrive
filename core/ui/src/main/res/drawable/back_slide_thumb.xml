@@ -1,0 +1,31 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <padding
+                android:bottom="16dp"
+                android:left="16dp"
+                android:right="16dp"
+                android:top="16dp" />
+            <gradient
+                android:endColor="#66BB6A"
+                android:startColor="#28A745" />
+            <size
+                android:width="50dp"
+                android:height="50dp" />
+        </shape>
+    </item>
+
+    <item>
+        <vector
+            android:width="11dp"
+            android:height="12dp"
+            android:viewportWidth="11"
+            android:viewportHeight="12">
+            <path
+                android:fillColor="#ffff"
+                android:pathData="M0.7,0L6.36,5.66L0.7,11.32L-0,10.61L4.95,5.66L-0,0.71L0.7,0ZM4.7,0L10.359,5.66L4.7,11.32L4,10.61L8.95,5.66L4,0.71L4.7,0Z" />
+        </vector>
+    </item>
+
+
+</layer-list>

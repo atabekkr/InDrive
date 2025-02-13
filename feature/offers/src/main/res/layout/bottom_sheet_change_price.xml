@@ -12,12 +12,15 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_weight="0.2"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_remove"
-            android:paddingHorizontal="@dimen/padding_small"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:padding="@dimen/padding_small"
+            android:text="+500"
+            android:textAppearance="@style/TextAppearance.InDrive.BodyLarge"
+            android:background="@drawable/bg_blue_radius_10"
+            android:textColor="@color/white"
+            android:layout_height="wrap_content"/>
 
         <androidx.appcompat.widget.AppCompatEditText
             style="@style/Widget.AppCompat.EditText"

@@ -35,6 +35,42 @@
         <item name="android:textAppearance">@style/TextAppearance.InDrive.PrimaryButton</item>
     </style>
 
+    <style name="Widget.InDrive.Button.GreenGradient" parent="Widget.InDrive.Button.Primary">
+        <item name="android:background">@drawable/selector_button_green_gradient</item>
+    </style>
+
+    <style name="Widget.InDrive.Slider.Tooltip" parent="android:Widget">
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:minWidth">32dp</item>
+        <item name="backgroundTint">@color/color_content_secondary</item>
+        <item name="android:minHeight">32dp</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.InDrive.Text</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.InDrive.Slider.Tooltip</item>
+    </style>
+
+    <style name="Widget.InDrive.Slider" parent="android:Widget">
+        <item name="haloColor">@color/color_interactive_accent</item>
+        <item name="haloRadius">24dp</item>
+        <item name="labelStyle">@style/Widget.InDrive.Slider.Tooltip</item>
+        <item name="thumbColor">@color/color_interactive_accent</item>
+        <item name="thumbElevation">1dp</item>
+        <item name="thumbRadius">10dp</item>
+        <item name="tickColorActive">@color/color_interactive_accent</item>
+        <item name="tickColorInactive">@color/color_interactive_accent</item>
+        <item name="tickRadiusActive">1dp</item>
+        <item name="tickRadiusInactive">1dp</item>
+        <item name="trackColorActive">@color/color_interactive_accent</item>
+        <item name="trackColorInactive">@color/color_interactive_accent</item>
+        <item name="trackHeight">4dp</item>
+        <item name="minSeparation">0dp</item>
+        <item name="trackInsideCornerSize">2dp</item>
+        <item name="thumbWidth">4dp</item>
+        <item name="thumbHeight">44dp</item>
+        <item name="thumbTrackGapSize">6dp</item>
+        <item name="trackStopIndicatorSize">4dp</item>
+    </style>
+
     <style name="Widget.InDrive.Button.Variant" parent="Widget.AppCompat.Button">
         <item name="android:background">@drawable/selector_button_primary_variant</item>
         <item name="android:stateListAnimator">@null</item>

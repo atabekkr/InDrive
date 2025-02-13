@@ -33,6 +33,13 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+
+    <style name="TextAppearance.InDrive.TitleGroup" parent="TextAppearance.InDrive.Text">
+        <item name="android:textColor">@color/color_content_secondary</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
     <style name="TextAppearance.InDrive.DisplaySmall" parent="TextAppearance.AppCompat.Display4">
         <item name="android:fontFamily">@font/inter_semibold</item>
         <item name="android:textSize">24sp</item>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/im_taxi"
+        android:contentDescription="@string/hint_phone" />
+
+    <TextView
+        style="@style/TextAppearance.InDrive.DisplaySmall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingHorizontal="@dimen/padding_large"
+        android:paddingTop="@dimen/padding_large"
+        android:text="@string/label_welcome" />
+
+    <TextView
+        style="@style/TextAppearance.InDrive.BodyLarge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/padding_medium"
+        android:text="@string/label_welcome_description" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end|center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="@dimen/padding_medium">
+
+        <TextView
+            style="@style/TextAppearance.InDrive.BodyLarge.SemiBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/margin_small"
+            android:padding="@dimen/padding_small"
+            android:visibility="gone"
+            android:text="@string/label_start" />
+
+        <View
+            android:id="@+id/view_next_button"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="@drawable/bg_next_button_circle"
+            android:foreground="@drawable/ripple_round" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

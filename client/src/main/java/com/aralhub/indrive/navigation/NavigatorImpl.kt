@@ -1,8 +1,8 @@
 package com.aralhub.indrive.navigation
 
 import androidx.navigation.NavController
-import com.aralhub.auth.AddSMSFragment
-import com.aralhub.auth.navigation.FeatureAuthNavigation
+import com.aralhub.client.client_auth.AddSMSFragment
+import com.aralhub.client.client_auth.navigation.FeatureClientAuthNavigation
 import com.aralhub.indrive.R
 import com.aralhub.indrive.request.navigation.FeatureRequestNavigation
 import com.aralhub.offers.navigation.FeatureOffersNavigation
@@ -10,7 +10,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class NavigatorImpl @Inject constructor(): Navigator, FeatureAuthNavigation, FeatureRequestNavigation, FeatureOffersNavigation{
+class NavigatorImpl @Inject constructor(): Navigator, FeatureClientAuthNavigation, FeatureRequestNavigation, FeatureOffersNavigation{
 
     private var navController: NavController? = null
 
@@ -26,8 +26,8 @@ class NavigatorImpl @Inject constructor(): Navigator, FeatureAuthNavigation, Fea
         navController?.navigate(R.id.action_logoFragment_to_addPhoneFragment)
     }
 
-    override fun goToHomeFragmentFromAddName() {
-        navController?.navigate(R.id.action_addNameFragment_to_HomeFragment)
+    override fun goToRequestFromAddName() {
+        navController?.navigate(R.id.action_addNameFragment_to_requestFragment)
     }
 
     override fun goToAddSMSCode(phone: String) {
@@ -38,8 +38,8 @@ class NavigatorImpl @Inject constructor(): Navigator, FeatureAuthNavigation, Fea
         navController?.navigate(R.id.action_addSmsFragment_to_addNameFragment)
     }
 
-    override fun goToHomeFragmentFromLogo() {
-        navController?.navigate(R.id.action_logoFragment_to_homeFragment)
+    override fun goToRequestFromLogo() {
+        navController?.navigate(R.id.action_logoFragment_to_requestFragment)
     }
 
     override fun goToGetOffersFromSendOrderFragment() {
