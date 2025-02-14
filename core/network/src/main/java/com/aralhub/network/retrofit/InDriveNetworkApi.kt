@@ -9,7 +9,7 @@ import retrofit2.http.POST
 
 interface InDriveNetworkApi {
     @Headers("Accept: application/json")
-    @POST(value = "api/v1/auth/send-code")
+    @POST(value = "/user/auth")
     suspend fun auth(@Body body: NetworkAuthRequest): Response<NetworkAuthResponseData>
 
 }
