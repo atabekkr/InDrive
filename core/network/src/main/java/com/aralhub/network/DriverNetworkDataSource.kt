@@ -16,6 +16,7 @@ import com.aralhub.network.models.driver.NetworkRideCompletedResponse
 import com.aralhub.network.models.location.NetworkSendLocationRequestWithoutType
 import com.aralhub.network.models.offer.CreateOfferByDriverResponse
 import com.aralhub.network.models.offer.NetworkActiveOfferResponse
+import com.aralhub.network.models.ride.NetworkWaitAmount
 import com.aralhub.network.requests.auth.NetworkDriverAuthRequest
 import com.aralhub.network.requests.logout.NetworkLogoutRequest
 import com.aralhub.network.requests.verify.NetworkVerifyRequest
@@ -43,4 +44,5 @@ interface DriverNetworkDataSource {
     suspend fun cancelRide(rideId: Int, cancelCauseId: Int): NetworkResult<Boolean>
     suspend fun updateRideStatus(rideId: Int, status: String): NetworkResult<NetworkRideCompletedResponse?>
     suspend fun getCancelCauses(): NetworkResult<List<NetworkDriverCancelCause>>
+    suspend fun getWaitTime(rideId: Int): NetworkResult<NetworkWaitAmount>
 }

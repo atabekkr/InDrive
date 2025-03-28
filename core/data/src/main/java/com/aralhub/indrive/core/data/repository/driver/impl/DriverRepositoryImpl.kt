@@ -7,6 +7,7 @@ import com.aralhub.indrive.core.data.model.driver.RideCompleted
 import com.aralhub.indrive.core.data.model.driver.toDomain
 import com.aralhub.indrive.core.data.model.offer.ActiveRideByDriverResponse
 import com.aralhub.indrive.core.data.model.offer.toActiveOfferDomain
+import com.aralhub.indrive.core.data.model.ride.WaitAmount
 import com.aralhub.indrive.core.data.repository.driver.DriverRepository
 import com.aralhub.indrive.core.data.result.Result
 import com.aralhub.network.DriverNetworkDataSource
@@ -72,6 +73,15 @@ class DriverRepositoryImpl @Inject constructor(
                 is NetworkResult.Success -> {
                     Result.Success(it.data.toDomain())
                 }
+            }
+        }
+    }
+
+    override suspend fun getWaitAmount(rideId: Int): Result<Double> {
+        return driverNetworkDataSource.getWaitTime(rideId).let {
+            when(it){
+                is NetworkResult.Error -> Result.Error(it.message)
+                is NetworkResult.Success -> Result.Success(it.data.paidWaitingTime)
             }
         }
     }

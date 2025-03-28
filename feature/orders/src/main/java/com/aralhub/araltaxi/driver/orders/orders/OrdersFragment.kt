@@ -38,7 +38,6 @@ import com.aralhub.araltaxi.driver.orders.sheet.RideFinishedModalBottomSheet
 import com.aralhub.araltaxi.driver.orders.sheet.RideModalBottomSheet
 import com.aralhub.araltaxi.driver.orders.sheet.TripCanceledModalBottomSheet
 import com.aralhub.araltaxi.driver.orders.sheet.WaitingForClientModalBottomSheet
-import com.aralhub.araltaxi.driver.orders.utils.SoundManager
 import com.aralhub.araltaxi.services.LocationService
 import com.aralhub.indrive.core.data.model.driver.DriverInfo
 import com.aralhub.ui.adapter.OrderItemAdapter
@@ -114,6 +113,12 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
         initRideModalBottomSheet()
         initTripCanceledModalBottomSheet()
         initListeners()
+
+        waitingForClientModalBottomSheet.arguments = arguments
+        waitingForClientModalBottomSheet.show(
+            childFragmentManager,
+            WaitingForClientModalBottomSheet.TAG
+        )
 
     }
 

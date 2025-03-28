@@ -19,6 +19,7 @@ import com.aralhub.network.models.driver.NetworkRideCompletedResponse
 import com.aralhub.network.models.location.NetworkSendLocationRequestWithoutType
 import com.aralhub.network.models.offer.CreateOfferByDriverResponse
 import com.aralhub.network.models.offer.NetworkActiveOfferResponse
+import com.aralhub.network.models.ride.NetworkWaitAmount
 import com.aralhub.network.requests.auth.NetworkDriverAuthRequest
 import com.aralhub.network.requests.logout.NetworkLogoutRequest
 import com.aralhub.network.requests.verify.NetworkVerifyRequest
@@ -104,4 +105,9 @@ class DriverNetworkDataSourceImpl @Inject constructor(private val api: DriverNet
     override suspend fun getCancelCauses(): NetworkResult<List<NetworkDriverCancelCause>> {
         return api.getCancelCauses().safeRequestServerResponse()
     }
+
+    override suspend fun getWaitTime(rideId: Int): NetworkResult<NetworkWaitAmount> {
+        return api.getWaitAmount(rideId).safeRequestServerResponse()
+    }
+
 }

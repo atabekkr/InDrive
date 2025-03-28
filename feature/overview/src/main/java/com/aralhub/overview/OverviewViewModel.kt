@@ -12,7 +12,9 @@ import com.aralhub.overview.mapper.asUI
 import com.aralhub.ui.model.GetActiveRideByDriverUI
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,10 +30,9 @@ class OverviewViewModel @Inject constructor(
         getActiveRide()
     }
 
-    private val _profileUiState = MutableSharedFlow<ProfileUiState>()
-    val profileUiState = _profileUiState.asSharedFlow()
+    private val _profileUiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Loading)
+    val profileUiState = _profileUiState.asStateFlow()
     fun getProfile() = viewModelScope.launch {
-        _profileUiState.emit(ProfileUiState.Loading)
         _profileUiState.emit(driverProfileUseCase().let {
             when (it) {
                 is Result.Error -> ProfileUiState.Error(it.message)
@@ -40,10 +41,9 @@ class OverviewViewModel @Inject constructor(
         })
     }
 
-    private val _balanceUiState = MutableSharedFlow<DriverBalanceUiState>()
+    private val _balanceUiState = MutableStateFlow<DriverBalanceUiState>(DriverBalanceUiState.Loading)
     val balanceUiState = _balanceUiState.asSharedFlow()
     fun getBalance() = viewModelScope.launch {
-        _balanceUiState.emit(DriverBalanceUiState.Loading)
         _balanceUiState.emit(driverBalanceUseCase().let {
             when (it) {
                 is Result.Error -> DriverBalanceUiState.Error(it.message)

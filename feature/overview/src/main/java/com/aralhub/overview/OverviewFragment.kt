@@ -81,7 +81,7 @@ class OverviewFragment : Fragment(R.layout.fragment_overview) {
             when (it) {
                 is ProfileUiState.Error -> showErrorDialog(it.message)
 
-                ProfileUiState.Loading -> showLoading()
+                is ProfileUiState.Loading -> showLoading()
 
                 is ProfileUiState.Success -> displayProfile(it.profile)
             }
@@ -91,12 +91,16 @@ class OverviewFragment : Fragment(R.layout.fragment_overview) {
             when (it) {
                 is DriverBalanceUiState.Error -> showErrorDialog(it.message)
 
-                DriverBalanceUiState.Loading -> showLoading()
+                is DriverBalanceUiState.Loading -> showLoading()
 
                 is DriverBalanceUiState.Success -> {
                     dismissLoading()
-                    binding.tvBalance.text = getString(com.aralhub.ui.R.string.standard_uzs_price, it.balance.toString())
-                    binding.tvDailyIncome.text = getString(com.aralhub.ui.R.string.standard_uzs_price, it.dayBalance.toString())
+                    binding.tvBalance.text =
+                        getString(com.aralhub.ui.R.string.standard_uzs_price, it.balance.toString())
+                    binding.tvDailyIncome.text = getString(
+                        com.aralhub.ui.R.string.standard_uzs_price,
+                        it.dayBalance.toString()
+                    )
                 }
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -243,11 +247,13 @@ class OverviewFragment : Fragment(R.layout.fragment_overview) {
 
     private fun showErrorDialog(errorMessage: String?) {
         errorDialog?.show(errorMessage)
-
         errorDialog?.setOnDismissClicked { errorDialog?.dismiss() }
+        loadingDialog?.dismiss()
     }
 
     private fun showLoading() {
+        Log.d("OverviewFragment", "show loading")
+        loadingDialog?.show()
         viewLifecycleOwner.lifecycleScope.launch {
             delay(500)
             if (!isResponseReceived) {
