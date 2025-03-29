@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import com.aralhub.araltaxi.driver.orders.R
 import com.aralhub.araltaxi.driver.orders.databinding.ModalBottomSheetRideFinishedBinding
+import com.aralhub.ui.model.PaymentType
 import com.aralhub.ui.model.RideCompletedUI
 import com.aralhub.ui.utils.viewBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -51,6 +52,9 @@ class RideFinishedModalBottomSheet :
             val roadDistanceValue =
                 if (it.distance < 1000) "${it.distance.toInt()} m" else "${it.distance.toInt() / 1000} km"
             binding.tvTotalDistance.text = roadDistanceValue
+            binding.ivPaymentMethod.setImageResource(it.paymentMethodId.resId)
+            binding.tvPaymentMethod.text = it.paymentMethodId.title
+            binding.tvPaymentMethodDesc.text = getString(com.aralhub.ui.R.string.label_trip_ended_description_payment_cash, it.paymentMethodId.title)
         }
     }
 

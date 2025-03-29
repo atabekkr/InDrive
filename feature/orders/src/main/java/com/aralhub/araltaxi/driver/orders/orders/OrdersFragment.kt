@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -113,12 +112,6 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
         initRideModalBottomSheet()
         initTripCanceledModalBottomSheet()
         initListeners()
-
-        waitingForClientModalBottomSheet.arguments = arguments
-        waitingForClientModalBottomSheet.show(
-            childFragmentManager,
-            WaitingForClientModalBottomSheet.TAG
-        )
 
     }
 
@@ -487,11 +480,13 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
                 "OrderDetail",
                 order
             )
-            waitingForClientModalBottomSheet.arguments = bundle
-            waitingForClientModalBottomSheet.show(
-                childFragmentManager,
-                WaitingForClientModalBottomSheet.TAG
-            )
+            if (!waitingForClientModalBottomSheet.isAdded) {
+                waitingForClientModalBottomSheet.arguments = bundle
+                waitingForClientModalBottomSheet.show(
+                    childFragmentManager,
+                    WaitingForClientModalBottomSheet.TAG
+                )
+            }
             viewModel.updateRideStatus(
                 order!!.id,
                 RideStatus.DRIVER_WAITING_CLIENT.status

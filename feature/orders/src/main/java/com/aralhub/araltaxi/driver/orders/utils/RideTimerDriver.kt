@@ -13,7 +13,7 @@ class RideTimerDriver {
     private var isRideAccepted = false
     private var isPaidWaiting = false
 
-    fun startTimer(endFreeTime: Long, textView: TextView) {
+    fun startTimer(endFreeTime: Long, textView: TextView, waitingStatusTitle: (String) -> Unit) {
         job?.cancel() // Cancel any existing timer
         job = CoroutineScope(Dispatchers.Main).launch {
 
@@ -28,6 +28,7 @@ class RideTimerDriver {
 
             // Платное ожидание
             if (!isRideAccepted) {
+                waitingStatusTitle("Tólemli kútiw waqtı baslandı")
                 isPaidWaiting = true
                 while (!isRideAccepted) {
                     val currentTimeMillis = System.currentTimeMillis()
@@ -43,10 +44,6 @@ class RideTimerDriver {
 
                     delay(1000) // Update every second
                 }
-            }
-
-            if (isRideAccepted) {
-                println("Ride accepted, timer stopped.")
             }
         }
     }

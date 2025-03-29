@@ -77,6 +77,6 @@ fun RideCompleted.asUI(): RideCompletedUI =
             cashbackAmount = cashbackAmount,
             duration = duration,
             distance = distance,
-            paymentMethodId = paymentMethodId
+            paymentMethodId = if(paymentMethodId == 1) PaymentType.CASH else PaymentType.CARD
         )
     }

@@ -2,13 +2,15 @@ package com.aralhub.araltaxi.driver.orders.sheet
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.aralhub.araltaxi.driver.orders.R
 import com.aralhub.araltaxi.driver.orders.databinding.ModalBottomSheetWaitingForClientBinding
 import com.aralhub.araltaxi.driver.orders.sheet.sheetviewmodel.GetFreeWaitingTimeViewModel
 import com.aralhub.araltaxi.driver.orders.utils.RideTimerDriver
+import com.aralhub.araltaxi.driver.orders.utils.sendPhoneNumberToDial
 import com.aralhub.araltaxi.driver.orders.utils.showSnackBar
 import com.aralhub.indrive.core.data.result.Result
 import com.aralhub.ui.model.OrderItem
@@ -27,7 +29,7 @@ class WaitingForClientModalBottomSheet :
 
     private val binding by viewBinding(ModalBottomSheetWaitingForClientBinding::bind)
 
-    private val viewModel by viewModels<GetFreeWaitingTimeViewModel>()
+    private val viewModel by activityViewModels<GetFreeWaitingTimeViewModel>()
 
     private var order: OrderItem? = null
 
@@ -78,6 +80,9 @@ class WaitingForClientModalBottomSheet :
         binding.btnCancel.setOnClickListener {
             rideCanceledListener.invoke(order)
         }
+        binding.btnCall.setOnClickListener {
+            sendPhoneNumberToDial()
+        }
     }
 
     private fun setupObservers() {
@@ -88,7 +93,8 @@ class WaitingForClientModalBottomSheet :
                 }
 
                 is Result.Success -> {
-                    val freeWaitingTime = result.data.toLong()
+                    val freeWaitingTime = result.data
+                    Log.d("WaitingForClientModalBottomSheet", "setupObservers: $freeWaitingTime")
                     startTimer(freeWaitingTime)
                 }
             }
@@ -115,11 +121,13 @@ class WaitingForClientModalBottomSheet :
             .into(binding.ivAvatar)
     }
 
-    private fun startTimer(freeWaitingTime: Long) {
+    private fun startTimer(freeWaitingTime: Double) {
         rideTimerDriver.startTimer(
-            freeWaitingTime,
+            (freeWaitingTime * 1000).toLong(),
             binding.tvTime
-        )
+        ) { timberLabel ->
+            binding.tvTimerLabel.text = timberLabel
+        }
     }
 
     override fun onDestroyView() {

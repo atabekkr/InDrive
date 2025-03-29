@@ -37,10 +37,12 @@ import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSocketSession
 import io.ktor.websocket.close
+import io.ktor.websocket.readReason
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
@@ -158,86 +160,95 @@ class LocationService : Service() {
 
         closeStartedRideStatusSocket()
 
-        try {
-            session = client.webSocketSession {
-                url("ws://araltaxi.aralhub.uz/websocket/wb/driver")
-            }
-            if (session?.isActive == true) {
-                Log.d("WebSocketLog", "Connected")
-                for (frame in session!!.incoming) {
-                    when (frame) {
-                        is Frame.Text -> {
-                            val jsonString = frame.readText()
-                            Log.d("WebSocketLog", jsonString)
-                            val event = try {
-                                val baseResponse =
-                                    Gson().fromJson(jsonString, WebSocketServerResponse::class.java)
+            Log.d("WebSocketLog", "While")
+            try {
+                session = client.webSocketSession {
+                    url("ws://araltaxi.aralhub.uz/websocket/wb/driver")
+                }
+                if (session?.isActive == true) {
+                    Log.d("WebSocketLog", "Connected")
 
-                                when (baseResponse.type) {
-                                    RIDE_CANCELED -> {
-                                        val rideCancelData =
-                                            Gson().fromJson<WebSocketServerResponse<NetworkOfferCancelResponse>>(
-                                                jsonString,
-                                                object :
-                                                    TypeToken<WebSocketServerResponse<NetworkOfferCancelResponse>>() {}.type
+//                    keepConnectionAlive()
+
+                    for (frame in session!!.incoming) {
+                        when (frame) {
+                            is Frame.Text -> {
+                                val jsonString = frame.readText()
+                                Log.d("WebSocketLog", jsonString)
+                                val event = try {
+                                    val baseResponse =
+                                        Gson().fromJson(jsonString, WebSocketServerResponse::class.java)
+
+                                    when (baseResponse.type) {
+                                        RIDE_CANCELED -> {
+                                            val rideCancelData =
+                                                Gson().fromJson<WebSocketServerResponse<NetworkOfferCancelResponse>>(
+                                                    jsonString,
+                                                    object :
+                                                        TypeToken<WebSocketServerResponse<NetworkOfferCancelResponse>>() {}.type
+                                                )
+                                            WebSocketEvent.RideCancel(rideCancelData.data.rideId)
+                                        }
+
+                                        OFFER_REJECTED -> {
+                                            val rideCancelData =
+                                                Gson().fromJson<WebSocketServerResponse<NetworkOfferRejectedResponse>>(
+                                                    jsonString,
+                                                    object :
+                                                        TypeToken<WebSocketServerResponse<NetworkOfferRejectedResponse>>() {}.type
+                                                )
+                                            WebSocketEvent.OfferReject(rideCancelData.data.rideUUID)
+                                        }
+
+                                        NEW_RIDE_REQUEST -> {
+                                            val offerData =
+                                                Gson().fromJson<WebSocketServerResponse<NetworkActiveOfferResponse>>(
+                                                    jsonString,
+                                                    object :
+                                                        TypeToken<WebSocketServerResponse<NetworkActiveOfferResponse>>() {}.type
+                                                )
+                                            playNotificationSound()
+                                            WebSocketEvent.ActiveOffer(
+                                                offerData.toDomain()
                                             )
-                                        WebSocketEvent.RideCancel(rideCancelData.data.rideId)
-                                    }
+                                        }
 
-                                    OFFER_REJECTED -> {
-                                        val rideCancelData =
-                                            Gson().fromJson<WebSocketServerResponse<NetworkOfferRejectedResponse>>(
-                                                jsonString,
-                                                object :
-                                                    TypeToken<WebSocketServerResponse<NetworkOfferRejectedResponse>>() {}.type
+                                        OFFER_ACCEPTED -> {
+                                            val offerData =
+                                                Gson().fromJson<WebSocketServerResponse<NetworkActiveRideByDriverResponse>>(
+                                                    jsonString,
+                                                    object :
+                                                        TypeToken<WebSocketServerResponse<NetworkActiveRideByDriverResponse>>() {}.type
+                                                )
+                                            WebSocketEvent.OfferAccepted(
+                                                offerData.data.toDomain()
                                             )
-                                        WebSocketEvent.OfferReject(rideCancelData.data.rideUUID)
-                                    }
+                                        }
 
-                                    NEW_RIDE_REQUEST -> {
-                                        val offerData =
-                                            Gson().fromJson<WebSocketServerResponse<NetworkActiveOfferResponse>>(
-                                                jsonString,
-                                                object :
-                                                    TypeToken<WebSocketServerResponse<NetworkActiveOfferResponse>>() {}.type
-                                            )
-                                        playNotificationSound()
-                                        WebSocketEvent.ActiveOffer(
-                                            offerData.toDomain()
-                                        )
+                                        else -> {
+                                            WebSocketEvent.Unknown(jsonString)
+                                        }
                                     }
-
-                                    OFFER_ACCEPTED -> {
-                                        val offerData =
-                                            Gson().fromJson<WebSocketServerResponse<NetworkActiveRideByDriverResponse>>(
-                                                jsonString,
-                                                object :
-                                                    TypeToken<WebSocketServerResponse<NetworkActiveRideByDriverResponse>>() {}.type
-                                            )
-                                        WebSocketEvent.OfferAccepted(
-                                            offerData.data.toDomain()
-                                        )
-                                    }
-
-                                    else -> {
-                                        WebSocketEvent.Unknown(jsonString)
-                                    }
+                                } catch (e: Exception) {
+                                    Log.e("WebSocketLog", "Parsing error: ${e.message}")
+                                    WebSocketEvent.Unknown(jsonString)
                                 }
-                            } catch (e: Exception) {
-                                Log.e("WebSocketLog", "Parsing error: ${e.message}")
-                                WebSocketEvent.Unknown(jsonString)
+                                webSocketEvent.emit(event)
                             }
-                            webSocketEvent.emit(event)
-                        }
 
-                        else -> {}
+                            is Frame.Ping ->{
+                                session?.send(Frame.Pong(frame.data))
+                            }
+
+                            else -> {}
+                        }
                     }
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                //handle web socket error here
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            //handle web socket error here
-        }
+
     }
 
     private suspend fun sendLocation(data: NetworkSendLocationRequest) {
@@ -256,6 +267,19 @@ class LocationService : Service() {
         session = null
         Log.d("WebSocketLog", "Session Closed")
     }
+
+    private suspend fun keepConnectionAlive() {
+        while (true) {
+            delay(30_000) // Каждые 30 секунд
+            try {
+                session?.send(Frame.Ping(ByteArray(0))) // Пинг для поддержания соединения
+                Log.d("WebSocketLog", "Ping sent")
+            } catch (e: Exception) {
+                Log.e("WebSocketLog", "Ping failed: ${e.message}")
+            }
+        }
+    }
+
 
     private suspend fun getStartedRideStatus() {
         try {
@@ -322,8 +346,8 @@ class LocationService : Service() {
     }
 
     companion object {
-        const val INTERVAL: Long = 2 * 1000
-        const val SMALLEST_DISTANCE: Float = 5f
+        const val INTERVAL: Long = 1 * 1000
+        const val SMALLEST_DISTANCE: Float = 1f
         const val CHANNEL_ID = "location_channel"
         const val ID = 100
 

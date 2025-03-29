@@ -14,5 +14,5 @@ data class DriverProfile(
 data class DriverInfo(
     val phoneNumber: String,
     val fullName: String,
-    val avatar: String
+    val avatar: String?
 )

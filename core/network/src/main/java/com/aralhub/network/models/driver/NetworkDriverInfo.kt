@@ -8,5 +8,5 @@ data class NetworkDriverInfo(
     @SerializedName("full_name")
     val fullName: String,
     @SerializedName("photo_url")
-    val avatar: String
+    val avatar: String?
 )

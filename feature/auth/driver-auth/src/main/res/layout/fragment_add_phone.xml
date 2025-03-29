@@ -52,20 +52,17 @@
 
         </androidx.core.widget.NestedScrollView>
 
-
         <com.aralhub.ui.components.ProgressButton
             android:id="@+id/btn_start"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
             android:layout_gravity="bottom"
+            android:paddingVertical="16dp"
             android:layout_margin="@dimen/margin_medium"
             app:buttonEnabled="false"
             android:background="@drawable/selector_button_primary"
             app:progressButtonText="@string/label_continue"
             app:textAppearance="@style/TextAppearance.InDrive.PrimaryButton" />
-
-
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

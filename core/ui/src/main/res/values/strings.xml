@@ -40,7 +40,7 @@
 
     <string name="label_trip_ended">Sapar juwmaqlandı</string>
     <string name="label_trip_ended_description_payment_online">Ótinish, tómendegi karta maǵlıwmatları arqalı jol haqın aydawshıǵa tikkeley ótkeriń.</string>
-    <string name="label_trip_ended_description_payment_cash">Jolawshı jol haqın naq pul arqalı tóleydi.</string>
+    <string name="label_trip_ended_description_payment_cash">Jolawshı jol haqın %s arqalı tóleydi.</string>
     <string name="label_card_number">Karta nomeri</string>
     <string name="label_close">Jabıw</string>
     

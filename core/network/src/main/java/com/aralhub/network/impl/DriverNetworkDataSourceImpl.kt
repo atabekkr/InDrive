@@ -9,7 +9,6 @@ import com.aralhub.network.models.WebSocketServerResponse
 import com.aralhub.network.models.auth.NetworkAuthToken
 import com.aralhub.network.models.balance.NetworkBalance
 import com.aralhub.network.models.balance.NetworkBalanceInfo
-import com.aralhub.network.models.cancel.NetworkCancelCause
 import com.aralhub.network.models.cancel.NetworkDriverCancelCause
 import com.aralhub.network.models.card.NetworkCard
 import com.aralhub.network.models.driver.NetworkActiveRideByDriverResponse
@@ -94,7 +93,10 @@ class DriverNetworkDataSourceImpl @Inject constructor(private val api: DriverNet
         return api.cancelRide(rideId, cancelCauseId).safeRequestEmpty()
     }
 
-    override suspend fun updateRideStatus(rideId: Int, status: String): NetworkResult<NetworkRideCompletedResponse?> {
+    override suspend fun updateRideStatus(
+        rideId: Int,
+        status: String
+    ): NetworkResult<NetworkRideCompletedResponse?> {
         return api.updateRideStatus(rideId, status).safeRequestServerResponseWithNullData()
     }
 

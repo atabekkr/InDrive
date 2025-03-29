@@ -58,7 +58,7 @@ data class ActiveRideDriver(
     val vehicleType: String,
     val vehicleNumber: String,
     val phoneNumber: String,
-    val photoUrl: String
+    val photoUrl: String?
 )
 
 data class ActiveRideVehicleColor(

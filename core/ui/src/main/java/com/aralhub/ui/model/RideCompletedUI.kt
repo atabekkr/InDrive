@@ -12,5 +12,5 @@ data class RideCompletedUI(
     val cashbackAmount: Double?,
     val duration: Double,
     val distance: Double,
-    val paymentMethodId: Int
+    val paymentMethodId: PaymentType
 ) : Parcelable

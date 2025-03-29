@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.View
 import com.aralhub.araltaxi.driver.orders.R
 import com.aralhub.araltaxi.driver.orders.databinding.ModalBottomSheetRideBinding
+import com.aralhub.araltaxi.driver.orders.utils.sendPhoneNumberToDial
 import com.aralhub.ui.model.OrderItem
 import com.aralhub.ui.utils.viewBinding
 import com.bumptech.glide.Glide
@@ -61,6 +62,9 @@ class RideModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_she
             val longitude = order!!.locations.getOrNull(1)?.coordinates?.longitude
             val latitude = order!!.locations.getOrNull(1)?.coordinates?.latitude
             openYandexNavigator(requireContext(), latitude!!, longitude!!)
+        }
+        binding.btnCall.setOnClickListener {
+            sendPhoneNumberToDial()
         }
     }
 

@@ -33,12 +33,15 @@ data class ClientRideLocationsCoordinatesUI(
 ): Parcelable
 
 enum class PaymentType(
-    val resId: Int
+    val resId: Int,
+    val title: String
 ) {
     CASH(
-        resId = R.drawable.ic_cash
+        resId = R.drawable.ic_cash,
+        title = "Naq pul"
     ),
     CARD(
-        resId = R.drawable.ic_credit_card_3d
+        resId = R.drawable.ic_credit_card_3d,
+        title = "Card"
     )
 }
