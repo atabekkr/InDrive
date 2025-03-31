@@ -65,4 +65,6 @@ dependencies {
     implementation libs.yandex.mapkit
 
     implementation(libs.timber)
+
+    implementation(libs.androidx.swiperefreshlayout)
 }

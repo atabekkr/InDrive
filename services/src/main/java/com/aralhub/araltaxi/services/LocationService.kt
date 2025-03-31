@@ -23,6 +23,7 @@ import com.aralhub.indrive.core.data.util.closeActiveOrdersWebSocket
 import com.aralhub.indrive.core.data.util.webSocketEvent
 import com.aralhub.network.models.WebSocketServerResponse
 import com.aralhub.network.models.driver.NetworkActiveRideByDriverResponse
+import com.aralhub.network.models.driver.NetworkRideFieldUpdatedResponse
 import com.aralhub.network.models.location.NetworkSendLocationRequest
 import com.aralhub.network.models.offer.NetworkActiveOfferResponse
 import com.aralhub.network.models.offer.NetworkOfferCancelResponse
@@ -37,7 +38,6 @@ import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSocketSession
 import io.ktor.websocket.close
-import io.ktor.websocket.readReason
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -156,10 +156,14 @@ class LocationService : Service() {
         )
     }
 
+    private val retryDelayMillis = 1000L // Initial delay for retry
+    private val maxRetryAttempts = 5 // Maximum number of retry attempts
     private suspend fun getActiveOrders() {
 
         closeStartedRideStatusSocket()
 
+        var retryCount = 0
+        while (retryCount < maxRetryAttempts) {
             Log.d("WebSocketLog", "While")
             try {
                 session = client.webSocketSession {
@@ -225,6 +229,17 @@ class LocationService : Service() {
                                             )
                                         }
 
+                                        RIDE_FIELD_UPDATED -> {
+//                                            {"type":"ride_field_updated","data":{"ride_id":"0285cb9e-2863-4468-9baf-c48e82d00aa1","field":"updated_amount","value":9000.0}}
+                                            val data =
+                                                Gson().fromJson<WebSocketServerResponse<NetworkRideFieldUpdatedResponse>>(
+                                                    jsonString,
+                                                    object :
+                                                        TypeToken<WebSocketServerResponse<NetworkRideFieldUpdatedResponse>>() {}.type
+                                                )
+                                            WebSocketEvent.RideFieldUpdated(data.data.rideId, data.data.value)
+                                        }
+
                                         else -> {
                                             WebSocketEvent.Unknown(jsonString)
                                         }
@@ -240,14 +255,24 @@ class LocationService : Service() {
                                 session?.send(Frame.Pong(frame.data))
                             }
 
-                            else -> {}
+                            else -> {
+                                Log.e("WebSocketLog", "Else")
+                            }
                         }
                     }
                 }
             } catch (e: Exception) {
+                Log.e("WebSocketLog", "Error catch")
                 e.printStackTrace()
+                // WebSocket connection failed, retry after delay
+                delay(retryDelayMillis * (retryCount + 1))
+                retryCount++
+                if (retryCount == maxRetryAttempts) {
+                    webSocketEvent.emit(WebSocketEvent.ConnectionFailed)
+                }
                 //handle web socket error here
             }
+        }
 
     }
 
@@ -362,6 +387,7 @@ class LocationService : Service() {
         const val RIDE_CANCELED_BY_PASSENGER = "cancelled_by_passenger"
         const val RIDE_DELETED = "ride_deleted"
         const val RIDE_AMOUNT_UPDATED = "ride_amount_updated"
+        const val RIDE_FIELD_UPDATED = "ride_field_updated"
         const val ERROR = "error"
     }
 }

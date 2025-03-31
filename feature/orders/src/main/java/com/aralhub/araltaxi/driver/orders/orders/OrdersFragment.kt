@@ -209,8 +209,9 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
     private fun initObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.ordersListState.collect { orders ->
+                val sortedOrders = orders.sortedByDescending { it.pickUpDistance }
                 dismissLoading()
-                adapter.submitList(orders)
+                adapter.submitList(sortedOrders)
                 binding.tvOrdersNotFound.visibility =
                     if (orders.isEmpty()) View.VISIBLE else View.GONE
             }
@@ -235,25 +236,24 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.ordersState
-                    .collectLatest { getActiveOrdersUiState ->
-                        Timber.d("initObservers: $getActiveOrdersUiState")
-                        when (getActiveOrdersUiState) {
+                    .collectLatest { result ->
+                        Timber.d("initObservers: $result")
+
+                        when (result) {
+
+                            GetActiveOrdersUiState.Idle -> {}
 
                             is GetActiveOrdersUiState.Error -> showErrorDialog(
-                                getActiveOrdersUiState.message
+                                result.message
                             )
 
-                            GetActiveOrdersUiState.Loading -> showLoading()
-
-                            is GetActiveOrdersUiState.OrderRemoved -> {}
-
-                            is GetActiveOrdersUiState.OfferRejected -> {}
+                            is GetActiveOrdersUiState.Loading -> showLoading()
 
                             is GetActiveOrdersUiState.OfferAccepted -> {
                                 val bundle = Bundle()
                                 bundle.putParcelable(
                                     "OrderDetail",
-                                    getActiveOrdersUiState.data
+                                    result.data
                                 )
                                 goingToPickUpModalBottomSheet.arguments = bundle
                                 if (!goingToPickUpModalBottomSheet.isAdded)
@@ -262,33 +262,33 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
                                         GoingToPickUpModalBottomSheet.TAG
                                     )
                                 viewModel.updateRideStatus(
-                                    getActiveOrdersUiState.data.id,
+                                    result.data.id,
                                     RideStatus.DRIVER_ON_THE_WAY.status
                                 )
                                 orderModalBottomSheet.dismissAllowingStateLoss()
                                 viewModel.disconnect()
                             }
 
-                            is GetActiveOrdersUiState.GetNewOrder -> {
-                                binding.tvOrdersNotFound.invisible()
-                            }
-
                             is GetActiveOrdersUiState.GetExistOrder -> {
                                 dismissLoading()
-                                if (getActiveOrdersUiState.data.isNotEmpty()) {
+                                if (result.data.isNotEmpty()) {
                                     binding.tvOrdersNotFound.invisible()
-                                    adapter.submitList(getActiveOrdersUiState.data)
+                                    adapter.submitList(result.data)
                                 } else {
                                     binding.tvOrdersNotFound.show()
                                 }
                             }
 
-                            GetActiveOrdersUiState.RideCanceledByPassenger -> {
+                            is GetActiveOrdersUiState.RideCanceledByPassenger -> {
                                 if (!rideCanceledByPassengerModalBottomSheet.isAdded)
                                     rideCanceledByPassengerModalBottomSheet.show(
                                         childFragmentManager,
                                         rideCanceledByPassengerModalBottomSheet.tag
                                     )
+                            }
+
+                            is GetActiveOrdersUiState.ConnectionFailed -> {
+                                showErrorDialog("Connection failed")
                             }
                         }
                     }
@@ -337,6 +337,12 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
     }
 
     private fun initListeners() {
+
+//        binding.swiperefresh.setOnRefreshListener {
+//            getExistingOrders()
+//            binding.swiperefresh.isRefreshing = false
+//        }
+
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             true
@@ -388,6 +394,7 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
             dismissAllBottomSheets()
             getExistingOrders()
             viewModel.switchBackToOrdersSocket()
+            viewModel.setIdleState()
             startService()
         }
 

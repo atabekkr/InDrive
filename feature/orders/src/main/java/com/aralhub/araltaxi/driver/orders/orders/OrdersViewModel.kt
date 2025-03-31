@@ -19,6 +19,7 @@ import com.aralhub.indrive.core.data.util.closeActiveOrdersWebSocket
 import com.aralhub.indrive.core.data.util.webSocketEvent
 import com.aralhub.ui.model.CancelItem
 import com.aralhub.ui.model.OrderItem
+import com.aralhub.ui.model.PaymentType
 import com.aralhub.ui.model.RideCompletedUI
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -30,11 +31,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -47,7 +46,80 @@ class OrdersViewModel @Inject constructor(
     private val getCancelCausesUseCase: GetCancelCausesUseCase,
 ) : ViewModel() {
 
-    private val _ordersListState = MutableStateFlow<List<OrderItem>>(emptyList())
+    private val _ordersListState = MutableStateFlow<List<OrderItem>>(
+        listOf(
+            OrderItem(
+                id = 1,
+                uuid = "",
+                name = "",
+                avatar = "",
+                pickUpAddress = "",
+                paymentType = PaymentType.CARD,
+                roadPrice = "",
+                recommendedPrice = "TODO()",
+                pickUpDistance = "TODO()",
+                roadDistance = "TODO()",
+                destinationAddress = "TODO()",
+                locations = emptyList(),
+            ),
+            OrderItem(
+                id = 2,
+                uuid = "",
+                name = "",
+                avatar = "",
+                pickUpAddress = "",
+                paymentType = PaymentType.CARD,
+                roadPrice = "",
+                recommendedPrice = "TODO()",
+                pickUpDistance = "TODO()",
+                roadDistance = "TODO()",
+                destinationAddress = "TODO()",
+                locations = emptyList(),
+            ),
+            OrderItem(
+                id = 3,
+                uuid = "",
+                name = "",
+                avatar = "",
+                pickUpAddress = "",
+                paymentType = PaymentType.CARD,
+                roadPrice = "",
+                recommendedPrice = "TODO()",
+                pickUpDistance = "TODO()",
+                roadDistance = "TODO()",
+                destinationAddress = "TODO()",
+                locations = emptyList(),
+            ),
+            OrderItem(
+                id = 4,
+                uuid = "",
+                name = "",
+                avatar = "",
+                pickUpAddress = "",
+                paymentType = PaymentType.CARD,
+                roadPrice = "",
+                recommendedPrice = "TODO()",
+                pickUpDistance = "TODO()",
+                roadDistance = "TODO()",
+                destinationAddress = "TODO()",
+                locations = emptyList(),
+            ),
+            OrderItem(
+                id = 5,
+                uuid = "",
+                name = "",
+                avatar = "",
+                pickUpAddress = "",
+                paymentType = PaymentType.CARD,
+                roadPrice = "",
+                recommendedPrice = "TODO()",
+                pickUpDistance = "TODO()",
+                roadDistance = "TODO()",
+                destinationAddress = "TODO()",
+                locations = emptyList(),
+            ),
+        )
+    )
     val ordersListState: StateFlow<List<OrderItem>> = _ordersListState.asStateFlow()
 
     private var _profileUiState = MutableSharedFlow<ProfileUiState>()
@@ -116,37 +188,44 @@ class OrdersViewModel @Inject constructor(
         ordersWebSocketJob = viewModelScope.launch {
             webSocketEvent
                 .collect {
-                    val state = when (it) {
+                    when (it) {
                         is WebSocketEvent.ActiveOffer -> {
                             addOrder(it.order.asUI())
-                            GetActiveOrdersUiState.GetNewOrder(it.order.asUI())
                         }
 
                         is WebSocketEvent.OfferAccepted -> {
-                            GetActiveOrdersUiState.OfferAccepted(it.data.asUI())
+                            try {
+                                webSocketOrdersState.value =
+                                    GetActiveOrdersUiState.OfferAccepted(it.data.asUI())
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
                         }
 
                         is WebSocketEvent.RideCancel -> {
                             removeOrder(it.rideId)
-                            GetActiveOrdersUiState.OrderRemoved(it.rideId)
                         }
 
                         is WebSocketEvent.OfferReject -> {
                             rejectOfferState.emit(Unit)
-                            GetActiveOrdersUiState.OfferRejected(it.rideUUID)
+                        }
+
+                        is WebSocketEvent.RideFieldUpdated -> {
+                            updateOrder(it.rideId, it.value)
                         }
 
                         is WebSocketEvent.Unknown -> {
-                            GetActiveOrdersUiState.Error(it.error)
+                            webSocketOrdersState.value = GetActiveOrdersUiState.Error(it.error)
                         }
 
-                        is WebSocketEvent.RideCancelledByPassenger -> GetActiveOrdersUiState.RideCanceledByPassenger
-                    }
-                    Timber.tag("OrdersViewModel").d("state: $state")
-                    try {
-                        webSocketOrdersState.emit(state)
-                    } catch (e: Exception) {
-                        Timber.tag("OrdersViewModel").e(e)
+                        is WebSocketEvent.RideCancelledByPassenger -> {
+                            webSocketOrdersState.value =
+                                GetActiveOrdersUiState.RideCanceledByPassenger
+                        }
+
+                        is WebSocketEvent.ConnectionFailed -> {
+                            webSocketOrdersState.value = GetActiveOrdersUiState.ConnectionFailed
+                        }
                     }
                 }
         }
@@ -158,37 +237,7 @@ class OrdersViewModel @Inject constructor(
     val ordersState = merge(
         existingOrdersState,
         webSocketOrdersState
-    ).map { result ->
-        when (result) {
-            is GetActiveOrdersUiState.GetExistOrder -> {
-                GetActiveOrdersUiState.GetExistOrder(result.data)
-            }
-
-            is GetActiveOrdersUiState.GetNewOrder -> {
-                GetActiveOrdersUiState.GetNewOrder(result.data)
-            }
-
-            is GetActiveOrdersUiState.OfferAccepted -> {
-                GetActiveOrdersUiState.OfferAccepted(result.data)
-            }
-
-            is GetActiveOrdersUiState.OrderRemoved -> {
-                GetActiveOrdersUiState.OrderRemoved(result.rideId)
-            }
-
-            is GetActiveOrdersUiState.OfferRejected -> {
-                GetActiveOrdersUiState.OfferRejected(result.rideUUID)
-            }
-
-            is GetActiveOrdersUiState.RideCanceledByPassenger -> {
-                GetActiveOrdersUiState.RideCanceledByPassenger
-            }
-
-            else -> {
-                GetActiveOrdersUiState.Loading
-            }
-        }
-    }.stateIn(
+    ).stateIn(
         viewModelScope,
         SharingStarted.Eagerly,
         GetActiveOrdersUiState.Loading
@@ -239,6 +288,16 @@ class OrdersViewModel @Inject constructor(
         _ordersListState.value = _ordersListState.value.filterNot { it.uuid == rideId }
     }
 
+    private fun updateOrder(rideId: String, value: Int) {
+        _ordersListState.value = _ordersListState.value.map {
+            if (it.uuid == rideId) {
+                it.copy(roadPrice = value.toString())
+            } else {
+                it
+            }
+        }
+    }
+
     private var _getCancelCausesResult = MutableSharedFlow<CancelRideUiState>()
     val getCancelCausesResult = _getCancelCausesResult.asSharedFlow()
     fun getCancelCauses() {
@@ -273,6 +332,10 @@ class OrdersViewModel @Inject constructor(
         }
     }
 
+    fun setIdleState() {
+        webSocketOrdersState.value = GetActiveOrdersUiState.Idle
+    }
+
     override fun onCleared() {
         super.onCleared()
         disconnect()
@@ -288,12 +351,11 @@ sealed interface LogoutUiState {
 
 sealed interface GetActiveOrdersUiState {
     data object Loading : GetActiveOrdersUiState
-    data class GetNewOrder(val data: OrderItem) : GetActiveOrdersUiState
     data class GetExistOrder(val data: List<OrderItem>) : GetActiveOrdersUiState
-    data class OrderRemoved(val rideId: String) : GetActiveOrdersUiState
-    data class OfferRejected(val rideUUID: String) : GetActiveOrdersUiState
     data class OfferAccepted(val data: OrderItem) : GetActiveOrdersUiState
     data object RideCanceledByPassenger : GetActiveOrdersUiState
+    data object ConnectionFailed : GetActiveOrdersUiState
+    data object Idle : GetActiveOrdersUiState
     data class Error(val message: String) : GetActiveOrdersUiState
 }
 
