@@ -1,57 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:fitsSystemWindows="true"
+    android:layout_height="match_parent">
 
-    <ImageView
+    <LinearLayout
+        android:id="@+id/view_next_button_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/im_taxi"
-        android:contentDescription="@string/hint_phone" />
+        android:gravity="top"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-    <TextView
-        style="@style/TextAppearance.InDrive.DisplaySmall"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingHorizontal="@dimen/padding_large"
-        android:paddingTop="@dimen/padding_large"
-        android:text="@string/label_welcome" />
+        <Button
+            android:id="@+id/view_next_button"
+            style="@style/Widget.InDrive.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:layout_marginHorizontal="@dimen/margin_medium"
+            android:layout_marginBottom="20dp"
+            android:text="@string/label_start" />
 
-    <TextView
-        style="@style/TextAppearance.InDrive.BodyLarge"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="@dimen/padding_medium"
-        android:text="@string/label_welcome_description" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="end|center_vertical"
-        android:orientation="horizontal"
-        android:layout_marginHorizontal="@dimen/padding_medium">
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/view_next_button_container"
+        android:gravity="center"
+        android:orientation="vertical">
 
-        <TextView
-            style="@style/TextAppearance.InDrive.BodyLarge.SemiBold"
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/margin_small"
-            android:padding="@dimen/padding_small"
-            android:visibility="gone"
-            android:text="@string/label_start" />
+            android:layout_marginTop="100dp"
+            android:background="@drawable/im_green_car"
+            android:contentDescription="@string/hint_phone" />
 
-        <View
-            android:id="@+id/view_next_button"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:background="@drawable/bg_next_button_circle"
-            android:foreground="@drawable/ripple_round" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_splash" />
+
+        <TextView
+            style="@style/TextAppearance.InDrive.BodyLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="@dimen/padding_small"
+            android:text="@string/label_taxi_service_description" />
+
 
     </LinearLayout>
 
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,7 +19,7 @@
         <activity
             android:name="com.aralhub.araltaxi.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.InDrive">
+            android:theme="@style/Theme.InDrive.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

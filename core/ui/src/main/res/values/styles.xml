@@ -34,7 +34,7 @@
         <item name="android:background">@drawable/selector_button_primary</item>
         <item name="android:textColor">@drawable/selector_primary_button_text</item>
         <item name="android:textAppearance">@style/TextAppearance.InDrive.BodyLarge.SemiBold</item>
-        <item name="android:paddingVertical">16dp</item>
+        <item name="android:paddingVertical">18dp</item>
     </style>
 
     <style name="Widget.InDrive.Button.GreenGradient" parent="Widget.InDrive.Button.Primary">
