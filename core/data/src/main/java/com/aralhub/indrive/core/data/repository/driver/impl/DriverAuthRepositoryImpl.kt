@@ -1,5 +1,6 @@
 package com.aralhub.indrive.core.data.repository.driver.impl
 
+import com.aralhub.araltaxi.core.common.sharedpreference.DriverSharedPreference
 import com.aralhub.indrive.core.data.model.driver.DriverBalance
 import com.aralhub.indrive.core.data.model.driver.DriverBalanceInfo
 import com.aralhub.indrive.core.data.model.driver.DriverCard
@@ -12,7 +13,6 @@ import com.aralhub.indrive.core.data.model.offer.toDomain
 import com.aralhub.indrive.core.data.repository.driver.DriverAuthRepository
 import com.aralhub.indrive.core.data.result.Result
 import com.aralhub.network.DriverNetworkDataSource
-import com.aralhub.network.local.LocalStorage
 import com.aralhub.network.models.NetworkResult
 import com.aralhub.network.requests.auth.NetworkDriverAuthRequest
 import com.aralhub.network.requests.logout.NetworkLogoutRequest
@@ -21,7 +21,7 @@ import java.io.File
 import javax.inject.Inject
 
 class DriverAuthRepositoryImpl @Inject constructor(
-    private val localStorage: LocalStorage,
+    private val localStorage: DriverSharedPreference,
     private val driverNetworkDataSource: DriverNetworkDataSource
 ) : DriverAuthRepository {
     override suspend fun driverAddPhone(phone: String): Result<Boolean> {
@@ -47,9 +47,12 @@ class DriverAuthRepositoryImpl @Inject constructor(
             return when (it) {
                 is NetworkResult.Error -> Result.Error(it.message)
                 is NetworkResult.Success -> {
-                    localStorage.access = it.data.accessToken
-                    localStorage.refresh = it.data.refreshToken
-                    localStorage.isLogin = true
+                    localStorage.apply {
+                        access = it.data.accessToken
+                        refresh = it.data.refreshToken
+                        isLogin = true
+                        phoneNumber = phone
+                    }
                     Result.Success(data = true)
                 }
             }
@@ -61,6 +64,11 @@ class DriverAuthRepositoryImpl @Inject constructor(
             return when (it) {
                 is NetworkResult.Error -> Result.Error(it.message)
                 is NetworkResult.Success -> {
+                    localStorage.apply {
+                        userName = it.data.fullName
+                        avatar = it.data.avatar.toString()
+                        phoneNumber = it.data.phoneNumber
+                    }
                     Result.Success(
                         DriverInfo(
                             phoneNumber = it.data.phoneNumber,

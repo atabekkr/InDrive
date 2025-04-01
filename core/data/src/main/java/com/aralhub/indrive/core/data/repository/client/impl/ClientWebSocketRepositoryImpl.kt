@@ -32,7 +32,7 @@ import com.aralhub.indrive.core.data.model.ride.toDomain
 import com.aralhub.indrive.core.data.repository.client.ClientWebSocketRepository
 import com.aralhub.indrive.core.data.result.Result
 import com.aralhub.network.WebSocketClientNetworkDataSource
-import com.aralhub.network.local.LocalStorage
+import com.aralhub.araltaxi.core.common.sharedpreference.ClientSharedPreference
 import com.aralhub.network.models.NetworkResult
 import com.aralhub.network.models.location.NetworkLocationPoint
 import com.aralhub.network.models.location.NetworkLocationPointCoordinates
@@ -41,7 +41,7 @@ import com.aralhub.network.models.price.NetworkRecommendedPrice
 import com.aralhub.network.requests.ride.NetworkClientRideRequest
 import javax.inject.Inject
 
-class ClientWebSocketRepositoryImpl @Inject constructor(private val localStorage: LocalStorage, private val dataSource: WebSocketClientNetworkDataSource) :
+class ClientWebSocketRepositoryImpl @Inject constructor(private val localStorage: ClientSharedPreference, private val dataSource: WebSocketClientNetworkDataSource) :
     ClientWebSocketRepository {
     override suspend fun getRecommendedPrice(points: List<GeoPoint>): Result<RecommendedPrice> {
        return dataSource.getRecommendedPrice(points.map { NetworkLocationPoint(
@@ -139,18 +139,14 @@ class ClientWebSocketRepositoryImpl @Inject constructor(private val localStorage
                                     ),
                                     name = segment.startPoint.name
                                 ),
-                                endPoint =ClientRideResponseDistanceItemPoint(
+                                endPoint = ClientRideResponseDistanceItemPoint(
                                     coordinates = ClientRideResponseDistanceItemStartPointCoordinates(
                                         longitude = segment.startPoint.coordinates.longitude,
                                         latitude = segment.startPoint.coordinates.latitude
                                     ),
                                     name = segment.endPoint.name
-                                ) ?: ClientRideResponseDistanceItemPoint(
-                                    coordinates = ClientRideResponseDistanceItemStartPointCoordinates(
-                                        longitude = segment.startPoint.coordinates.longitude,
-                                        latitude = segment.startPoint.coordinates.latitude
-                                    ),
-                                    name = segment.startPoint.name))
+                                )
+                            )
                         },
                         totalDistance = it.data.distance.totalDistance,
                         totalDuration = it.data.distance.totalDuration

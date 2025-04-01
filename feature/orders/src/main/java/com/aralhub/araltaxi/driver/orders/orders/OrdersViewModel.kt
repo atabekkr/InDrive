@@ -122,23 +122,6 @@ class OrdersViewModel @Inject constructor(
     )
     val ordersListState: StateFlow<List<OrderItem>> = _ordersListState.asStateFlow()
 
-    private var _profileUiState = MutableSharedFlow<ProfileUiState>()
-    val profileUiState = _profileUiState.asSharedFlow()
-    fun getDriverProfile() = viewModelScope.launch {
-        _profileUiState.emit(ProfileUiState.Loading)
-        driverProfileUseCase().let { result ->
-            when (result) {
-                is Result.Success -> {
-                    _profileUiState.emit(ProfileUiState.Success(result.data))
-                }
-
-                is Result.Error -> {
-                    _profileUiState.emit(ProfileUiState.Error(result.message))
-                }
-            }
-        }
-    }
-
     private val _logoutUiState = MutableSharedFlow<LogoutUiState>()
     val logoutUiState = _logoutUiState.asSharedFlow()
     fun logout() = viewModelScope.launch {

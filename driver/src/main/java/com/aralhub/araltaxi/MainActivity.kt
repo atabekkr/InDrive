@@ -7,16 +7,16 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import com.aralhub.araltaxi.core.common.sharedpreference.DriverSharedPreference
 import com.aralhub.araltaxi.driver.R
 import com.aralhub.araltaxi.navigation.Navigator
-import com.aralhub.network.local.LocalStorage
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     @Inject lateinit var navigator: Navigator
-    @Inject lateinit var localStorage: LocalStorage
+    @Inject lateinit var localStorage: DriverSharedPreference
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(com.aralhub.ui.R.style.Theme_InDrive)
         enableEdgeToEdge()

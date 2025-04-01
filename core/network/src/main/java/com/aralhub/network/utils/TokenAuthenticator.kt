@@ -2,7 +2,7 @@ package com.aralhub.network.utils
 
 import android.util.Log
 import com.aralhub.network.api.UserNetworkApi
-import com.aralhub.network.local.LocalStorage
+import com.aralhub.araltaxi.core.common.sharedpreference.ClientSharedPreference
 import com.aralhub.network.requests.refresh.NetworkRefreshTokenRequest
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
@@ -14,7 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
 
 class TokenAuthenticator @Inject constructor(
-    private val localStorage: LocalStorage,
+    private val localStorage: ClientSharedPreference,
 ) : Authenticator {
 
     private val retrofit = Retrofit.Builder()

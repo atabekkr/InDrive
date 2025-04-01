@@ -6,7 +6,6 @@ import com.aralhub.network.models.WebSocketServerResponse
 import com.aralhub.network.models.auth.NetworkAuthToken
 import com.aralhub.network.models.balance.NetworkBalance
 import com.aralhub.network.models.balance.NetworkBalanceInfo
-import com.aralhub.network.models.cancel.NetworkCancelCause
 import com.aralhub.network.models.cancel.NetworkDriverCancelCause
 import com.aralhub.network.models.card.NetworkCard
 import com.aralhub.network.models.driver.NetworkActiveRideByDriverResponse
@@ -53,9 +52,6 @@ interface DriverNetworkApi {
 
     @POST("/driver/card")
     suspend fun driverCard(@Body networkDriverCardRequest: NetworkCard): Response<ServerResponseEmpty>
-
-    @PUT("/driver/card")
-    suspend fun updateDriverCard(@Body networkDriverCardRequest: NetworkCard): Response<ServerResponse<ServerResponseEmpty>>
 
     @GET("/driver/balance")
     suspend fun getDriverBalance(): Response<ServerResponse<NetworkBalance>>

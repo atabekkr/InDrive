@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 object LifecycleOwnerEx {
 
     fun <T> LifecycleOwner.observeState(stateFlow: SharedFlow<T>, action: (T) -> Unit) {
-        lifecycleScope.launch {
+        this.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 stateFlow.collect {
                     action(it)

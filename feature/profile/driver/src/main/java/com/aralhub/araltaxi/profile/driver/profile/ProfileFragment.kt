@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.aralhub.araltaxi.core.common.error.ErrorHandler
 import com.aralhub.araltaxi.core.common.file.UriEx.getFileFromUri
+import com.aralhub.araltaxi.core.common.sharedpreference.DriverSharedPreference
 import com.aralhub.araltaxi.profile.driver.R
 import com.aralhub.araltaxi.profile.driver.databinding.FragmentProfileBinding
 import com.aralhub.ui.adapter.ProfileItemAdapter
@@ -24,10 +25,16 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
+
     private val binding by viewBinding(FragmentProfileBinding::bind)
+
     private val viewModel by viewModels<ProfileViewModel>()
+
     private val adapter = ProfileItemAdapter()
+
     @Inject lateinit var errorHandler: ErrorHandler
+    @Inject lateinit var driverSharedPreference: DriverSharedPreference
+
     private val pickMedia: ActivityResultLauncher<PickVisualMediaRequest?> = registerForActivityResult<PickVisualMediaRequest, Uri>(PickVisualMedia()) { uri: Uri? ->
         uri?.let { handleMediaSelection(it) } ?: Log.i("PhotoPicker", "No media selected")
     }
@@ -55,6 +62,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 is ProfileUiState.Error -> errorHandler.showToast(profileUiState.message)
                 ProfileUiState.Loading -> {}
                 is ProfileUiState.Success -> {
+                    driverSharedPreference.avatar = profileUiState.avatar
                     displayAvatar(profileUiState.avatar, binding.ivAvatar)
                 }
             }

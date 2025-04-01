@@ -40,7 +40,8 @@ class OffersViewModel @Inject constructor(
     private var _searchRideUiState = MutableStateFlow<SearchRideUiState>(SearchRideUiState.Loading)
     val searchRideUiState = _searchRideUiState.asStateFlow()
 
-    private var _autoTakeOfferUiState = MutableStateFlow<AutoTakeOfferUiState>(AutoTakeOfferUiState.Loading)
+    private var _autoTakeOfferUiState =
+        MutableStateFlow<AutoTakeOfferUiState>(AutoTakeOfferUiState.Loading)
     val autoTakeOfferUiState = _autoTakeOfferUiState.asStateFlow()
 
     init {
@@ -104,9 +105,14 @@ class OffersViewModel @Inject constructor(
                     } else if (!offers.any { offer -> offer.offerId == newOffer.offerId }) {
                         offers.add(newOffer)
                     }
-                    offers.removeIf { offer -> declinedOfferIds.contains(offer.offerId) || isOfferExpired(offer) }
+                    offers.removeIf { offer ->
+                        declinedOfferIds.contains(offer.offerId) || isOfferExpired(
+                            offer
+                        )
+                    }
                     _offersUiState.emit(OffersUiState.Success(offers.map { offer -> offer.asOfferItem() }))
                 }
+
                 is ClientWebSocketEvent.Unknown -> {
                     _offersUiState.emit(OffersUiState.Error(it.error))
                 }
@@ -201,7 +207,7 @@ sealed interface DeclineOfferUiState {
 }
 
 sealed interface SearchRideUiState {
-    data class Success(val searchRide: SearchRide): SearchRideUiState
-    data object Loading: SearchRideUiState
-    data class Error(val message: String): SearchRideUiState
+    data class Success(val searchRide: SearchRide) : SearchRideUiState
+    data object Loading : SearchRideUiState
+    data class Error(val message: String) : SearchRideUiState
 }

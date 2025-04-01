@@ -38,7 +38,7 @@ class ProfileViewModel @Inject constructor(
         driverProfileUseCase().let { result ->
             when (result) {
                 is Result.Success -> {
-                    _profileUiState.emit(ProfileUiState.Success("https://araltaxi.aralhub.uz/${result.data.avatar}",
+                    _profileUiState.emit(ProfileUiState.Success(result.data.avatar.toString(),
                         result.data.toProfileItemList()))
                 }
                 is Result.Error -> {

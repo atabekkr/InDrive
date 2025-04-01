@@ -7,11 +7,12 @@ import com.aralhub.indrive.core.data.model.address.toNetwork
 import com.aralhub.indrive.core.data.result.Result
 import com.aralhub.indrive.core.data.result.asResult
 import com.aralhub.network.AddressNetworkDataSource
-import com.aralhub.network.local.LocalStorage
+import com.aralhub.araltaxi.core.common.sharedpreference.ClientSharedPreference
 import javax.inject.Inject
 
 class AddressRepositoryImpl @Inject constructor(private val addressNetworkDataSource: AddressNetworkDataSource,
-    private val localStorage: LocalStorage) :
+    private val localStorage: ClientSharedPreference
+) :
     AddressRepository {
     override suspend fun createAddress(createAddressRequest: CreateAddressRequest): Result<Address> =
         addressNetworkDataSource.address(createAddressRequest.toNetwork(localStorage.userId)).asResult {

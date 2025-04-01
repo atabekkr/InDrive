@@ -1,12 +1,12 @@
 package com.aralhub.network.utils
 
-import com.aralhub.network.local.LocalStorage
+import com.aralhub.araltaxi.core.common.sharedpreference.ClientSharedPreference
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
 
 class AuthInterceptor @Inject constructor(
-    private val localStorage: LocalStorage
+    private val localStorage: ClientSharedPreference
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()

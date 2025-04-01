@@ -11,14 +11,14 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.aralhub.araltaxi.client.R
 import com.aralhub.araltaxi.navigation.Navigator
-import com.aralhub.network.local.LocalStorage
+import com.aralhub.araltaxi.core.common.sharedpreference.ClientSharedPreference
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     @Inject lateinit var navigator: Navigator
-    @Inject lateinit var localStorage: LocalStorage
+    @Inject lateinit var localStorage: ClientSharedPreference
     private val requiredPermissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
     private val locationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions -> permissions.forEach { permission ->     } }
     override fun onCreate(savedInstanceState: Bundle?) {

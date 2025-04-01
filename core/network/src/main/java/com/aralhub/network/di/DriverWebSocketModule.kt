@@ -1,10 +1,10 @@
 package com.aralhub.network.di
 
+import com.aralhub.araltaxi.core.common.sharedpreference.DriverSharedPreference
 import com.aralhub.network.ClientRideNetworkDataSource
 import com.aralhub.network.WebSocketClientOffersNetworkDataSource
 import com.aralhub.network.impl.ClientRideNetworkDataSourceImpl
 import com.aralhub.network.impl.WebSocketClientOffersNetworkDataSourceImpl
-import com.aralhub.network.local.LocalStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,7 +23,7 @@ object DriverWebSocketModule {
 
     @Singleton
     @Provides
-    fun provideHttpClient(localStorage: LocalStorage): HttpClient {
+    fun provideHttpClient(localStorage: DriverSharedPreference): HttpClient {
         return HttpClient(CIO) {
             install(Logging)
             install(WebSockets) {

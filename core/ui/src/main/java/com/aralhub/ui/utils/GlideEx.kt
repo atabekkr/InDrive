@@ -8,7 +8,7 @@ import com.bumptech.glide.signature.ObjectKey
 object GlideEx {
     fun displayAvatar(url : String, imageView: ImageView) {
         Glide.with(imageView.context)
-            .load(url)
+            .load("https://araltaxi.aralhub.uz/$url")
             .centerCrop()
             .placeholder(com.aralhub.ui.R.drawable.ic_user)
             .signature(ObjectKey(System.currentTimeMillis()))

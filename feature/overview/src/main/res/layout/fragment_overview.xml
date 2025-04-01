@@ -112,32 +112,6 @@
                         </LinearLayout>
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginTop="1dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/round_bottom"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="@dimen/padding_medium"
-                        android:paddingVertical="@dimen/padding_small"
-                        android:visibility="gone">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="86 000"
-                            android:textAppearance="@style/TextAppearance.InDrive.Text.TitleBody" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Búgingi dáramat"
-                            android:textAppearance="@style/TextAppearance.InDrive.TitleSmall" />
-
-
-                    </LinearLayout>
-
                 </LinearLayout>
 
             </LinearLayout>

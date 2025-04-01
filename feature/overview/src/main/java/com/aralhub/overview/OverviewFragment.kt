@@ -25,10 +25,8 @@ import com.aralhub.overview.utils.BottomSheetBehaviorDrawerListener
 import com.aralhub.overview.utils.isGPSEnabled
 import com.aralhub.ui.dialog.ErrorMessageDialog
 import com.aralhub.ui.dialog.LoadingDialog
+import com.aralhub.ui.utils.GlideEx
 import com.aralhub.ui.utils.viewBinding
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.signature.ObjectKey
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -182,13 +180,10 @@ class OverviewFragment : Fragment(R.layout.fragment_overview) {
             profile.fullName
         binding.navigationView.getHeaderView(0).findViewById<TextView>(R.id.tv_phone).text =
             profile.phoneNumber
-        Glide.with(requireContext())
-            .load("https://araltaxi.aralhub.uz/${profile.avatar}")
-            .centerCrop()
-            .placeholder(com.aralhub.ui.R.drawable.ic_user)
-            .signature(ObjectKey(System.currentTimeMillis()))
-            .apply(RequestOptions.circleCropTransform())
-            .into(binding.navigationView.getHeaderView(0).findViewById<ImageView>(R.id.iv_avatar))
+        GlideEx.displayAvatar(
+            profile.avatar.toString(),
+            binding.navigationView.getHeaderView(0).findViewById<ImageView>(R.id.iv_avatar)
+        )
 
     }
 

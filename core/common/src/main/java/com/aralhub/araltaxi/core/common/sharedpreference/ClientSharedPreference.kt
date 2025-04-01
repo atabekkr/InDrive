@@ -1,8 +1,8 @@
-package com.aralhub.network.local
+package com.aralhub.araltaxi.core.common.sharedpreference
 
 import android.content.SharedPreferences
 
-class LocalStorage(preference: SharedPreferences) {
+class ClientSharedPreference(preference: SharedPreferences) {
 
     var userId by IntPreference(preference)
 

@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
@@ -38,11 +37,11 @@ import com.aralhub.araltaxi.driver.orders.sheet.RideModalBottomSheet
 import com.aralhub.araltaxi.driver.orders.sheet.TripCanceledModalBottomSheet
 import com.aralhub.araltaxi.driver.orders.sheet.WaitingForClientModalBottomSheet
 import com.aralhub.araltaxi.services.LocationService
-import com.aralhub.indrive.core.data.model.driver.DriverInfo
 import com.aralhub.ui.adapter.OrderItemAdapter
 import com.aralhub.ui.dialog.ErrorMessageDialog
 import com.aralhub.ui.dialog.LoadingDialog
 import com.aralhub.ui.model.OrderItem
+import com.aralhub.ui.utils.GlideEx
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.ViewEx.invisible
 import com.aralhub.ui.utils.ViewEx.show
@@ -148,7 +147,6 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
         arguments?.let {
             showActiveRideSheet()
         }
-        viewModel.getDriverProfile()
     }
 
     private fun showActiveRideSheet() {
@@ -214,14 +212,6 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
                 adapter.submitList(sortedOrders)
                 binding.tvOrdersNotFound.visibility =
                     if (orders.isEmpty()) View.VISIBLE else View.GONE
-            }
-        }
-
-        observeState(viewModel.profileUiState) { profileUiState ->
-            when (profileUiState) {
-                is ProfileUiState.Error -> showErrorDialog(profileUiState.message)
-                ProfileUiState.Loading -> showLoading()
-                is ProfileUiState.Success -> displayProfile(profileUiState.driverProfile)
             }
         }
 
@@ -321,19 +311,16 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
         }
     }
 
-    private fun displayProfile(driverProfile: DriverInfo) {
+    private fun displayProfile() {
         dismissLoading()
         binding.navigationView.getHeaderView(0).findViewById<TextView>(R.id.tv_name).text =
-            driverProfile.fullName
+            driverSharedPreference.userName
         binding.navigationView.getHeaderView(0).findViewById<TextView>(R.id.tv_phone).text =
-            driverProfile.phoneNumber
-        Glide.with(requireContext())
-            .load("https://araltaxi.aralhub.uz/${driverProfile.avatar}")
-            .centerCrop()
-            .placeholder(com.aralhub.ui.R.drawable.ic_user)
-            .signature(ObjectKey(System.currentTimeMillis()))
-            .apply(RequestOptions.circleCropTransform())
-            .into(binding.navigationView.getHeaderView(0).findViewById<ImageView>(R.id.iv_avatar))
+            driverSharedPreference.phoneNumber
+        GlideEx.displayAvatar(
+            driverSharedPreference.avatar,
+            binding.navigationView.getHeaderView(0).findViewById(R.id.iv_avatar)
+        )
     }
 
     private fun initListeners() {
@@ -507,6 +494,7 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
     }
 
     private fun initViews() {
+        displayProfile()
         initToolbar()
         initRecyclerView()
     }
