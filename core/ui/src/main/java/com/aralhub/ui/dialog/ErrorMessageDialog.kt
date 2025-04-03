@@ -17,9 +17,12 @@ class ErrorMessageDialog(context: Context) {
     private val tvErrorMessage: TextView? = dialog.findViewById(R.id.tv_error_message)
     private val tvDismiss: TextView? = dialog.findViewById(R.id.tv_dismiss)
 
-    fun show(errorMessage: String?) {
+    fun show(errorMessage: String?, isWebSocketError: Boolean = false) {
         if (!dialog.isShowing) {
             tvErrorMessage?.text = errorMessage
+
+            if (isWebSocketError) tvDismiss?.text = "Reconnect"
+
             dialog.show()
         }
     }

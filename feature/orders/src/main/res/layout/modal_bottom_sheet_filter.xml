@@ -103,13 +103,13 @@
 
     </LinearLayout>
 
-
     <Button
         android:id="@+id/btn_apply"
         style="@style/Widget.InDrive.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_small"
+        android:layout_marginVertical="@dimen/margin_small"
+        android:layout_marginHorizontal="14dp"
         android:text="@string/label_apply" />
 
 </LinearLayout>

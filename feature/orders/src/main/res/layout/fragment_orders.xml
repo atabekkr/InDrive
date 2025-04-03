@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#f1f3f5"
@@ -32,41 +32,36 @@
 
             </com.google.android.material.appbar.AppBarLayout>
 
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_orders"
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swiperefresh"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="@dimen/padding_small"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                tools:listitem="@layout/item_order" />
+                android:layout_height="wrap_content">
 
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_orders"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/padding_small"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                    tools:listitem="@layout/item_order" />
+
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
             <TextView
                 android:id="@+id/tv_orders_not_found"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_marginHorizontal="32dp"
+                android:gravity="center_vertical"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="Zakazlar tabılmadı"
                 android:textAppearance="@style/TextAppearance.InDrive.BodyLarge"
                 android:visibility="visible" />
 
-            <View
-                android:id="@+id/btn_filter"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_gravity="bottom|end"
-                android:layout_margin="@dimen/margin_medium"
-                android:background="@drawable/bg_fab_filter"
-                android:elevation="4dp"
-                android:foreground="@drawable/ripple_round" />
-
-
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        </LinearLayout>
 
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/navigation_view"
@@ -79,5 +74,14 @@
 
     </androidx.drawerlayout.widget.DrawerLayout>
 
+    <View
+        android:id="@+id/btn_filter"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/margin_medium"
+        android:background="@drawable/bg_fab_filter"
+        android:elevation="4dp"
+        android:foreground="@drawable/ripple_round" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</FrameLayout>

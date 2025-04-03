@@ -44,31 +44,31 @@ class ClientRideNetworkDataSourceImpl(private val client: HttpClient) :
         if (!isInitialized) {
             networkScope.launch {
                 try {
-                    Log.i("WebSocketLog", "Initializing session")
+                    Log.i("WebSocketLogClient", "Initializing session")
                     session = client.webSocketSession { url(RIDE_SOCKET_URL) }
                     isInitialized = true
 
                     session?.let { webSocketSession ->
-                        Log.i("WebSocketLog", "Session is getting data")
+                        Log.i("WebSocketLogClient", "Session is getting data")
                         webSocketSession.incoming
                             .consumeAsFlow()
                             .filterIsInstance<Frame.Text>()
                             .collect { frameText ->
                                 val text = frameText.readText()
-                                Log.i("WebSocketLog", "Received text: $text")
+                                Log.i("WebSocketLogClient", "Received text: $text")
                                 try {
                                     val data = Gson().fromJson(
                                         text,
                                         ClientWebSocketServerResponse::class.java
                                     )
-                                    Log.i("WebSocketLog", "Parsed type: ${data.type}")
+                                    Log.i("WebSocketLogClient", "Parsed type: ${data.type}")
                                     val event = when (data.type) {
                                         RIDE_STATUS_UPDATE -> {
-                                            Log.i("WebSocketLog", "Parsed status: ${data.data.status}")
+                                            Log.i("WebSocketLogClient", "Parsed status: ${data.data.status}")
                                             when (data.data.status) {
                                                 NetworkRideStatus.DRIVER_ON_THE_WAY.status -> {
                                                     Log.i(
-                                                        "WebSocketLog",
+                                                        "WebSocketLogClient",
                                                         "Parsed message: ${data.data.status}"
                                                     )
                                                     val message =
@@ -113,7 +113,7 @@ class ClientRideNetworkDataSourceImpl(private val client: HttpClient) :
                                                                 TypeToken<ClientWebSocketServerResponseUpdate<String>>() {}.type
                                                         )
                                                     Log.i(
-                                                        "WebSocketLog",
+                                                        "WebSocketLogClient",
                                                         "Parsed message: ${message.data.message}"
                                                     )
                                                     ClientWebSocketEventRideMessage.PaidWaiting(
@@ -156,7 +156,7 @@ class ClientRideNetworkDataSourceImpl(private val client: HttpClient) :
 
                                         else -> ClientWebSocketEventRideMessage.Unknown("Unknown type: ${data.type}")
                                     }
-                                    Log.i("WebSocketLog", "$event")
+                                    Log.i("WebSocketLogClient", "$event")
                                     _rideStatusFlow.emit(event)
                                 } catch (e: Exception) {
                                     _rideStatusFlow.emit(ClientWebSocketEventRideMessage.Unknown("Parsing error: ${e.message}"))
@@ -167,7 +167,7 @@ class ClientRideNetworkDataSourceImpl(private val client: HttpClient) :
                     }
                 } catch (e: Exception) {
                     _rideStatusFlow.emit(ClientWebSocketEventRideMessage.Unknown("WebSocket error: ${e.message}"))
-                    Log.e("WebSocketLog", "Error initializing WebSocket: ${e.message}", e)
+                    Log.e("WebSocketLogClient", "Error initializing WebSocket: ${e.message}", e)
                 }
             }
         }

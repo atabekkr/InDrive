@@ -6,7 +6,9 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
+import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.media.AudioAttributes
@@ -15,6 +17,7 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.ServiceCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import com.aralhub.araltaxi.core.common.sharedpreference.DriverSharedPreference
 import com.aralhub.indrive.core.data.model.offer.toDomain
@@ -28,6 +31,8 @@ import com.aralhub.network.models.location.NetworkSendLocationRequest
 import com.aralhub.network.models.offer.NetworkActiveOfferResponse
 import com.aralhub.network.models.offer.NetworkOfferCancelResponse
 import com.aralhub.network.models.offer.NetworkOfferRejectedResponse
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.AndroidEntryPoint
@@ -67,8 +72,12 @@ class LocationService : Service() {
     @Inject
     lateinit var driverSharedPreference: DriverSharedPreference
 
+    private var fusedLocationClient: FusedLocationProviderClient? = null
+
     private lateinit var soundPool: SoundPool
     private var soundId: Int = 0
+
+    private var isStartedRideWebSocketActive = true
 
     private var locationManager: LocationManager? = null
     private var notificationManager: NotificationManager? = null
@@ -104,6 +113,8 @@ class LocationService : Service() {
             SMALLEST_DISTANCE,
             locationListener
         )
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
     private fun initSoundPool() {
@@ -163,14 +174,15 @@ class LocationService : Service() {
         closeStartedRideStatusSocket()
 
         var retryCount = 0
-        while (retryCount < maxRetryAttempts) {
-            Log.d("WebSocketLog", "While")
+        while (retryCount <= maxRetryAttempts) {
+            Log.d("WebSocketLogDriver", "While")
             try {
                 session = client.webSocketSession {
                     url("ws://araltaxi.aralhub.uz/websocket/wb/driver")
                 }
                 if (session?.isActive == true) {
-                    Log.d("WebSocketLog", "Connected")
+                    sendInitialLocation()
+                    Log.d("WebSocketLogDriver", "Connected")
 
 //                    keepConnectionAlive()
 
@@ -178,10 +190,13 @@ class LocationService : Service() {
                         when (frame) {
                             is Frame.Text -> {
                                 val jsonString = frame.readText()
-                                Log.d("WebSocketLog", jsonString)
+                                Log.d("WebSocketLogDriver", jsonString)
                                 val event = try {
                                     val baseResponse =
-                                        Gson().fromJson(jsonString, WebSocketServerResponse::class.java)
+                                        Gson().fromJson(
+                                            jsonString,
+                                            WebSocketServerResponse::class.java
+                                        )
 
                                     when (baseResponse.type) {
                                         RIDE_CANCELED -> {
@@ -237,7 +252,10 @@ class LocationService : Service() {
                                                     object :
                                                         TypeToken<WebSocketServerResponse<NetworkRideFieldUpdatedResponse>>() {}.type
                                                 )
-                                            WebSocketEvent.RideFieldUpdated(data.data.rideId, data.data.value)
+                                            WebSocketEvent.RideFieldUpdated(
+                                                data.data.rideId,
+                                                data.data.value
+                                            )
                                         }
 
                                         else -> {
@@ -245,24 +263,24 @@ class LocationService : Service() {
                                         }
                                     }
                                 } catch (e: Exception) {
-                                    Log.e("WebSocketLog", "Parsing error: ${e.message}")
+                                    Log.e("WebSocketLogDriver", "Parsing error: ${e.message}")
                                     WebSocketEvent.Unknown(jsonString)
                                 }
                                 webSocketEvent.emit(event)
                             }
 
-                            is Frame.Ping ->{
+                            is Frame.Ping -> {
                                 session?.send(Frame.Pong(frame.data))
                             }
 
                             else -> {
-                                Log.e("WebSocketLog", "Else")
+                                Log.e("WebSocketLogDriver", "Else")
                             }
                         }
                     }
                 }
             } catch (e: Exception) {
-                Log.e("WebSocketLog", "Error catch")
+                Log.e("WebSocketLogDriver", "Error catch")
                 e.printStackTrace()
                 // WebSocket connection failed, retry after delay
                 delay(retryDelayMillis * (retryCount + 1))
@@ -270,7 +288,6 @@ class LocationService : Service() {
                 if (retryCount == maxRetryAttempts) {
                     webSocketEvent.emit(WebSocketEvent.ConnectionFailed)
                 }
-                //handle web socket error here
             }
         }
 
@@ -280,7 +297,7 @@ class LocationService : Service() {
         session?.outgoing?.send(
             Frame.Text(Gson().toJson(data))
         )
-        Log.d("WebSocketLog", "location sent")
+        Log.d("WebSocketLogDriver", "location sent")
     }
 
     private suspend fun close() {
@@ -290,84 +307,114 @@ class LocationService : Service() {
             )
         )
         session = null
-        Log.d("WebSocketLog", "Session Closed")
+        Log.d("WebSocketLogDriver", "Session Closed")
     }
-
-    private suspend fun keepConnectionAlive() {
-        while (true) {
-            delay(30_000) // Каждые 30 секунд
-            try {
-                session?.send(Frame.Ping(ByteArray(0))) // Пинг для поддержания соединения
-                Log.d("WebSocketLog", "Ping sent")
-            } catch (e: Exception) {
-                Log.e("WebSocketLog", "Ping failed: ${e.message}")
-            }
-        }
-    }
-
 
     private suspend fun getStartedRideStatus() {
-        try {
-            rideStatusSession = client.webSocketSession {
-                url("ws://araltaxi.aralhub.uz/ride/wb")
-            }
-            if (rideStatusSession?.isActive == true) {
-                Log.d("WebSocketLog", "Started ride web socket Connected")
-                for (frame in rideStatusSession!!.incoming) {
-                    when (frame) {
-                        is Frame.Text -> {
-                            val jsonString = frame.readText()
-                            Log.d("WebSocketLog", jsonString)
-                            val event = try {
-                                val baseResponse =
-                                    Gson().fromJson(jsonString, WebSocketServerResponse::class.java)
+        var retryCount = 0
+        while (retryCount <= maxRetryAttempts && isStartedRideWebSocketActive) {
+            try {
+                rideStatusSession = client.webSocketSession {
+                    url("ws://araltaxi.aralhub.uz/ride/wb")
+                }
+                if (rideStatusSession?.isActive == true) {
+                    Log.d("WebSocketLogDriver", "Started ride web socket Connected")
+                    for (frame in rideStatusSession!!.incoming) {
+                        when (frame) {
+                            is Frame.Text -> {
+                                val jsonString = frame.readText()
+                                Log.d("WebSocketLogDriver", jsonString)
+                                val event = try {
+                                    val baseResponse =
+                                        Gson().fromJson(
+                                            jsonString,
+                                            WebSocketServerResponse::class.java
+                                        )
 
-                                when (baseResponse.type) {
-                                    RIDE_CANCELED_BY_PASSENGER -> {
-                                        WebSocketEvent.RideCancelledByPassenger
-                                    }
+                                    when (baseResponse.type) {
+                                        RIDE_CANCELED_BY_PASSENGER -> {
+                                            WebSocketEvent.RideCancelledByPassenger
+                                        }
 
-                                    else -> {
-                                        WebSocketEvent.Unknown(jsonString)
+                                        else -> {
+                                            WebSocketEvent.Unknown(jsonString)
+                                        }
                                     }
+                                } catch (e: Exception) {
+                                    Log.e("WebSocketLogDriver", "Parsing error: ${e.message}")
+                                    WebSocketEvent.Unknown(jsonString)
                                 }
-                            } catch (e: Exception) {
-                                Log.e("WebSocketLog", "Parsing error: ${e.message}")
-                                WebSocketEvent.Unknown(jsonString)
+                                webSocketEvent.emit(event)
                             }
-                            webSocketEvent.emit(event)
-                        }
 
-                        else -> {}
+                            else -> {}
+                        }
                     }
                 }
+            } catch (e: Exception) {
+                Log.e("WebSocketLogDriver", "Error Started Ride")
+                e.printStackTrace()
+                // WebSocket connection failed, retry after delay
+                delay(retryDelayMillis * (retryCount + 1))
+                retryCount++
+                if (retryCount == maxRetryAttempts) {
+                    webSocketEvent.emit(WebSocketEvent.ConnectionFailed)
+                }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            //handle web socket error here
         }
     }
 
     private suspend fun closeStartedRideStatusSocket() {
+        isStartedRideWebSocketActive = false
         rideStatusSession?.close(
             CloseReason(
                 CloseReason.Codes.NORMAL, "Closing RideStatus Session"
             )
         )
         rideStatusSession = null
-        Log.d("WebSocketLog", "RideStatus Session Closed")
+        Log.d("WebSocketLogDriver", "RideStatus Session Closed")
     }
 
     private fun initObservers() {
         closeActiveOrdersWebSocket.onEach {
+            isStartedRideWebSocketActive = true
             close()
             getStartedRideStatus()
         }.launchIn(scope)
     }
 
+    @SuppressLint("MissingPermission")
+    private fun sendInitialLocation() {
+        if (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient?.lastLocation
+                ?.addOnSuccessListener { location: Location? ->
+                    // Got last known location. In some rare situations this can be null.
+                    val distance = driverSharedPreference.distance
+                    location?.let {
+                        scope.launch {
+                            sendLocation(
+                                NetworkSendLocationRequest(
+                                    latitude = it.latitude,
+                                    longitude = it.longitude,
+                                    distance = distance
+                                )
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         locationManager?.removeUpdates(locationListener)
+        Log.w("WebSocketLogDriver", "onDestroy")
+        job.cancel()
     }
 
     companion object {

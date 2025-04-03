@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-
 class ClientOffersRepositoryImpl @Inject constructor(
     private val clientOffersNetworkDataSource: ClientOffersNetworkDataSource,
     private val webSocketClientOffersNetworkDataSource: WebSocketClientOffersNetworkDataSource

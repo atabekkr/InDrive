@@ -36,22 +36,15 @@ class LocationNotification @Inject constructor(
         NotificationChannel(
             CHANNEL_ID,
             "Smth",
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_MIN
         ).apply {
             description = "Location tracking channel"
+            setShowBadge(false)
             manager.createNotificationChannel(this)
         }
     }
 
     fun createNotification(): Notification {
         return builder.build()
-    }
-
-    fun updateContentText(latitude: Double, longitude: Double) {
-        val notification =
-            builder.setContentText(
-                latitude.toString()
-            ).build()
-        manager.notify(LocationService.ID, notification)
     }
 }

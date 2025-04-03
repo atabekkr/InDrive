@@ -17,6 +17,11 @@ class FilterModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_s
     @Inject
     lateinit var driverSharedPreference: DriverSharedPreference
 
+    private var onClick: () -> Unit = {}
+    fun setOnConfirmClickListener(onClick: () -> Unit) {
+        this.onClick = onClick
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -31,10 +36,15 @@ class FilterModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_s
         }
 
         binding.btnApply.setOnClickListener {
+            onClick()
             dismissAllowingStateLoss()
         }
 
-        binding.tvClearFilter.setOnClickListener { dismiss() }
+        binding.tvClearFilter.setOnClickListener {
+            driverSharedPreference.distance = 3000
+            onClick()
+            dismissAllowingStateLoss()
+        }
 
     }
 

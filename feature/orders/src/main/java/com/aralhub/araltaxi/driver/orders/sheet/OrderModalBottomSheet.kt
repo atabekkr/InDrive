@@ -8,6 +8,7 @@ import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.aralhub.araltaxi.core.common.error.ErrorHandler
+import com.aralhub.araltaxi.core.common.utils.rejectOfferState
 import com.aralhub.araltaxi.driver.orders.R
 import com.aralhub.araltaxi.driver.orders.databinding.ModalBottomSheetOrderBinding
 import com.aralhub.araltaxi.driver.orders.orders.CreateOfferUiState
@@ -37,6 +38,7 @@ class OrderModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_sh
     private val binding by viewBinding(ModalBottomSheetOrderBinding::bind)
 
     private val orderLoadingModalBottomSheet = OrderLoadingModalBottomSheet()
+    private val orderRejectedByClientModalBottomSheet = OrderRejectedByClientModalBottomSheet()
 
     private val offerViewModel by activityViewModels<OfferViewModel>()
 
@@ -64,6 +66,16 @@ class OrderModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_sh
         val behavior = BottomSheetBehavior.from(requireView().parent as View)
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
         behavior.isDraggable = false
+    }
+
+    private fun updateUI() {
+        binding.btnAcceptOffer.visibility = View.GONE
+        binding.btnSendOffer.visibility = View.VISIBLE
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (offerAmount != 0) updateUI()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -104,19 +116,13 @@ class OrderModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_sh
 
     private fun setupListeners() {
         binding.btnSendOffer.setOnClickListener {
-            val priceValue = binding.etPrice.text.toString().filter { it.isDigit() }
-            offerAmount = if (priceValue.isNotBlank()) priceValue.toInt() else 0
-            if (order != null && offerAmount != 0) {
-                offerViewModel.createOffer(
-                    order!!.uuid,
-                    offerAmount
-                )
-                initObservers()
-            } else {
-                showErrorDialog("Нельзя отправить оффер")
-            }
+            sendOffer()
+        }
+        binding.btnAcceptOffer.setOnClickListener {
+            sendOffer()
         }
         binding.tvDecrease500.setOnClickListener {
+            updateUI()
             val price = Integer.parseInt(binding.etPrice.text.toString().filter { it.isDigit() }
                 .replace(" ", ""))
             if (price - 500 >= minimumPrice) {
@@ -127,6 +133,7 @@ class OrderModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_sh
             }
         }
         binding.tvIncrease500.setOnClickListener {
+            updateUI()
             val price = Integer.parseInt(binding.etPrice.text.toString().filter { it.isDigit() }
                 .replace(" ", ""))
             if (price + 500 <= maximumPrice) {
@@ -138,6 +145,20 @@ class OrderModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_sh
         }
         binding.llPickUpAddress.setOnClickListener { onAddressClick(order) }
         binding.llDestinationAddress.setOnClickListener { onAddressClick(order) }
+    }
+
+    private fun sendOffer() {
+        val priceValue = binding.etPrice.text.toString().filter { it.isDigit() }
+        offerAmount = if (priceValue.isNotBlank()) priceValue.toInt() else 0
+        if (order != null && offerAmount != 0) {
+            offerViewModel.createOffer(
+                order!!.uuid,
+                offerAmount
+            )
+            initObservers()
+        } else {
+            showErrorDialog("Нельзя отправить оффер")
+        }
     }
 
     private fun initObservers() {
@@ -180,6 +201,17 @@ class OrderModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_sh
                     }
                 }
             }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        rejectOfferState.onEach {
+            if (!orderRejectedByClientModalBottomSheet.isAdded) {
+                orderRejectedByClientModalBottomSheet.arguments = arguments
+                orderRejectedByClientModalBottomSheet.showNow(
+                    parentFragmentManager,
+                    orderRejectedByClientModalBottomSheet.tag
+                )
+            }
+            orderLoadingModalBottomSheet.dismissAllowingStateLoss()
         }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 

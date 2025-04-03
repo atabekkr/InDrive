@@ -1,9 +1,7 @@
 package com.aralhub.network.di
 
-import com.aralhub.araltaxi.core.common.sharedpreference.DriverSharedPreference
-import com.aralhub.network.ClientRideNetworkDataSource
+import com.aralhub.araltaxi.core.common.sharedpreference.ClientSharedPreference
 import com.aralhub.network.WebSocketClientOffersNetworkDataSource
-import com.aralhub.network.impl.ClientRideNetworkDataSourceImpl
 import com.aralhub.network.impl.WebSocketClientOffersNetworkDataSourceImpl
 import dagger.Module
 import dagger.Provides
@@ -15,15 +13,17 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.request.header
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DriverWebSocketModule {
+object ClientWebSocketModule {
 
     @Singleton
     @Provides
-    fun provideHttpClient(localStorage: DriverSharedPreference): HttpClient {
+    @Named("ClientHttpClient")
+    fun provideHttpClientForClientPart(localStorage: ClientSharedPreference): HttpClient {
         return HttpClient(CIO) {
             install(Logging)
             install(WebSockets) {
@@ -40,7 +40,7 @@ object DriverWebSocketModule {
 
     @Singleton
     @Provides
-    fun provideClientRideNetworkDataSource(httpClient: HttpClient): ClientRideNetworkDataSource {
-        return ClientRideNetworkDataSourceImpl(httpClient)
+    fun provideClientOffersNetworkDataSource(@Named("ClientHttpClient") httpClient: HttpClient): WebSocketClientOffersNetworkDataSource {
+        return WebSocketClientOffersNetworkDataSourceImpl(httpClient)
     }
 }

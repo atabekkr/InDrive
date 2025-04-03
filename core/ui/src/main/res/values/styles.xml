@@ -77,6 +77,7 @@
         <item name="android:background">@drawable/selector_button_primary_variant</item>
         <item name="android:stateListAnimator">@null</item>
         <item name="android:textAppearance">@style/TextAppearance.InDrive.PrimaryButton.Variant</item>
+        <item name="android:paddingVertical">18dp</item>
     </style>
 
     <style name="Widget.InDrive.EditText" parent="Widget.AppCompat.EditText">

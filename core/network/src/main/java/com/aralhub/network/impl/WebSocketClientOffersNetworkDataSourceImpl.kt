@@ -29,27 +29,27 @@ class WebSocketClientOffersNetworkDataSourceImpl(private val client: HttpClient)
         session = client.webSocketSession { url("ws://araltaxi.aralhub.uz/websocket/wb/passenger") }
 
         return session?.let { webSocketSession ->
-            Log.i("WebSocketLog", "Session is not null")
+            Log.i("WebSocketLogClient", "Session is not null")
             webSocketSession.incoming
                 .consumeAsFlow()
                 .onEach { frame ->
-                    Log.i("WebSocketLog", "Received a frame of type: ${frame::class.java.simpleName}")
+                    Log.i("WebSocketLogClient", "Received a frame of type: ${frame::class.java.simpleName}")
                 }
                 .filterIsInstance<Frame.Text>()
                 .onEach { frame ->
-                    Log.i("WebSocketLog", "Processing Text frame")
+                    Log.i("WebSocketLogClient", "Processing Text frame")
                 }
                 .let { textFramesFlow ->
                     flow {
                         try {
                             textFramesFlow.collect { frameText ->
                                 val text = frameText.readText()
-                                Log.i("WebSocketLog", "Received raw frame: $text")
+                                Log.i("WebSocketLogClient", "Received raw frame: $text")
 
                                 // Rest of your processing logic
                                 try {
                                     val data = Gson().fromJson(text, ClientWebSocketServerResponse::class.java)
-                                    Log.i("WebSocketLog", "Parsed type: ${data.type}")
+                                    Log.i("WebSocketLogClient", "Parsed type: ${data.type}")
 
                                     val event = when (data.type) {
                                         DRIVER_OFFER -> {
@@ -71,18 +71,18 @@ class WebSocketClientOffersNetworkDataSourceImpl(private val client: HttpClient)
 
                                     emit(event)
                                 } catch (e: Exception) {
-                                    Log.e("WebSocketLog", "Error parsing frame: ${e.message}", e)
+                                    Log.e("WebSocketLogClient", "Error parsing frame: ${e.message}", e)
                                     emit(ClientWebSocketEventNetwork.Unknown("Parsing error: ${e.message}"))
                                 }
                             }
                         } catch (e: Exception) {
-                            Log.e("WebSocketLog", "WebSocket error: ${e.message}", e)
+                            Log.e("WebSocketLogClient", "WebSocket error: ${e.message}", e)
                             emit(ClientWebSocketEventNetwork.Unknown("WebSocket error: ${e.message}"))
                         }
                     }
                 }
         } ?: flow {
-            Log.i("WebSocketLog", "Session is null")
+            Log.i("WebSocketLogClient", "Session is null")
             emit(ClientWebSocketEventNetwork.Unknown("Session initialization failed"))
         }
     }

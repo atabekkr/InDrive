@@ -17,7 +17,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.aralhub.araltaxi.core.common.error.ErrorHandler
 import com.aralhub.araltaxi.core.common.sharedpreference.DriverSharedPreference
 import com.aralhub.araltaxi.driver.orders.R
 import com.aralhub.araltaxi.driver.orders.databinding.FragmentOrdersBinding
@@ -45,10 +44,8 @@ import com.aralhub.ui.utils.GlideEx
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.ViewEx.invisible
 import com.aralhub.ui.utils.ViewEx.show
+import com.aralhub.ui.utils.setOnSafeClickListener
 import com.aralhub.ui.utils.viewBinding
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.signature.ObjectKey
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,9 +59,6 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
 
     private val binding by viewBinding(FragmentOrdersBinding::bind)
     private val adapter = OrderItemAdapter()
-
-    @Inject
-    lateinit var errorHandler: ErrorHandler
 
     private val viewModel by viewModels<OrdersViewModel>()
 
@@ -150,6 +144,7 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
     }
 
     private fun showActiveRideSheet() {
+        viewModel.disconnect()
         val status = arguments?.getString("Status") ?: ""
         when (status) {
             "driver_on_the_way" -> {
@@ -212,6 +207,8 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
                 adapter.submitList(sortedOrders)
                 binding.tvOrdersNotFound.visibility =
                     if (orders.isEmpty()) View.VISIBLE else View.GONE
+                binding.swiperefresh.visibility =
+                    if (orders.isEmpty()) View.GONE else View.VISIBLE
             }
         }
 
@@ -278,7 +275,7 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
                             }
 
                             is GetActiveOrdersUiState.ConnectionFailed -> {
-                                showErrorDialog("Connection failed")
+                                showWebSocketErrorDialog("Connection failed")
                             }
                         }
                     }
@@ -325,10 +322,11 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
 
     private fun initListeners() {
 
-//        binding.swiperefresh.setOnRefreshListener {
-//            getExistingOrders()
-//            binding.swiperefresh.isRefreshing = false
-//        }
+        binding.swiperefresh.setOnRefreshListener {
+            getExistingOrders()
+            startService()
+            binding.swiperefresh.isRefreshing = false
+        }
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -338,6 +336,9 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
             navigation.goToProfileFromOrders()
         }
+
+        filterModalBottomSheet.setOnConfirmClickListener { getExistingOrders() }
+
         binding.navigationView.setNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.action_support -> {
@@ -385,7 +386,7 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
             startService()
         }
 
-        binding.btnFilter.setOnClickListener {
+        binding.btnFilter.setOnSafeClickListener {
             filterModalBottomSheet.show(
                 childFragmentManager,
                 FilterModalBottomSheet.TAG
@@ -532,7 +533,8 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
     }
 
     private fun showExitLineBottomSheet() {
-        exitLineModalBottomSheet.show(childFragmentManager, ExitLineModalBottomSheet.TAG)
+        if (!exitLineModalBottomSheet.isAdded)
+            exitLineModalBottomSheet.show(childFragmentManager, ExitLineModalBottomSheet.TAG)
     }
 
     private fun dismissAllBottomSheets() {
@@ -556,7 +558,16 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
         errorDialog?.setOnDismissClicked { errorDialog?.dismiss() }
         errorDialog?.show(errorMessage)
 
-        errorDialog?.setOnDismissClicked { errorDialog?.dismiss() }
+    }
+
+    private fun showWebSocketErrorDialog(errorMessage: String?) {
+        dismissLoading()
+        errorDialog?.setOnDismissClicked {
+            startService()
+            errorDialog?.dismiss()
+        }
+        errorDialog?.show(errorMessage = errorMessage, isWebSocketError = true)
+
     }
 
     private fun showLoading() {

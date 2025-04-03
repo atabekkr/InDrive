@@ -5,21 +5,18 @@ import androidx.lifecycle.viewModelScope
 import com.aralhub.araltaxi.core.common.utils.rejectOfferState
 import com.aralhub.araltaxi.core.domain.driver.CancelRideUseCase
 import com.aralhub.araltaxi.core.domain.driver.DriverLogoutUseCase
-import com.aralhub.araltaxi.core.domain.driver.DriverProfileUseCase
 import com.aralhub.araltaxi.core.domain.driver.GetCancelCausesUseCase
 import com.aralhub.araltaxi.core.domain.driver.GetExistingOrdersUseCase
 import com.aralhub.araltaxi.core.domain.driver.UpdateRideStatusUseCase
 import com.aralhub.araltaxi.driver.orders.model.SendDriverLocationUI
 import com.aralhub.araltaxi.driver.orders.model.asDomain
 import com.aralhub.araltaxi.driver.orders.model.asUI
-import com.aralhub.indrive.core.data.model.driver.DriverInfo
 import com.aralhub.indrive.core.data.result.Result
 import com.aralhub.indrive.core.data.util.WebSocketEvent
 import com.aralhub.indrive.core.data.util.closeActiveOrdersWebSocket
 import com.aralhub.indrive.core.data.util.webSocketEvent
 import com.aralhub.ui.model.CancelItem
 import com.aralhub.ui.model.OrderItem
-import com.aralhub.ui.model.PaymentType
 import com.aralhub.ui.model.RideCompletedUI
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -38,7 +35,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OrdersViewModel @Inject constructor(
-    private val driverProfileUseCase: DriverProfileUseCase,
     private val driverLogoutUseCase: DriverLogoutUseCase,
     private val getExistingOrdersUseCase: GetExistingOrdersUseCase,
     private val updateRideStatusUseCase: UpdateRideStatusUseCase,
@@ -47,78 +43,7 @@ class OrdersViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _ordersListState = MutableStateFlow<List<OrderItem>>(
-        listOf(
-            OrderItem(
-                id = 1,
-                uuid = "",
-                name = "",
-                avatar = "",
-                pickUpAddress = "",
-                paymentType = PaymentType.CARD,
-                roadPrice = "",
-                recommendedPrice = "TODO()",
-                pickUpDistance = "TODO()",
-                roadDistance = "TODO()",
-                destinationAddress = "TODO()",
-                locations = emptyList(),
-            ),
-            OrderItem(
-                id = 2,
-                uuid = "",
-                name = "",
-                avatar = "",
-                pickUpAddress = "",
-                paymentType = PaymentType.CARD,
-                roadPrice = "",
-                recommendedPrice = "TODO()",
-                pickUpDistance = "TODO()",
-                roadDistance = "TODO()",
-                destinationAddress = "TODO()",
-                locations = emptyList(),
-            ),
-            OrderItem(
-                id = 3,
-                uuid = "",
-                name = "",
-                avatar = "",
-                pickUpAddress = "",
-                paymentType = PaymentType.CARD,
-                roadPrice = "",
-                recommendedPrice = "TODO()",
-                pickUpDistance = "TODO()",
-                roadDistance = "TODO()",
-                destinationAddress = "TODO()",
-                locations = emptyList(),
-            ),
-            OrderItem(
-                id = 4,
-                uuid = "",
-                name = "",
-                avatar = "",
-                pickUpAddress = "",
-                paymentType = PaymentType.CARD,
-                roadPrice = "",
-                recommendedPrice = "TODO()",
-                pickUpDistance = "TODO()",
-                roadDistance = "TODO()",
-                destinationAddress = "TODO()",
-                locations = emptyList(),
-            ),
-            OrderItem(
-                id = 5,
-                uuid = "",
-                name = "",
-                avatar = "",
-                pickUpAddress = "",
-                paymentType = PaymentType.CARD,
-                roadPrice = "",
-                recommendedPrice = "TODO()",
-                pickUpDistance = "TODO()",
-                roadDistance = "TODO()",
-                destinationAddress = "TODO()",
-                locations = emptyList(),
-            ),
-        )
+        emptyList()
     )
     val ordersListState: StateFlow<List<OrderItem>> = _ordersListState.asStateFlow()
 
@@ -340,17 +265,6 @@ sealed interface GetActiveOrdersUiState {
     data object ConnectionFailed : GetActiveOrdersUiState
     data object Idle : GetActiveOrdersUiState
     data class Error(val message: String) : GetActiveOrdersUiState
-}
-
-sealed interface GetStartedRideStatusUiState {
-    data object RideCanceled : GetStartedRideStatusUiState
-    data class Error(val message: String) : GetStartedRideStatusUiState
-}
-
-sealed interface ProfileUiState {
-    data object Loading : ProfileUiState
-    data class Success(val driverProfile: DriverInfo) : ProfileUiState
-    data class Error(val message: String) : ProfileUiState
 }
 
 sealed interface RideCancelUiState {

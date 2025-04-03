@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
+import com.aralhub.ui.utils.setOnSafeClickListener
 import com.aralhub.ui.R
 import com.aralhub.ui.databinding.ItemOrderBinding
 import com.aralhub.ui.model.OrderItem
@@ -35,7 +36,7 @@ class OrderItemAdapter :
             binding.tvPrice.text = context.getString(R.string.standard_uzs_price, orderItem.roadPrice)
             binding.ivPaymentMethod.setImageResource(orderItem.paymentType.resId)
 
-            binding.root.setOnClickListener {
+            binding.root.setOnSafeClickListener {
                 onItemClickListener?.invoke(orderItem)
             }
 
