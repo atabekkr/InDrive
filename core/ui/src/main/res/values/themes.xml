@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Only Themes and ThemeOverlays -->
 
     <style name="Base.V24.Theme.InDrive" parent="Theme.AppCompat.Light.NoActionBar">
@@ -16,7 +16,12 @@
 
     <style name="Theme.InDrive" parent="Base.Theme.InDrive">
         <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
         <item name="bottomSheetDialogTheme">@style/Theme.InDrive.BottomSheetDialog</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 
     <style name="Theme.InDrive.Splash" parent="Base.Theme.InDrive">

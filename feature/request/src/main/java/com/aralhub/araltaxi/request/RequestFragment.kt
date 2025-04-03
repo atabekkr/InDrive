@@ -3,30 +3,30 @@ package com.aralhub.araltaxi.request
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.addCallback
-import androidx.appcompat.app.ActionBar.LayoutParams
-import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.GravityCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.RecyclerView
 import com.aralhub.araltaxi.client.request.R
 import com.aralhub.araltaxi.client.request.databinding.FragmentRequestBinding
 import com.aralhub.araltaxi.core.common.error.ErrorHandler
 import com.aralhub.araltaxi.core.common.permission.PermissionHelper
 import com.aralhub.araltaxi.request.navigation.FeatureRequestNavigation
 import com.aralhub.araltaxi.request.utils.BottomSheetBehaviorDrawerListener
-import com.aralhub.araltaxi.request.utils.MapKitInitializer
 import com.aralhub.indrive.core.data.model.client.ClientProfile
 import com.aralhub.ui.adapter.location.LocationItemAdapter
+import com.aralhub.ui.components.EndTextEditText
 import com.aralhub.ui.model.LocationItemClickOwner
 import com.aralhub.ui.model.args.LocationType
 import com.aralhub.ui.model.args.SelectedLocation
@@ -39,6 +39,7 @@ import com.aralhub.ui.utils.ViewEx.show
 import com.aralhub.ui.utils.viewBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.yandex.mapkit.Animation
+import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.layers.GeoObjectTapListener
 import com.yandex.mapkit.map.CameraPosition
@@ -78,10 +79,13 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
         private val START_ANIMATION = Animation(Animation.Type.LINEAR, 1f)
         private val SMOOTH_ANIMATION = Animation(Animation.Type.SMOOTH, 0.4f)
     }
+
     private val binding by viewBinding(FragmentRequestBinding::bind)
     private var bottomSheetBehavior: BottomSheetBehavior<View>? = null
+
     @Inject
     lateinit var navigation: FeatureRequestNavigation
+
     @Inject
     lateinit var errorHandler: ErrorHandler
     private val adapter = LocationItemAdapter()
@@ -98,7 +102,7 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
     private var isFullscreen = false
     private lateinit var mapWindow: MapWindow
     private lateinit var map: Map
-    private var isProgrammaticChange= false
+    private var isProgrammaticChange = false
 
     private val geoObjectTapListener = GeoObjectTapListener {
         // Move camera to selected geoObject
@@ -107,32 +111,35 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
             val position = CameraPosition(point, zoom, azimuth, tilt)
             map.move(position, SMOOTH_ANIMATION, null)
         }
-        val selectionMetadata = it.geoObject.metadataContainer.getItem(GeoObjectSelectionMetadata::class.java)
+        val selectionMetadata =
+            it.geoObject.metadataContainer.getItem(GeoObjectSelectionMetadata::class.java)
         map.selectGeoObject(selectionMetadata)
         errorHandler.showToast("Tapped ${it.geoObject.name} id = ${selectionMetadata.objectId}")
         true
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        MapKitInitializer.init("f1c206ee-1f73-468c-8ba8-ec3ef7a7f69a", requireContext())
+    override fun onStart() {
+        super.onStart()
+        MapKitFactory.getInstance().onStart()
+        binding.mapView.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        MapKitFactory.getInstance().onStop()
+        binding.mapView.onStop()
+        locationManager = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mapWindow = binding.mapView.mapWindow
         map = mapWindow.map
-        locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationManager =
+            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         observeStates()
         initViews()
         initListeners()
-    }
-
-
-    override fun onStart() {
-        super.onStart()
-        binding.mapView.onStart()
-        Log.i("RequestFragment", "onStart")
     }
 
     override fun onResume() {
@@ -140,11 +147,6 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
         locationManager?.let { observeLocationUpdates(it) }
     }
 
-    override fun onStop() {
-        super.onStop()
-        binding.mapView.onStop()
-        locationManager = null
-    }
     private val locationListener = LocationListener { location ->
         requestViewModel2.setCurrentLocation(location.latitude, location.longitude)
     }
@@ -204,7 +206,7 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
                 SuggestionsUiState.Loading -> {}
                 is SuggestionsUiState.Success -> {
                     adapter.submitList(null)
-                    binding.space.hide()
+//                    binding.space.hide()
                     adapter.submitList(suggestionsUiState.suggestions)
                 }
             }
@@ -274,7 +276,7 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
         }
 
         binding.mapView.setOnClickListener {
-            if (isFullscreen){
+            if (isFullscreen) {
                 binding.space.hide()
                 isFullscreen = false
             }
@@ -303,7 +305,7 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
             textField.setOnActivatedListener {
                 textField.setEndTextVisible(it)
                 if (!isFullscreen) {
-                   // binding.space.show()
+                     binding.space.show()
                 }
             }
         }
@@ -461,10 +463,28 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
         bottomSheetBehavior = BottomSheetBehavior.from(binding.layoutBottomSheet)
         bottomSheetBehavior?.apply {
             state = BottomSheetBehavior.STATE_EXPANDED
-            peekHeight = 200
+            peekHeight = resources.displayMetrics.heightPixels
             isHideable = false
         }
         bottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
+
+    }
+
+    private fun showFullScreenBottomSheet() {
+        bottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    private fun setupCollapseSheetActions() {
+        // Or handle back press in your activity
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            if (bottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED) {
+                bottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
+            } else {
+                isEnabled = false
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+                isEnabled = true
+            }
+        }
     }
 
     private fun updateLoadingDialog() {
@@ -505,7 +525,9 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
             isVisible = true
         }
         binding.mapView.mapWindow.map.move(
-            CameraPosition(Point(latitude, longitude), 17.0f, 150.0f, 30.0f)
+            CameraPosition(Point(latitude, longitude), 17.0f, 0f, 0f),
+            SMOOTH_ANIMATION,
+            null
         )
     }
 

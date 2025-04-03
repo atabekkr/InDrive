@@ -122,7 +122,7 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
             map.addCameraListener(cameraListener)
             updateFocusInfo()
             map.move(
-                CameraPosition(Point(42.4651, 59.6136), 17.0f, 150.0f, 30.0f)
+                CameraPosition(Point(42.4651, 59.6136), 17.0f, 0f, 0f)
             )
         }
 

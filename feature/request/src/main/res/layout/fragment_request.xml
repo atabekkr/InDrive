@@ -53,14 +53,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
-        android:fitsSystemWindows="false"
         android:focusable="true"
         android:orientation="vertical"
         app:behavior_draggable="false"
         android:paddingTop="0dp"
         app:layout_behavior="@string/bottom_sheet_behavior"
         app:paddingBottomSystemWindowInsets="true"
-        app:paddingTopSystemWindowInsets="false">
+        app:paddingTopSystemWindowInsets="false"
+        app:behavior_hideable="true"
+        app:behavior_expandedOffset="0dp"
+        app:behavior_halfExpandedRatio="0.5">
 
 
         <ImageButton
@@ -130,12 +132,8 @@
                 android:paddingBottom="25dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-
-
         </LinearLayout>
 
-
 </LinearLayout>
-
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
