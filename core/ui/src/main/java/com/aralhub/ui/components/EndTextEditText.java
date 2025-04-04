@@ -12,7 +12,6 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -128,22 +127,26 @@ public class EndTextEditText extends LinearLayout {
                 startIconView.setImageDrawable(startIcon);
                 startIconContainer.setVisibility(VISIBLE);
             } else {
-                startIconContainer.setVisibility(GONE);
+                startIconContainer.setVisibility(INVISIBLE);
             }
 
             String endText = a.getString(R.styleable.EndTextEditText_endText);
             String hint = a.getString(R.styleable.EndTextEditText_android_hint);
             editText.setHint(hint);
             editText.setHintTextColor(a.getColor(R.styleable.EndTextEditText_hintTextColor, Color.GRAY));
-            boolean endTextContainerVisible = a.getBoolean(R.styleable.EndTextEditText_endTextVisible, false);
-            if (endTextContainerVisible) {
-                endTextContainer.setVisibility(VISIBLE);
-            } else {
-                endTextContainer.setVisibility(GONE);
-            }
+
+            // Показывать endTextContainer только если активен input
+            endTextContainer.setVisibility(GONE);
+
+            editText.setOnFocusChangeListener((v, hasFocus) -> {
+                setActivated(hasFocus);
+                endTextContainer.setVisibility(hasFocus ? VISIBLE : GONE);
+            });
+
             endTextView.setText(endText);
             a.recycle();
         }
+
     }
 
     private int dpToPx(float dp) {

@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:fitsSystemWindows="true">
 
     <androidx.drawerlayout.widget.DrawerLayout
@@ -55,32 +54,27 @@
         android:clickable="true"
         android:focusable="true"
         android:orientation="vertical"
-        app:behavior_draggable="false"
         android:paddingTop="0dp"
+        app:behavior_draggable="true"
+        app:behavior_expandedOffset="100dp"
+        app:behavior_hideable="false"
         app:layout_behavior="@string/bottom_sheet_behavior"
         app:paddingBottomSystemWindowInsets="true"
-        app:paddingTopSystemWindowInsets="false"
-        app:behavior_hideable="true"
-        app:behavior_expandedOffset="0dp"
-        app:behavior_halfExpandedRatio="0.5">
-
+        app:paddingTopSystemWindowInsets="false">
 
         <ImageButton
             android:id="@+id/btn_current_location"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginBottom="@dimen/margin_small"
-            android:layout_marginHorizontal="@dimen/margin_medium"
             android:layout_gravity="end"
+            android:layout_marginHorizontal="@dimen/margin_medium"
+            android:layout_marginBottom="@dimen/margin_small"
             android:background="@drawable/shape_circle_icon"
             android:contentDescription="@string/cd_menu"
             android:elevation="2dp"
             android:foreground="@drawable/ripple_round"
             android:padding="@dimen/padding_medium"
-            android:src="@drawable/ic_carbon_location_current_1"
-            />
-
-
+            android:src="@drawable/ic_carbon_location_current_1" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -95,45 +89,63 @@
                 android:padding="0dp"
                 android:paddingBottom="0dp" />
 
-
-            <com.aralhub.ui.components.EndTextEditText
-                android:id="@+id/et_from_location"
+            <LinearLayout
+                android:id="@+id/layout_from_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_medium"
-                app:startIconDrawable="@drawable/ic_start_location"
-                android:hint="@string/hint_from_location"
-                app:endText="Karta"
-                app:hintTextColor="@color/color_tertiary" />
+                android:layout_marginHorizontal="@dimen/margin_medium"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/selector_edit_text_auth"
+                android:orientation="horizontal">
 
-            <com.aralhub.ui.components.EndTextEditText
-                android:id="@+id/et_to_location"
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="12dp"
+                    android:src="@drawable/ic_start_location" />
+
+                <TextView
+                    android:id="@+id/tv_start_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Alıp ketiw ornı?"
+                    android:lines="1"
+                    android:layout_marginEnd="16dp"
+                    android:ellipsize="end"
+                    android:textColor="@color/color_tertiary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_to_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:startIconDrawable="@drawable/ic_end_location"
-                android:layout_margin="@dimen/margin_medium"
-                android:hint="@string/hint_to_location"
-                app:endText="Karta"
-                app:hintTextColor="@color/color_tertiary" />
+                android:layout_marginHorizontal="@dimen/margin_medium"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/selector_edit_text_auth"
+                android:orientation="horizontal">
 
-            <View
-                android:id="@+id/space"
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="12dp"
+                    android:src="@drawable/ic_end_location" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_locations"
-                tools:itemCount="12"
-                tools:listitem="@layout/item_location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="true"
-                android:paddingBottom="25dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                <TextView
+                    android:id="@+id/tv_end_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Mánzil?"
+                    android:textColor="@color/color_tertiary" />
+            </LinearLayout>
 
         </LinearLayout>
+    </LinearLayout>
 
-</LinearLayout>
+    <include
+        android:id="@+id/bottom_sheet_search_address"
+        layout="@layout/layout_search_address" />
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

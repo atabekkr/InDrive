@@ -1,6 +1,7 @@
 package com.aralhub.araltaxi.request.utils
 
 import android.view.View
+import android.widget.LinearLayout
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 

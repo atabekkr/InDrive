@@ -3,21 +3,20 @@ package com.aralhub.araltaxi.request
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.location.LocationListener
+import android.content.pm.PackageManager
+import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.addCallback
-import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.RecyclerView
 import com.aralhub.araltaxi.client.request.R
 import com.aralhub.araltaxi.client.request.databinding.FragmentRequestBinding
 import com.aralhub.araltaxi.core.common.error.ErrorHandler
@@ -26,7 +25,6 @@ import com.aralhub.araltaxi.request.navigation.FeatureRequestNavigation
 import com.aralhub.araltaxi.request.utils.BottomSheetBehaviorDrawerListener
 import com.aralhub.indrive.core.data.model.client.ClientProfile
 import com.aralhub.ui.adapter.location.LocationItemAdapter
-import com.aralhub.ui.components.EndTextEditText
 import com.aralhub.ui.model.LocationItemClickOwner
 import com.aralhub.ui.model.args.LocationType
 import com.aralhub.ui.model.args.SelectedLocation
@@ -34,16 +32,16 @@ import com.aralhub.ui.sheets.LoadingModalBottomSheet
 import com.aralhub.ui.sheets.LogoutModalBottomSheet
 import com.aralhub.ui.utils.GlideEx.displayAvatar
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
-import com.aralhub.ui.utils.ViewEx.hide
-import com.aralhub.ui.utils.ViewEx.show
+import com.aralhub.ui.utils.hideKeyboard
+import com.aralhub.ui.utils.showKeyboardAndFocus
 import com.aralhub.ui.utils.viewBinding
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
-import com.yandex.mapkit.layers.GeoObjectTapListener
 import com.yandex.mapkit.map.CameraPosition
-import com.yandex.mapkit.map.GeoObjectSelectionMetadata
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapWindow
 import com.yandex.mapkit.map.PlacemarkMapObject
@@ -55,8 +53,6 @@ import javax.inject.Inject
 internal class RequestFragment : Fragment(R.layout.fragment_request) {
 
     private companion object {
-        private const val LOCATION_REQUEST_MIN_TIME = 0L //Milliseconds
-        private const val LOCATION_REQUEST_MIN_DISTANCE = 5f //Meter
 
         //To fetch args when go back from SelectLocationFragment
         private const val SELECT_LOCATION_OWNER_FROM = 0
@@ -76,12 +72,12 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
         private var currentLongitude = CURRENT_LOCATION_NOT_INITIALISED_VALUE
         private var currentLatitude = CURRENT_LOCATION_NOT_INITIALISED_VALUE
 
-        private val START_ANIMATION = Animation(Animation.Type.LINEAR, 1f)
         private val SMOOTH_ANIMATION = Animation(Animation.Type.SMOOTH, 0.4f)
     }
 
     private val binding by viewBinding(FragmentRequestBinding::bind)
     private var bottomSheetBehavior: BottomSheetBehavior<View>? = null
+    private var searchAddressBottomSheetBehavior: BottomSheetBehavior<LinearLayout>? = null
 
     @Inject
     lateinit var navigation: FeatureRequestNavigation
@@ -104,19 +100,7 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
     private lateinit var map: Map
     private var isProgrammaticChange = false
 
-    private val geoObjectTapListener = GeoObjectTapListener {
-        // Move camera to selected geoObject
-        val point = it.geoObject.geometry.firstOrNull()?.point ?: return@GeoObjectTapListener true
-        map.cameraPosition.run {
-            val position = CameraPosition(point, zoom, azimuth, tilt)
-            map.move(position, SMOOTH_ANIMATION, null)
-        }
-        val selectionMetadata =
-            it.geoObject.metadataContainer.getItem(GeoObjectSelectionMetadata::class.java)
-        map.selectGeoObject(selectionMetadata)
-        errorHandler.showToast("Tapped ${it.geoObject.name} id = ${selectionMetadata.objectId}")
-        true
-    }
+    private var fusedLocationClient: FusedLocationProviderClient? = null
 
     override fun onStart() {
         super.onStart()
@@ -140,19 +124,18 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
         observeStates()
         initViews()
         initListeners()
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+        setCurrentUserLocation()
     }
 
     override fun onResume() {
         super.onResume()
-        locationManager?.let { observeLocationUpdates(it) }
-    }
-
-    private val locationListener = LocationListener { location ->
-        requestViewModel2.setCurrentLocation(location.latitude, location.longitude)
+        locationManager?.let { observeLocationUpdates() }
     }
 
     @SuppressLint("MissingPermission")
-    private fun observeLocationUpdates(locationManager: LocationManager) {
+    private fun observeLocationUpdates() {
         if (PermissionHelper.arePermissionsGranted(
                 requireContext(),
                 listOf(
@@ -175,11 +158,24 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
             updateMap(it.longitude, it.latitude)
             currentLatitude = it.latitude
             currentLongitude = it.longitude
-            binding.etFromLocation.text = it.name
+
+            binding.tvStartLocation.text = it.name
+            binding.tvStartLocation.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    com.aralhub.ui.R.color.color_text_primary
+                )
+            )
         }
         observeState(requestViewModel2.fromLocationFlow) {
             it?.let { fromLocation ->
-                binding.etFromLocation.text = fromLocation.name
+                binding.tvStartLocation.text = fromLocation.name
+                binding.tvStartLocation.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        com.aralhub.ui.R.color.color_text_primary
+                    )
+                )
             }
         }
         observeState(requestViewModel2.toLocationFlow) {
@@ -187,9 +183,7 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
                 Log.i("LocationTo", "${toLocation.name}")
                 isNavigatedToCreateOrderFragment = false
                 Log.i("LocationTo", "isNavigated ${isNavigatedToCreateOrderFragment}")
-                binding.etToLocation.text = toLocation.name
-            } ?: run {
-                binding.etToLocation.text = ""
+                binding.tvEndLocation.text = toLocation.name
             }
         }
         observeState(requestViewModel2.navigateToCreateOrderFlow) { selectedLocations ->
@@ -205,8 +199,6 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
                 is SuggestionsUiState.Error -> errorHandler.showToast(suggestionsUiState.message)
                 SuggestionsUiState.Loading -> {}
                 is SuggestionsUiState.Success -> {
-                    adapter.submitList(null)
-//                    binding.space.hide()
                     adapter.submitList(suggestionsUiState.suggestions)
                 }
             }
@@ -254,12 +246,45 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
         }
     }
 
+    private fun setCurrentUserLocation() {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient?.lastLocation
+                ?.addOnSuccessListener { location: Location? ->
+                    // Got last known location. In some rare situations this can be null.
+                    location?.let {
+                        requestViewModel2.setCurrentLocation(
+                            latitude = it.latitude,
+                            longitude = location.longitude
+                        )
+                    }
+                }
+        }
+    }
+
     private fun initViews() {
-        binding.rvLocations.adapter = adapter
+        binding.bottomSheetSearchAddress.recyclerViewAddress.adapter = adapter
         setUpBottomSheet()
+        searchAddressBottomSheetBehavior =
+            BottomSheetBehavior.from(binding.bottomSheetSearchAddress.bottomSheetSearchAddress)
+        searchAddressBottomSheetBehavior?.peekHeight =
+            (resources.displayMetrics.heightPixels * 0.95).toInt()
+        searchAddressBottomSheetBehavior!!.apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+            isHideable = true
+            expandedOffset = 0  // Убирает отступ сверху в раскрытом состоянии
+        }
     }
 
     private fun initListeners() {
+
+        val etFromLocation = binding.bottomSheetSearchAddress.dynamicLayout.etFromLocation
+        val etToLocation = binding.bottomSheetSearchAddress.dynamicLayout.etToLocation
+
         initFragmentResultListener()
         initAdapterListener()
 
@@ -269,7 +294,6 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
         ) {
             if (isFullscreen || adapter.currentList.isNotEmpty()) {
                 adapter.submitList(null)
-                binding.space.hide()
             } else {
                 requireActivity().finish()
             }
@@ -277,12 +301,11 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
 
         binding.mapView.setOnClickListener {
             if (isFullscreen) {
-                binding.space.hide()
                 isFullscreen = false
             }
         }
 
-        binding.etFromLocation.setOnTextChangedListener {
+        etFromLocation.setOnTextChangedListener {
             if (it.isNotEmpty() && !it.isNullOrBlank()) {
                 Log.i("Suggest", "Suggest Location")
                 viewModel.suggestLocation(it, LocationItemClickOwner.FROM)
@@ -291,7 +314,7 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
             }
         }
 
-        binding.etToLocation.setOnTextChangedListener {
+        etToLocation.setOnTextChangedListener {
             if (it.isNotEmpty() && !it.isNullOrBlank()) {
                 Log.i("Suggest 2", "Suggest Location 2")
                 viewModel.suggestLocation(it, LocationItemClickOwner.TO)
@@ -300,21 +323,18 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
             }
         }
 
-        val textFields = listOf(binding.etFromLocation, binding.etToLocation)
-        for (textField in textFields) {
-            textField.setOnActivatedListener {
-                textField.setEndTextVisible(it)
-                if (!isFullscreen) {
-                     binding.space.show()
-                }
-            }
+        binding.layoutFromLocation.setOnClickListener {
+            showFullScreenBottomSheet(locationItemClickOwner = LocationItemClickOwner.FROM)
+        }
+        binding.layoutToLocation.setOnClickListener {
+            showFullScreenBottomSheet(locationItemClickOwner = LocationItemClickOwner.TO)
         }
 
-        binding.etFromLocation.setEndTextClickListener {
+        etFromLocation.setEndTextClickListener {
             navigation.goToSelectFromLocationFromRequestFragment()
         }
 
-        binding.etToLocation.setEndTextClickListener {
+        etToLocation.setEndTextClickListener {
             navigation.goToSelectToLocationFromRequestFragment()
         }
 
@@ -327,6 +347,55 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
                 updateMap(currentLongitude, currentLatitude)
             }
         }
+
+
+        searchAddressBottomSheetBehavior?.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_EXPANDED -> {
+                        Log.d("BottomSheet", "Развернут (STATE_EXPANDED)")
+                    }
+
+                    BottomSheetBehavior.STATE_COLLAPSED -> {
+                        Log.d("BottomSheet", "Свернут (STATE_COLLAPSED)")
+                    }
+
+                    BottomSheetBehavior.STATE_DRAGGING -> {
+                        binding.root.hideKeyboard()
+                        Log.d("BottomSheet", "Перетаскивается (STATE_DRAGGING)")
+                    }
+
+                    BottomSheetBehavior.STATE_SETTLING -> {
+                        Log.d("BottomSheet", "Фиксируется (STATE_SETTLING)")
+                    }
+
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        binding.root.hideKeyboard()
+                    }
+
+                    BottomSheetBehavior.STATE_HALF_EXPANDED -> {
+                        Log.d("BottomSheet", "Частично развернут (STATE_HALF_EXPANDED)")
+                    }
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                Log.d("BottomSheet", "Скролл, offset: $slideOffset")
+            }
+        })
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            true
+        ) {
+            if (searchAddressBottomSheetBehavior?.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                searchAddressBottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+            } else {
+                requireActivity().finish()
+            }
+        }
+
 
         initNavigationViewListener()
         initDrawerListener()
@@ -346,7 +415,13 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
             when (locationOwner) {
                 SELECT_LOCATION_OWNER_FROM -> {
                     isProgrammaticChange = true
-                    binding.etFromLocation.text = locationName
+                    binding.tvStartLocation.text = locationName
+                    binding.tvStartLocation.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            com.aralhub.ui.R.color.color_text_primary
+                        )
+                    )
                     isProgrammaticChange = false
                     requestViewModel2.setFromLocation(
                         SelectedLocation(
@@ -396,7 +471,7 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
                 }
 
                 LocationItemClickOwner.TO -> {
-                    binding.etToLocation.text = it.title
+                    binding.tvEndLocation.text = it.title
                     requestViewModel2.setToLocation(
                         SelectedLocation(
                             name = it.title,
@@ -408,6 +483,7 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
                     adapter.submitList(null)
                 }
             }
+            searchAddressBottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
         }
     }
 
@@ -461,28 +537,21 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
 
     private fun setUpBottomSheet() {
         bottomSheetBehavior = BottomSheetBehavior.from(binding.layoutBottomSheet)
-        bottomSheetBehavior?.apply {
-            state = BottomSheetBehavior.STATE_EXPANDED
-            peekHeight = resources.displayMetrics.heightPixels
-            isHideable = false
-        }
-        bottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
-
     }
 
-    private fun showFullScreenBottomSheet() {
-        bottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
-    }
+    private fun showFullScreenBottomSheet(locationItemClickOwner: LocationItemClickOwner) {
+        searchAddressBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
 
-    private fun setupCollapseSheetActions() {
-        // Or handle back press in your activity
-        requireActivity().onBackPressedDispatcher.addCallback(this) {
-            if (bottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED) {
-                bottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
-            } else {
-                isEnabled = false
-                requireActivity().onBackPressedDispatcher.onBackPressed()
-                isEnabled = true
+        val etFromLocation = binding.bottomSheetSearchAddress.dynamicLayout.etFromLocation
+        val etToLocation = binding.bottomSheetSearchAddress.dynamicLayout.etToLocation
+
+        when (locationItemClickOwner) {
+            LocationItemClickOwner.FROM -> {
+                etFromLocation.showKeyboardAndFocus()
+            }
+
+            LocationItemClickOwner.TO -> {
+                etToLocation.showKeyboardAndFocus()
             }
         }
     }
@@ -555,5 +624,6 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
         super.onDestroyView()
         LoadingModalBottomSheet.hide(childFragmentManager)
     }
+
 
 }

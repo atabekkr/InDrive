@@ -19,7 +19,6 @@ import com.aralhub.ui.model.args.SelectedLocation
 import com.aralhub.ui.model.args.SelectedLocations
 import com.yandex.mapkit.geometry.BoundingBox
 import com.yandex.mapkit.geometry.Point
-import com.yandex.mapkit.search.Address
 import com.yandex.mapkit.search.Response
 import com.yandex.mapkit.search.SearchFactory
 import com.yandex.mapkit.search.SearchManager
@@ -31,7 +30,6 @@ import com.yandex.mapkit.search.SuggestOptions
 import com.yandex.mapkit.search.SuggestResponse
 import com.yandex.mapkit.search.SuggestSession
 import com.yandex.mapkit.search.SuggestType
-import com.yandex.mapkit.search.ToponymObjectMetadata
 import com.yandex.runtime.Error
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -78,7 +76,8 @@ class RequestViewModel @Inject constructor(
     }
 
     // UI States
-    private val _suggestionsUiState = MutableStateFlow<SuggestionsUiState>(SuggestionsUiState.Loading)
+    private val _suggestionsUiState =
+        MutableStateFlow<SuggestionsUiState>(SuggestionsUiState.Loading)
     val suggestionsUiState = _suggestionsUiState.asStateFlow()
 
     private val _locationEnabled = MutableStateFlow(false)
@@ -126,7 +125,10 @@ class RequestViewModel @Inject constructor(
                         _suggestionsUiState.value = SuggestionsUiState.Loading
                         _suggestionsUiState.value = SuggestionsUiState.Success(
                             response.items
-                                .filter { it.center?.let { pt -> pt.latitude < MAX_LAT || pt.longitude < MAX_LON } ?: false }
+                                .filter {
+                                    it.center?.let { pt -> pt.latitude < MAX_LAT || pt.longitude < MAX_LON }
+                                        ?: false
+                                }
                                 .map { item ->
                                     LocationItem(
                                         id = 1,
@@ -141,7 +143,8 @@ class RequestViewModel @Inject constructor(
                     }
 
                     override fun onError(error: Error) {
-                        _suggestionsUiState.value = SuggestionsUiState.Error(error.isValid.toString())
+                        _suggestionsUiState.value =
+                            SuggestionsUiState.Error(error.isValid.toString())
                     }
                 }
             )
@@ -160,6 +163,7 @@ class RequestViewModel @Inject constructor(
                     _fromLocation.value = location
                     isFromLocationManuallySelected = true
                 }
+
                 LocationType.TO -> _toLocation.value = location
             }
             updateSelectedLocations()
@@ -182,19 +186,23 @@ class RequestViewModel @Inject constructor(
     private fun searchName(latitude: Double, longitude: Double) {
         viewModelScope.launch {
             _fromLocationUiState.emit(FromLocationUiState.Loading)
-            searchManager.submit(Point(latitude, longitude), 17, searchOptions, object : Session.SearchListener {
-                override fun onSearchResponse(response: Response) {
-                    val geoObjects = response.collection.children.mapNotNull { it.obj }
+            searchManager.submit(
+                Point(latitude, longitude),
+                17,
+                searchOptions,
+                object : Session.SearchListener {
+                    override fun onSearchResponse(response: Response) {
+                        val geoObjects = response.collection.children.mapNotNull { it.obj }
 
-                    val name = geoObjects.firstOrNull { it.name != null }?.name
-                        ?: "Anıqlap bolmadı"
-                    emitFromLocationSuccess(latitude, longitude, name)
-                }
+                        val name = geoObjects.firstOrNull { it.name != null }?.name
+                            ?: "Anıqlap bolmadı"
+                        emitFromLocationSuccess(latitude, longitude, name)
+                    }
 
-                override fun onSearchError(error: Error) {
-                    emitFromLocationError("Error finding location name")
-                }
-            })
+                    override fun onSearchError(error: Error) {
+                        emitFromLocationError("Error finding location name")
+                    }
+                })
         }
     }
 
@@ -235,6 +243,7 @@ class RequestViewModel @Inject constructor(
                 is Result.Success -> _profileUiState.emit(
                     ProfileUiState.Success(result.data.copy(profilePhoto = "${result.data.profilePhoto}"))
                 )
+
                 is Result.Error -> _profileUiState.emit(ProfileUiState.Error(result.message))
             }
         }
@@ -255,7 +264,7 @@ class RequestViewModel @Inject constructor(
             _searchRideUiState.emit(SearchRideUiState.Loading)
             _searchRideUiState.emit(
                 clientGetSearchRideUseCase().fold(
-                    onSuccess = { SearchRideUiState.Success(it)},
+                    onSuccess = { SearchRideUiState.Success(it) },
                     onError = { SearchRideUiState.Error(it) }
                 )
             )
@@ -270,6 +279,7 @@ class RequestViewModel @Inject constructor(
                     Log.i("RequestViewModel", "getActiveRide: ${result.data}")
                     _activeRideUiState.emit(ActiveRideUiState.Success(result.data))
                 }
+
                 is Result.Error -> {
                     Log.i("RequestViewModel", "getActiveRide: ${result.message}")
                     _activeRideUiState.emit(ActiveRideUiState.Error(result.message))

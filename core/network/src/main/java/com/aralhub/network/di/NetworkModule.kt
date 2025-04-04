@@ -10,6 +10,7 @@ import com.aralhub.network.api.RideOptionNetworkApi
 import com.aralhub.network.api.UserNetworkApi
 import com.aralhub.network.api.WebSocketClientNetworkApi
 import com.aralhub.network.utils.AuthInterceptor
+import com.aralhub.network.utils.DriverAuthInterceptor
 import com.aralhub.network.utils.NetworkErrorInterceptor
 import com.aralhub.network.utils.TokenAuthenticator
 import com.chuckerteam.chucker.api.ChuckerInterceptor
@@ -23,6 +24,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -41,6 +43,7 @@ object NetworkModule {
     }
 
     @[Provides Singleton]
+    @Named("Client")
     fun provideMainOkHttpClient(
         chucker: ChuckerInterceptor,
         httpLoggingInterceptor: HttpLoggingInterceptor,
@@ -56,8 +59,25 @@ object NetworkModule {
         .build()
 
     @[Provides Singleton]
+    @Named("Driver")
+    fun provideDriverOkHttpClient(
+        chucker: ChuckerInterceptor,
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+        authInterceptor: DriverAuthInterceptor,
+        tokenAuthenticator: TokenAuthenticator,
+        networkErrorInterceptor: NetworkErrorInterceptor
+    ): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(chucker)
+        .addInterceptor(httpLoggingInterceptor)
+        .addInterceptor(networkErrorInterceptor)
+        .addInterceptor(authInterceptor)
+        .authenticator(tokenAuthenticator)
+        .build()
+
+    @[Provides Singleton]
+    @Named("Client")
     fun provideMainRetrofit(
-        okHttpClient: OkHttpClient,
+        @Named("Client") okHttpClient: OkHttpClient,
     ): Retrofit = Retrofit.Builder()
         .baseUrl("https://araltaxi.aralhub.uz/")
         .addConverterFactory(GsonConverterFactory.create())
@@ -65,35 +85,45 @@ object NetworkModule {
         .build()
 
     @[Provides Singleton]
-    fun provideUserNetworkApi(retrofit: Retrofit): UserNetworkApi =
+    @Named("Driver")
+    fun provideDriverRetrofit(
+        @Named("Driver") okHttpClient: OkHttpClient,
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl("https://araltaxi.aralhub.uz/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .client(okHttpClient)
+        .build()
+
+    @[Provides Singleton]
+    fun provideUserNetworkApi(@Named("Client") retrofit: Retrofit): UserNetworkApi =
         retrofit.create(UserNetworkApi::class.java)
 
     @[Provides Singleton]
-    fun provideDriverNetworkApi(retrofit: Retrofit): DriverNetworkApi =
+    fun provideDriverNetworkApi(@Named("Driver")retrofit: Retrofit): DriverNetworkApi =
         retrofit.create(DriverNetworkApi::class.java)
 
     @[Provides Singleton]
-    fun provideWebsocketClientNetworkApi(retrofit: Retrofit): WebSocketClientNetworkApi =
+    fun provideWebsocketClientNetworkApi(@Named("Client")retrofit: Retrofit): WebSocketClientNetworkApi =
         retrofit.create(WebSocketClientNetworkApi::class.java)
 
     @[Provides Singleton]
-    fun providePaymentMethodNetworkApi(retrofit: Retrofit): PaymentMethodsNetworkApi =
+    fun providePaymentMethodNetworkApi(@Named("Client")retrofit: Retrofit): PaymentMethodsNetworkApi =
         retrofit.create(PaymentMethodsNetworkApi::class.java)
 
     @[Provides Singleton]
-    fun provideRideOptionNetworkApi(retrofit: Retrofit): RideOptionNetworkApi =
+    fun provideRideOptionNetworkApi(@Named("Client")retrofit: Retrofit): RideOptionNetworkApi =
         retrofit.create(RideOptionNetworkApi::class.java)
 
     @[Provides Singleton]
-    fun provideCancelCauseNetworkApi(retrofit: Retrofit): CancelCauseNetworkApi =
+    fun provideCancelCauseNetworkApi(@Named("Client")retrofit: Retrofit): CancelCauseNetworkApi =
         retrofit.create(CancelCauseNetworkApi::class.java)
 
     @[Provides Singleton]
-    fun provideAddressNetworkApi(retrofit: Retrofit): AddressNetworkApi =
+    fun provideAddressNetworkApi(@Named("Client")retrofit: Retrofit): AddressNetworkApi =
         retrofit.create(AddressNetworkApi::class.java)
 
     @[Provides Singleton]
-    fun provideReviewNetworkApi(retrofit: Retrofit): ReviewsNetworkApi =
+    fun provideReviewNetworkApi(@Named("Client")retrofit: Retrofit): ReviewsNetworkApi =
         retrofit.create(ReviewsNetworkApi::class.java)
 
 }

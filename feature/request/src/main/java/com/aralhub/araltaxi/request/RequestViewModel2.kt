@@ -1,5 +1,6 @@
 package com.aralhub.araltaxi.request
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aralhub.ui.model.args.LocationType
@@ -90,6 +91,7 @@ class RequestViewModel2 @Inject constructor() : ViewModel() {
     }
 
     private fun fetchCurrentLocationName(latitude: Double, longitude: Double) {
+        Log.i("RequestViewModel", latitude.toString())
         viewModelScope.launch {
             val point = Point(latitude, longitude)
             searchManager.submit(point,
@@ -100,6 +102,7 @@ class RequestViewModel2 @Inject constructor() : ViewModel() {
                         val name =
                             response.collection.children.firstNotNullOfOrNull { it.obj?.name }
                                 ?: return
+                        Log.i("RequestViewModel", "Current Location Name: $name")
                         _currentLocationFlow.value = SelectedLocation(
                             locationType = LocationType.FROM,
                             name = name,

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:paddingBottom="20dp">
+
+    <com.aralhub.ui.components.EndTextEditText
+        android:id="@+id/et_from_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_medium"
+        android:layout_marginTop="16dp"
+        android:hint="@string/hint_from_location"
+        app:endText="Karta"
+        app:hintTextColor="@color/color_tertiary"
+        app:startIconDrawable="@drawable/ic_start_location" />
+
+    <com.aralhub.ui.components.EndTextEditText
+        android:id="@+id/et_to_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_medium"
+        android:layout_marginTop="12dp"
+        android:hint="@string/hint_to_location"
+        app:endText="Karta"
+        app:hintTextColor="@color/color_tertiary"
+        app:startIconDrawable="@drawable/ic_end_location" />
+
+
+</LinearLayout>
