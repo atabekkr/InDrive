@@ -19,15 +19,22 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class AddPhoneFragment : Fragment(R.layout.fragment_add_phone) {
+
     private val binding by viewBinding(FragmentAddPhoneBinding::bind)
+
     private val viewModel by viewModels<AddPhoneViewModel>()
+
     private var _phone: String = ""
+
     @Inject lateinit var navigator: FeatureClientAuthNavigation
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         initViews()
         initListeners()
         initObservers()
+
     }
 
     private fun initObservers() {

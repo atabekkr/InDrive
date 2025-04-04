@@ -132,7 +132,7 @@ class AddSMSFragment : Fragment(R.layout.fragment_add_sms) {
     }
 
     private fun startCountDownTimerOfConfirmationCode(
-        millisInFuture: Long = 10 * 1000,
+        millisInFuture: Long = 1* 60 * 1000,
     ) {
         displayTimer()
         countDownTimer = object : CountDownTimer(
@@ -141,7 +141,7 @@ class AddSMSFragment : Fragment(R.layout.fragment_add_sms) {
         ) {
             override fun onTick(millisUntilFinished: Long) {
                 val seconds = millisUntilFinished / 1000
-                binding.tvTimer.text = getString(R.string.resend_code_label, "00:$seconds")
+                binding.tvTimer.text = getString(com.aralhub.ui.R.string.resend_code_label, "00:$seconds")
             }
 
             override fun onFinish() {

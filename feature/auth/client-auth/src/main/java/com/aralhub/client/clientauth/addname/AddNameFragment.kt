@@ -19,13 +19,19 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class AddNameFragment : Fragment(R.layout.fragment_add_name) {
+
     private val binding by viewBinding(FragmentAddNameBinding::bind)
+
     @Inject lateinit var navigator: FeatureClientAuthNavigation
+
     private val viewModel by viewModels<AddNameViewModel>()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         initListeners()
         initObservers()
+
     }
 
     private fun initObservers() {

@@ -12,9 +12,12 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class LogoFragment : Fragment(R.layout.fragment_logo) {
+
     private val binding by viewBinding(FragmentLogoBinding::bind)
+
     @Inject
     lateinit var navigator: FeatureClientAuthNavigation
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.viewNextButton.setOnClickListener { navigator.goToAddPhoneNumber() }

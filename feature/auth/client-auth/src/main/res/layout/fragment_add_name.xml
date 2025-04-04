@@ -27,7 +27,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="100dp"
                     android:gravity="center"
-                    android:text="@string/label_information"
+                    android:text="Ism"
                     android:textAppearance="@style/TextAppearance.InDrive.Text.Title" />
 
 
@@ -62,6 +62,7 @@
             android:layout_alignParentBottom="true"
             android:layout_gravity="bottom"
             android:layout_margin="@dimen/margin_medium"
+            android:paddingVertical="16dp"
             app:buttonEnabled="false"
             android:background="@drawable/selector_button_primary"
             app:progressButtonText="@string/label_save"
