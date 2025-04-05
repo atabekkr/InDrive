@@ -55,7 +55,7 @@ class RequestViewModel @Inject constructor(
     private val suggestSession: SuggestSession = searchManager.createSuggestSession()
     private val searchOptions = SearchOptions().apply {
         searchTypes = SearchType.GEO.value
-        resultPageSize = 1
+        resultPageSize = 55
     }
     private val suggestOptions = SuggestOptions().apply {
         suggestTypes = SuggestType.BIZ.value
@@ -63,8 +63,6 @@ class RequestViewModel @Inject constructor(
 
     // Karakalpakstan region bounding box
     private companion object {
-        const val PHOTO_BASE_URL = "https://araltaxi.aralhub.uz/"
-        const val DEFAULT_ZOOM_LEVEL = 17
         const val MIN_LAT = 41.0
         const val MAX_LAT = 44.0
         const val MIN_LON = 56.0

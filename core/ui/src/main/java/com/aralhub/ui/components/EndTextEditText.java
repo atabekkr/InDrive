@@ -92,6 +92,37 @@ public class EndTextEditText extends LinearLayout {
         containerParams.setMargins(dpToPx(16), 0, dpToPx(16), 0);
         addView(endTextContainer, containerParams);
 
+        // Add Clear (X) icon
+        ImageView clearIconView = new ImageView(context);
+        LayoutParams clearIconParams = new LayoutParams(dpToPx(24), dpToPx(24));
+        clearIconParams.setMargins(0, 0, 24, 0);
+        clearIconParams.gravity = Gravity.CENTER_VERTICAL;
+        clearIconView.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_gridicons_cross)); // замените на свою иконку
+        clearIconView.setVisibility(GONE); // по умолчанию скрыт
+        clearIconView.setClickable(true);
+        clearIconView.setFocusable(true);
+        clearIconView.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_round)); // если хочешь ripple
+
+        // Очистка текста при клике
+        clearIconView.setOnClickListener(v -> {
+            editText.setText("");
+        });
+        endTextContainer.addView(clearIconView, clearIconParams);
+
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Показать/спрятать clear icon
+                clearIconView.setVisibility(s.length() > 0 ? VISIBLE : GONE);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+
         // Divider
         View dividerView = new View(context);
         LinearLayout.LayoutParams dividerParams = new LinearLayout.LayoutParams(
@@ -117,6 +148,23 @@ public class EndTextEditText extends LinearLayout {
                 endTextClickListener.onClick(v);
             }
         });
+
+//        editText.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                if (!isProgrammaticChange) {
+//                    listener.onTextChanged(s.toString());
+//                }
+//
+//                // Показать/спрятать clear icon
+//                clearIconView.setVisibility(s.length() > 0 ? VISIBLE : GONE);
+//            }
+//
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+//            @Override
+//            public void afterTextChanged(Editable s) {}
+//        });
 
         if (attrs != null) {
             TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.EndTextEditText);

@@ -75,6 +75,9 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
         private val SMOOTH_ANIMATION = Animation(Animation.Type.SMOOTH, 0.4f)
     }
 
+    private var startLocationName: String? = null
+    private var endLocationName: String? = null
+
     private val binding by viewBinding(FragmentRequestBinding::bind)
     private var bottomSheetBehavior: BottomSheetBehavior<View>? = null
     private var searchAddressBottomSheetBehavior: BottomSheetBehavior<LinearLayout>? = null
@@ -117,6 +120,7 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         mapWindow = binding.mapView.mapWindow
         map = mapWindow.map
         locationManager =
@@ -159,31 +163,18 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
             currentLatitude = it.latitude
             currentLongitude = it.longitude
 
-            binding.tvStartLocation.text = it.name
-            binding.tvStartLocation.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    com.aralhub.ui.R.color.color_text_primary
-                )
-            )
+            setStartLocationName(it.name)
         }
         observeState(requestViewModel2.fromLocationFlow) {
             it?.let { fromLocation ->
-                binding.tvStartLocation.text = fromLocation.name
-                binding.tvStartLocation.setTextColor(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        com.aralhub.ui.R.color.color_text_primary
-                    )
-                )
+                setStartLocationName(fromLocation.name)
             }
         }
         observeState(requestViewModel2.toLocationFlow) {
             it?.let { toLocation ->
-                Log.i("LocationTo", "${toLocation.name}")
                 isNavigatedToCreateOrderFragment = false
-                Log.i("LocationTo", "isNavigated ${isNavigatedToCreateOrderFragment}")
                 binding.tvEndLocation.text = toLocation.name
+                endLocationName = toLocation.name
             }
         }
         observeState(requestViewModel2.navigateToCreateOrderFlow) { selectedLocations ->
@@ -415,13 +406,7 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
             when (locationOwner) {
                 SELECT_LOCATION_OWNER_FROM -> {
                     isProgrammaticChange = true
-                    binding.tvStartLocation.text = locationName
-                    binding.tvStartLocation.setTextColor(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            com.aralhub.ui.R.color.color_text_primary
-                        )
-                    )
+                    setStartLocationName(locationName)
                     isProgrammaticChange = false
                     requestViewModel2.setFromLocation(
                         SelectedLocation(
@@ -455,6 +440,17 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
         }
     }
 
+    private fun setStartLocationName(startLocationName: String?) {
+        this.startLocationName = startLocationName
+        binding.tvStartLocation.text = startLocationName
+        binding.tvStartLocation.setTextColor(
+            ContextCompat.getColor(
+                requireContext(),
+                com.aralhub.ui.R.color.color_text_primary
+            )
+        )
+    }
+
     private fun initAdapterListener() {
         adapter.setOnItemClickListener {
             when (it.clickOwner) {
@@ -472,6 +468,7 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
 
                 LocationItemClickOwner.TO -> {
                     binding.tvEndLocation.text = it.title
+                    endLocationName = it.title
                     requestViewModel2.setToLocation(
                         SelectedLocation(
                             name = it.title,
@@ -554,6 +551,10 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
                 etToLocation.showKeyboardAndFocus()
             }
         }
+
+        startLocationName?.let { etFromLocation.text = it }
+        endLocationName?.let { etToLocation.text = it }
+
     }
 
     private fun updateLoadingDialog() {

@@ -58,13 +58,13 @@ class RequestViewModel2 @Inject constructor() : ViewModel() {
     }
 
     fun setToLocation(selectedLocation: SelectedLocation) {
-        if (setCurrentLocationUpdatesAsFromLocation){
+        if (setCurrentLocationUpdatesAsFromLocation) {
             _fromLocationFlow.value = currentLocationFlow.value
         }
         _toLocationFlow.value = selectedLocation
     }
 
-    fun clearToLocation() = viewModelScope.launch{
+    fun clearToLocation() = viewModelScope.launch {
         _toLocationFlow.value = null
         _navigateToCreateOrderFlow.emit(null)
     }
@@ -75,10 +75,15 @@ class RequestViewModel2 @Inject constructor() : ViewModel() {
         _fromLocationFlow.value = selectedLocation
     }
 
-    private fun observeNavigateToCreateOrderFlow()  = viewModelScope.launch{
-        combine(fromLocationFlow, toLocationFlow){ _, _ -> }.collect {
-            if (fromLocationFlow.value != null && toLocationFlow.value != null){
-                _navigateToCreateOrderFlow.emit(SelectedLocations(fromLocationFlow.value!!, toLocationFlow.value!!))
+    private fun observeNavigateToCreateOrderFlow() = viewModelScope.launch {
+        combine(fromLocationFlow, toLocationFlow) { _, _ -> }.collect {
+            if (fromLocationFlow.value != null && toLocationFlow.value != null) {
+                _navigateToCreateOrderFlow.emit(
+                    SelectedLocations(
+                        fromLocationFlow.value!!,
+                        toLocationFlow.value!!
+                    )
+                )
                 _toLocationFlow.value = null
             }
         }
@@ -91,7 +96,6 @@ class RequestViewModel2 @Inject constructor() : ViewModel() {
     }
 
     private fun fetchCurrentLocationName(latitude: Double, longitude: Double) {
-        Log.i("RequestViewModel", latitude.toString())
         viewModelScope.launch {
             val point = Point(latitude, longitude)
             searchManager.submit(point,
