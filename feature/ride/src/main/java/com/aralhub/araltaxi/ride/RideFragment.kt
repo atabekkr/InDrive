@@ -2,8 +2,6 @@ package com.aralhub.araltaxi.ride
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -44,9 +42,6 @@ internal class RideFragment : Fragment(R.layout.fragment_ride) {
     lateinit var errorHandler: ErrorHandler
     private val rideViewModel by activityViewModels<RideViewModel>()
 
-    private val handler = Handler(Looper.getMainLooper())
-    private var isUpdating = false
-
     override fun onStart() {
         super.onStart()
         binding.mapView.onStart()
@@ -68,7 +63,6 @@ internal class RideFragment : Fragment(R.layout.fragment_ride) {
 
     private fun startService() {
         val intent = Intent(requireContext(), RideService::class.java)
-        Log.i("RideService", "startService")
         requireActivity().startService(intent)
     }
 

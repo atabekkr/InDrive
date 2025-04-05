@@ -4,7 +4,6 @@ import android.util.Log
 import com.aralhub.network.ClientRideNetworkDataSource
 import com.aralhub.network.models.ClientWebSocketServerResponse
 import com.aralhub.network.models.ClientWebSocketServerResponseUpdate
-import com.aralhub.network.models.ride.NetworkRideActive
 import com.aralhub.network.models.ride.NetworkRideCompleted
 import com.aralhub.network.utils.ClientWebSocketEventRideMessage
 import com.aralhub.network.utils.NetworkDriverWaitingClientMessage
@@ -64,7 +63,10 @@ class ClientRideNetworkDataSourceImpl(private val client: HttpClient) :
                                     Log.i("WebSocketLogClient", "Parsed type: ${data.type}")
                                     val event = when (data.type) {
                                         RIDE_STATUS_UPDATE -> {
-                                            Log.i("WebSocketLogClient", "Parsed status: ${data.data.status}")
+                                            Log.i(
+                                                "WebSocketLogClient",
+                                                "Parsed status: ${data.data.status}"
+                                            )
                                             when (data.data.status) {
                                                 NetworkRideStatus.DRIVER_ON_THE_WAY.status -> {
                                                     Log.i(
@@ -74,7 +76,8 @@ class ClientRideNetworkDataSourceImpl(private val client: HttpClient) :
                                                     val message =
                                                         Gson().fromJson<ClientWebSocketServerResponseUpdate<String>>(
                                                             text,
-                                                            object : TypeToken<ClientWebSocketServerResponseUpdate<String>>() {}.type
+                                                            object :
+                                                                TypeToken<ClientWebSocketServerResponseUpdate<String>>() {}.type
                                                         )
                                                     ClientWebSocketEventRideMessage.DriverOnTheWay(
                                                         message.data.message
@@ -144,10 +147,17 @@ class ClientRideNetworkDataSourceImpl(private val client: HttpClient) :
                                                         message.data.message.status
                                                     )
                                                 }
+
                                                 NetworkRideStatus.CANCELED_BY_DRIVER.status -> {
-                                                    val message = Gson().fromJson<ClientWebSocketServerResponseUpdate<String>>(text,
-                                                        object : TypeToken<ClientWebSocketServerResponseUpdate<String>>() {}.type)
-                                                    ClientWebSocketEventRideMessage.CancelledByDriver(message.data.message)
+                                                    val message =
+                                                        Gson().fromJson<ClientWebSocketServerResponseUpdate<String>>(
+                                                            text,
+                                                            object :
+                                                                TypeToken<ClientWebSocketServerResponseUpdate<String>>() {}.type
+                                                        )
+                                                    ClientWebSocketEventRideMessage.CancelledByDriver(
+                                                        message.data.message
+                                                    )
                                                 }
 
                                                 else -> ClientWebSocketEventRideMessage.Unknown("Unknown status: ${data.data.status}")

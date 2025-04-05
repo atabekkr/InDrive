@@ -1,7 +1,9 @@
 package com.aralhub.network.di
 
 import com.aralhub.araltaxi.core.common.sharedpreference.ClientSharedPreference
+import com.aralhub.network.ClientRideNetworkDataSource
 import com.aralhub.network.WebSocketClientOffersNetworkDataSource
+import com.aralhub.network.impl.ClientRideNetworkDataSourceImpl
 import com.aralhub.network.impl.WebSocketClientOffersNetworkDataSourceImpl
 import dagger.Module
 import dagger.Provides
@@ -42,5 +44,11 @@ object ClientWebSocketModule {
     @Provides
     fun provideClientOffersNetworkDataSource(@Named("ClientHttpClient") httpClient: HttpClient): WebSocketClientOffersNetworkDataSource {
         return WebSocketClientOffersNetworkDataSourceImpl(httpClient)
+    }
+
+    @Singleton
+    @Provides
+    fun provideClientRideNetworkDataSource(@Named("ClientHttpClient") httpClient: HttpClient): ClientRideNetworkDataSource {
+        return ClientRideNetworkDataSourceImpl(httpClient)
     }
 }

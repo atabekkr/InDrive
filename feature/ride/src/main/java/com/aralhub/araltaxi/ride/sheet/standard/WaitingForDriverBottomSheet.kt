@@ -119,7 +119,6 @@ class WaitingForDriverBottomSheet : Fragment(R.layout.bottom_sheet_waiting_for_d
     }
 
     private fun displayActiveRide(activeRide: ActiveRide) {
-        binding.tvTitle.text = "Aydawshı jolda kelatır"
         binding.btnCall.setOnClickListener {}
         binding.tvDriverName.text = activeRide.driver.fullName
         displayAvatar("https://araltaxi.aralhub.uz/${activeRide.driver.photoUrl}", binding.ivDriver)

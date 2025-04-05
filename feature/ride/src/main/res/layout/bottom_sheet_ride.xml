@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
+    android:layout_marginTop="8dp"
     android:paddingHorizontal="@dimen/padding_medium">
 
     <TextView
@@ -77,7 +78,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginTop="20dp"
         android:baselineAligned="false"
         android:gravity="center_horizontal"
         android:orientation="horizontal">
@@ -138,7 +139,8 @@
         android:id="@+id/layout_money"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/margin_small"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="@dimen/margin_small"
         android:gravity="top"
         android:orientation="horizontal">
 

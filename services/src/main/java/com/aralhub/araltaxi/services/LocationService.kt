@@ -53,6 +53,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Named
 
 @AndroidEntryPoint
 class LocationService : Service() {
@@ -61,6 +62,7 @@ class LocationService : Service() {
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
     @Inject
+    @Named("DriverHttpClient")
     lateinit var client: HttpClient
 
     private var session: WebSocketSession? = null
