@@ -7,6 +7,8 @@ import android.graphics.PointF
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.util.Log
 import android.view.View
@@ -17,9 +19,12 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.aralhub.araltaxi.core.common.error.ErrorHandler
 import com.aralhub.araltaxi.core.common.permission.PermissionHelper
+import com.aralhub.araltaxi.core.common.utils.MapStyles
+import com.aralhub.araltaxi.core.common.utils.loadJsonFromAssets
 import com.aralhub.araltaxi.create_order.databinding.FragmentCreateOrderBinding
 import com.aralhub.araltaxi.create_order.navigation.FeatureCreateOrderNavigation
 import com.aralhub.araltaxi.create_order.utils.NewCurrentLocationListener
+import com.aralhub.araltaxi.create_order.utils.updateMapStyle
 import com.aralhub.indrive.core.data.model.client.GeoPoint
 import com.aralhub.indrive.core.data.model.client.RecommendedPrice
 import com.aralhub.indrive.core.data.model.payment.PaymentMethodType
@@ -46,7 +51,9 @@ import com.yandex.mapkit.directions.driving.VehicleOptions
 import com.yandex.mapkit.geometry.BoundingBox
 import com.yandex.mapkit.geometry.Geometry
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObjectCollection
@@ -62,6 +69,7 @@ import javax.inject.Inject
 class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
     private val binding by viewBinding(FragmentCreateOrderBinding::bind)
     private var isConfiguring: Boolean = false
+
     @Inject
     lateinit var errorHandler: ErrorHandler
     private val changePaymentMethodModalBottomSheet by lazy { ChangePaymentMethodModalBottomSheet() }
@@ -84,6 +92,7 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
         override fun onDrivingRoutes(drivingRoutes: MutableList<DrivingRoute>) {
             drawDrivingRoutes(drivingRoutes)
         }
+
         override fun onDrivingRoutesError(error: Error) {
             when (error) {
                 is NetworkError -> errorHandler.showToast(getString(com.aralhub.ui.R.string.error_network_connection))
@@ -122,10 +131,11 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
     lateinit var navigation: FeatureCreateOrderNavigation
     private val newCurrentLocationListener = NewCurrentLocationListener(
         onInitMapPosition = { point ->
-           /* createCurrentLocationPlaceMarkObject(point)*/ },
-        onUpdateMapPosition = { point -> /*createCurrentLocationPlaceMarkObject(point) */},
+            /* createCurrentLocationPlaceMarkObject(point)*/
+        },
+        onUpdateMapPosition = { point -> /*createCurrentLocationPlaceMarkObject(point) */ },
         onProviderDisabledListener = { point ->
-         /*   createCurrentLocationPlaceMarkObject(point)*/
+            /*   createCurrentLocationPlaceMarkObject(point)*/
         },
         onProviderEnabledListener = { }
     )
@@ -134,11 +144,14 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
     private var toRoutePlaceMarkObject: PlacemarkMapObject? = null
     private var imageProvider: ImageProvider? = null
 
+    private val handler = Handler(Looper.getMainLooper())
+    private var isUpdating = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationManager =
+            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         initMap()
         initObservers()
         initViews()
@@ -167,6 +180,41 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
         mapObjects = mapWindow.map.mapObjects.addCollection()
         imageProvider =
             ImageProvider.fromResource(requireContext(), com.aralhub.ui.R.drawable.ic_vector)
+
+        setDefaultMapStyle()
+        mapCameraListener()
+
+    }
+
+    private fun setDefaultMapStyle() {
+        val minimalisticMapStyle =
+            loadJsonFromAssets(requireContext(), MapStyles.MINIMALISTIC_MAP_STYLE)
+        binding.mapView.map.setMapStyle(minimalisticMapStyle)
+    }
+
+    private fun mapCameraListener() {
+        binding.mapView.map.addCameraListener(object : CameraListener {
+            override fun onCameraPositionChanged(
+                p0: Map,
+                cameraPosition: CameraPosition,
+                p2: CameraUpdateReason,
+                p3: Boolean
+            ) {
+                val zoom = cameraPosition.zoom
+                Log.i("ZoomInCreateOrder", zoom.toString())
+                if (isUpdating) return
+                isUpdating = true
+
+                handler.postDelayed({
+                    updateMapStyle(zoom)
+                    isUpdating = false
+                }, 500)
+            }
+        })
+    }
+
+    private fun updateMapStyle(zoom: Float) {
+        map?.updateMapStyle(zoom, requireContext())
     }
 
     override fun onResume() {
@@ -189,10 +237,12 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
                 )
             )
         ) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+            locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
                 0,
                 0f,
-                newCurrentLocationListener)
+                newCurrentLocationListener
+            )
         }
     }
 
@@ -221,18 +271,22 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
                 )
             )
 
-            Log.i("Locations", "${listOf(
-                GeoPoint(
-                    latitude = it.from.latitude,
-                    longitude = it.from.longitude,
-                    name = it.from.name
-                ),
-                GeoPoint(
-                    latitude = it.to.latitude,
-                    longitude = it.to.longitude,
-                    name = it.to.name
-                )
-            )}")
+            Log.i(
+                "Locations", "${
+                    listOf(
+                        GeoPoint(
+                            latitude = it.from.latitude,
+                            longitude = it.from.longitude,
+                            name = it.from.name
+                        ),
+                        GeoPoint(
+                            latitude = it.to.latitude,
+                            longitude = it.to.longitude,
+                            name = it.to.name
+                        )
+                    )
+                }"
+            )
             requestRoutes(it)
             binding.tvFromLocationName.text = it.from.name
             binding.tvToLocationName.text = it.to.name
@@ -293,11 +347,11 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
         }
 
         binding.tvFromLocationName.setOnClickListener {
-          //  navigation.goToSelectFromLocationFromCreateOrderFragment()
+            //  navigation.goToSelectFromLocationFromCreateOrderFragment()
         }
 
         binding.tvToLocationName.setOnClickListener {
-           // navigation.goToSelectToLocationFromCreateOrderFragment()
+            // navigation.goToSelectToLocationFromCreateOrderFragment()
         }
 
 
@@ -330,7 +384,7 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
                     paymentId = viewModel.paymentMethod.value.id,
                     options = enabledOptionsIds
                 )
-              }
+            }
         }
 
         binding.ivChangePaymentMethod.setOnClickListener {
@@ -464,7 +518,7 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
     }
 
     private fun drawDrivingRoutes(drivingRoutes: MutableList<DrivingRoute>) {
-        Log.i("Routes","Route: $drivingRoutes")
+        Log.i("Routes", "Route: $drivingRoutes")
         val route = drivingRoutes[0]
         mapObjects?.clear()
         mapObjects?.addPolyline(route.geometry)
@@ -477,7 +531,8 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
     }
 
     private fun addRouteFromPointMarker(point: Point) {
-        val fromPointImageProvider = ImageProvider.fromResource(requireContext(), com.aralhub.ui.R.drawable.ic_pickup_marker)
+        val fromPointImageProvider =
+            ImageProvider.fromResource(requireContext(), com.aralhub.ui.R.drawable.ic_pickup_marker)
         map?.let {
             if (it.isValid) {
                 if (fromRoutePlaceMarkObject == null) {

@@ -7,6 +7,8 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -21,8 +23,11 @@ import com.aralhub.araltaxi.client.request.R
 import com.aralhub.araltaxi.client.request.databinding.FragmentRequestBinding
 import com.aralhub.araltaxi.core.common.error.ErrorHandler
 import com.aralhub.araltaxi.core.common.permission.PermissionHelper
+import com.aralhub.araltaxi.core.common.utils.MapStyles
+import com.aralhub.araltaxi.core.common.utils.loadJsonFromAssets
 import com.aralhub.araltaxi.request.navigation.FeatureRequestNavigation
 import com.aralhub.araltaxi.request.utils.BottomSheetBehaviorDrawerListener
+import com.aralhub.araltaxi.request.utils.updateMapStyle
 import com.aralhub.indrive.core.data.model.client.ClientProfile
 import com.aralhub.ui.adapter.location.LocationItemAdapter
 import com.aralhub.ui.model.LocationItemClickOwner
@@ -41,7 +46,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapWindow
 import com.yandex.mapkit.map.PlacemarkMapObject
@@ -99,11 +106,14 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
     private var placeMarkObject: PlacemarkMapObject? = null
     private var isNavigatedToCreateOrderFragment = false
     private var isFullscreen = false
-    private lateinit var mapWindow: MapWindow
-    private lateinit var map: Map
+    private var mapWindow: MapWindow? = null
+    private var map: Map? = null
     private var isProgrammaticChange = false
 
     private var fusedLocationClient: FusedLocationProviderClient? = null
+
+    private val handler = Handler(Looper.getMainLooper())
+    private var isUpdating = false
 
     override fun onStart() {
         super.onStart()
@@ -122,7 +132,7 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
         super.onViewCreated(view, savedInstanceState)
 
         mapWindow = binding.mapView.mapWindow
-        map = mapWindow.map
+        map = mapWindow?.map
         locationManager =
             requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         observeStates()
@@ -131,6 +141,40 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         setCurrentUserLocation()
+
+        setDefaultMapStyle()
+        mapCameraListener()
+
+    }
+
+    private fun setDefaultMapStyle() {
+        val minimalisticMapStyle =
+            loadJsonFromAssets(requireContext(), MapStyles.MINIMALISTIC_MAP_STYLE)
+        binding.mapView.map.setMapStyle(minimalisticMapStyle)
+    }
+
+    private fun mapCameraListener() {
+        binding.mapView.map.addCameraListener(object : CameraListener {
+            override fun onCameraPositionChanged(
+                p0: Map,
+                cameraPosition: CameraPosition,
+                p2: CameraUpdateReason,
+                p3: Boolean
+            ) {
+                val zoom = cameraPosition.zoom
+                if (isUpdating) return
+                isUpdating = true
+
+                handler.postDelayed({
+                    updateMapStyle(zoom)
+                    isUpdating = false
+                }, 500)
+            }
+        })
+    }
+
+    private fun updateMapStyle(zoom: Float) {
+        map?.updateMapStyle(zoom, requireContext())
     }
 
     override fun onResume() {

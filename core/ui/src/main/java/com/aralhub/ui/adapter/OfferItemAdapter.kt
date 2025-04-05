@@ -1,5 +1,6 @@
 package com.aralhub.ui.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
@@ -9,6 +10,10 @@ import com.aralhub.ui.model.OfferItem
 import com.aralhub.ui.model.OfferItemDiffCallback
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 class OfferItemAdapter :
     ListAdapter<OfferItem, OfferItemAdapter.ViewHolder>(OfferItemDiffCallback) {
@@ -34,7 +39,8 @@ class OfferItemAdapter :
                 onItemDeclineClickListener.invoke(offerItem, adapterPosition)
             }
 
-            itemOfferBinding.btnAccept.setExpirationTime(offerItem.expiresAt)
+            Log.i("OfferItemAdapter", "Expiration time: ${offerItem.expiresAt}")
+            itemOfferBinding.btnAccept.setExpirationTime(getTime30SecondsAhead())
 
             itemOfferBinding.apply {
                 tvDriverName.text = offerItem.driver.name
@@ -51,6 +57,22 @@ class OfferItemAdapter :
                     .into(itemOfferBinding.ivAvatar)
             }
         }
+    }
+
+
+    fun getTime30SecondsAhead(): String {
+        // Get current time as Instant
+        val currentTime = Instant.now()
+
+        // Add 30 seconds
+        val time30SecondsAhead = currentTime.plus(30, ChronoUnit.SECONDS)
+
+        // Format with explicit +00:00 timezone
+        val formatter = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX")
+            .withZone(ZoneOffset.UTC)
+
+        return formatter.format(time30SecondsAhead)
     }
 
     fun removeItem(position: Int){

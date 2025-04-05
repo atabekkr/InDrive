@@ -97,7 +97,7 @@
             app:textColor="@color/color_content_tertiary"
             app:progressiveButtonText="Kerek emes"
             android:layout_marginEnd="@dimen/margin_small"
-            android:layout_height="wrap_content"/>
+            android:layout_height="40dp"/>
 
         <com.aralhub.ui.components.ProgressiveButton
             android:id="@+id/btn_accept"
@@ -108,7 +108,7 @@
             app:progressiveButtonText="Qabillaw"
             android:layout_weight="1"
             android:layout_marginStart="@dimen/margin_small"
-            android:layout_height="wrap_content"/>
+            android:layout_height="40dp"/>
 
 
     </LinearLayout>

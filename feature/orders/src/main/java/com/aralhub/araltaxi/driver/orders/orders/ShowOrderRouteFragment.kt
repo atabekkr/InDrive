@@ -5,6 +5,8 @@ import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.aralhub.araltaxi.driver.orders.R
 import com.aralhub.araltaxi.driver.orders.databinding.FragmentShowOrderRouteBinding
+import com.aralhub.araltaxi.driver.orders.utils.updateMapStyle
 import com.aralhub.ui.model.ClientRideLocationsCoordinatesUI
 import com.aralhub.ui.model.OrderItem
 import com.aralhub.ui.utils.viewBinding
@@ -33,8 +36,11 @@ import com.yandex.mapkit.directions.driving.VehicleOptions
 import com.yandex.mapkit.geometry.BoundingBox
 import com.yandex.mapkit.geometry.Geometry
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.map.IconStyle
+import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.runtime.Error
@@ -62,6 +68,9 @@ class ShowOrderRouteFragment : Fragment(R.layout.fragment_show_order_route),
     private var routeStartLocation: Point? = null
     private var routeEndLocation: Point? = null
 
+    private val handler = Handler(Looper.getMainLooper())
+    private var isUpdating = false
+
     override fun onStart() {
         super.onStart()
         MapKitFactory.getInstance().onStart()
@@ -76,11 +85,13 @@ class ShowOrderRouteFragment : Fragment(R.layout.fragment_show_order_route),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         registerPermissionListener()
         checkLocationPermission()
         setupData()
         setupUI()
         setupListeners()
+        mapCameraListener()
 
     }
 
@@ -114,6 +125,30 @@ class ShowOrderRouteFragment : Fragment(R.layout.fragment_show_order_route),
 
     private fun setupListeners() {
         binding.btnClose.setOnClickListener { findNavController().navigateUp() }
+    }
+
+    private fun mapCameraListener() {
+        binding.mapView.map.addCameraListener(object : CameraListener {
+            override fun onCameraPositionChanged(
+                p0: Map,
+                cameraPosition: CameraPosition,
+                p2: CameraUpdateReason,
+                p3: Boolean
+            ) {
+                val zoom = cameraPosition.zoom
+                if (isUpdating) return
+                isUpdating = true
+
+                handler.postDelayed({
+                    updateMapStyle(zoom)
+                    isUpdating = false
+                }, 500)
+            }
+        })
+    }
+
+    private fun updateMapStyle(zoom: Float) {
+        binding.mapView.mapWindow.map.updateMapStyle(zoom, requireContext())
     }
 
     private fun addPointMarkerToRoute(point: Point, resId: Int) {

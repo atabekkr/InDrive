@@ -10,6 +10,8 @@ import androidx.navigation.fragment.NavHostFragment
 import com.aralhub.araltaxi.client.offers.R
 import com.aralhub.araltaxi.client.offers.databinding.FragmentOffersBinding
 import com.aralhub.araltaxi.core.common.error.ErrorHandler
+import com.aralhub.araltaxi.core.common.utils.MapStyles
+import com.aralhub.araltaxi.core.common.utils.loadJsonFromAssets
 import com.aralhub.offers.navigation.FeatureOffersNavigation
 import com.aralhub.offers.navigation.sheet.SheetNavigator
 import com.aralhub.ui.adapter.OfferItemAdapter
@@ -30,6 +32,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class OffersFragment : Fragment(R.layout.fragment_offers) {
+
     private val binding by viewBinding(FragmentOffersBinding::bind)
 
     @Inject
@@ -63,6 +66,13 @@ class OffersFragment : Fragment(R.layout.fragment_offers) {
         binding.dotLottie.load(config)
         binding.dotLottie.play()
         initObservers()
+        setDefaultMapStyle()
+    }
+
+    private fun setDefaultMapStyle() {
+        val minimalisticMapStyle =
+            loadJsonFromAssets(requireContext(), MapStyles.MINIMALISTIC_MAP_STYLE)
+        binding.mapView.map.setMapStyle(minimalisticMapStyle)
     }
 
     private fun initObservers() {
