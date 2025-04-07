@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import com.aralhub.araltaxi.driver.orders.R
 import com.aralhub.araltaxi.driver.orders.databinding.ModalBottomSheetRideFinishedBinding
-import com.aralhub.ui.model.PaymentType
 import com.aralhub.ui.model.RideCompletedUI
 import com.aralhub.ui.utils.viewBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior

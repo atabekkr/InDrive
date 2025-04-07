@@ -37,29 +37,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_orders"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/padding_small"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                    tools:listitem="@layout/item_order" />
+                    android:orientation="vertical">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_orders"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="@dimen/padding_small"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                        tools:listitem="@layout/item_order" />
+
+                    <TextView
+                        android:id="@+id/tv_orders_not_found"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_marginHorizontal="32dp"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:maxLines="1"
+                        android:text="Zakazlar tabılmadı"
+                        android:textAppearance="@style/TextAppearance.InDrive.BodyLarge"
+                        android:visibility="visible" />
+                </LinearLayout>
 
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-            <TextView
-                android:id="@+id/tv_orders_not_found"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_marginHorizontal="32dp"
-                android:gravity="center_vertical"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="Zakazlar tabılmadı"
-                android:textAppearance="@style/TextAppearance.InDrive.BodyLarge"
-                android:visibility="visible" />
 
         </LinearLayout>
 

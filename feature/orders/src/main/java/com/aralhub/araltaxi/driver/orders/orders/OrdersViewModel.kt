@@ -28,9 +28,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -65,7 +67,7 @@ class OrdersViewModel @Inject constructor(
     }
 
     private val existingOrdersState =
-        MutableStateFlow<GetActiveOrdersUiState>(GetActiveOrdersUiState.Loading)
+        MutableStateFlow<GetActiveOrdersUiState>(GetActiveOrdersUiState.Idle)
 
     fun getExistingOrders(
         sendDriverLocationUI: SendDriverLocationUI
@@ -96,6 +98,7 @@ class OrdersViewModel @Inject constructor(
         ordersWebSocketJob = viewModelScope.launch {
             webSocketEvent
                 .collect {
+                    Timber.d("startOrdersWebSocket: $it")
                     when (it) {
                         is WebSocketEvent.ActiveOffer -> {
                             addOrder(it.order.asUI())
@@ -141,7 +144,6 @@ class OrdersViewModel @Inject constructor(
 
     private val webSocketOrdersState =
         MutableStateFlow<GetActiveOrdersUiState>(GetActiveOrdersUiState.Loading)
-
     val ordersState = merge(
         existingOrdersState,
         webSocketOrdersState

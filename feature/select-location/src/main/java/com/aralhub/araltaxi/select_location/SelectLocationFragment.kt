@@ -1,8 +1,7 @@
 package com.aralhub.araltaxi.select_location
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.location.LocationManager
+import android.location.Location
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,35 +9,42 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.aralhub.araltaxi.core.common.error.ErrorHandler
 import com.aralhub.araltaxi.core.common.permission.PermissionHelper
 import com.aralhub.araltaxi.select_location.databinding.FragmentSelectLocationBinding
-import com.aralhub.araltaxi.select_location.utils.CurrentLocationListener
+import com.aralhub.offers.utils.updateMapStyle
 import com.aralhub.ui.utils.FloatLandAnimation
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.ViewEx.disable
 import com.aralhub.ui.utils.ViewEx.enable
 import com.aralhub.ui.utils.viewBinding
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.ScreenPoint
 import com.yandex.mapkit.ScreenRect
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapWindow
 import com.yandex.mapkit.map.SizeChangedListener
 import com.yandex.mapkit.search.Address
 import com.yandex.mapkit.search.ToponymObjectMetadata
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
-    private lateinit var mapWindow: MapWindow
-    private lateinit var map: Map
-    private lateinit var floatLandAnimation: FloatLandAnimation
+
+    private var mapWindow: MapWindow? = null
+    private var map: Map? = null
+    private var floatLandAnimation: FloatLandAnimation? = null
 
     @Inject
     lateinit var errorHandler: ErrorHandler
@@ -47,15 +53,20 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
     private val movementHandler = Handler(Looper.getMainLooper())
     private val movementDelay = 500L
 
+    private val handler = Handler(Looper.getMainLooper())
+    private var isUpdating = false
+
+    private var fusedLocationClient: FusedLocationProviderClient? = null
+
     private val cameraListener =
         CameraListener { map, cameraPosition, cameraUpdateReason, finished ->
             if (!finished && !isMapMoving) {
                 isMapMoving = true
                 binding.btnSelectLocation.disable()
-                floatLandAnimation.startFloating()
+                floatLandAnimation?.startFloating()
             } else if (finished) {
                 isMapMoving = false
-                floatLandAnimation.land()
+                floatLandAnimation?.land()
             }
             // Handle map movement start
             if (!isMapMoving) {
@@ -78,19 +89,7 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
         // Recalculate FocusRect and FocusPoint on every map's size change
         updateFocusInfo()
     }
-    private val currentLocationListener = CurrentLocationListener(
-        onUpdateMapPosition = ::updateMapPosition,
-        onProviderDisabledListener = { initialPoint ->
-            updateMapPosition(initialPoint)
-            displayGpsStatus(false)
-        },
-        onProviderEnabledListener = { point ->
-            updateMapPosition(point)
-            displayGpsStatus(true)
-        }
-    )
 
-    private var locationManager: LocationManager? = null
     private var isMapMoving = false
     private var selectedLatitude = 0.0
     private var selectedLongitude = 0.0
@@ -100,13 +99,18 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.i("SelectLocationFragment", "onViewCreated")
-        locationManager = requireActivity().getSystemService(LocationManager::class.java)
+
+        initData()
         initMap()
         initObservers()
         initArgs()
         initViews()
         initListeners()
+
+    }
+
+    private fun initData() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
     }
 
     private fun initViews() {
@@ -115,23 +119,53 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
 
     private fun initMap() {
         mapWindow = binding.mapView.mapWindow
-        map = mapWindow.map
-        if (map.isValid) {
-            viewModel.setVisibleRegion(map.visibleRegion)
-            mapWindow.addSizeChangedListener(sizeChangedListener)
-            map.addCameraListener(cameraListener)
+        map = mapWindow?.map
+        if (map?.isValid == true) {
+            viewModel.setVisibleRegion(map!!.visibleRegion)
+            mapWindow?.addSizeChangedListener(sizeChangedListener)
+            map?.addCameraListener(cameraListener)
             updateFocusInfo()
-            map.move(
-                CameraPosition(Point(42.4651, 59.6136), 17.0f, 0f, 0f)
-            )
         }
 
+        showCurrentLocation()
+        mapCameraListener()
+
+    }
+
+    private fun moveCamera(point: Point) {
+        map?.move(
+            CameraPosition(point, 17.0f, 0f, 0f),
+            Animation(Animation.Type.SMOOTH, 1f),
+            null
+        )
+    }
+
+    private fun mapCameraListener() {
+        binding.mapView.map.addCameraListener(object : CameraListener {
+            override fun onCameraPositionChanged(
+                p0: Map,
+                cameraPosition: CameraPosition,
+                p2: CameraUpdateReason,
+                p3: Boolean
+            ) {
+                val zoom = cameraPosition.zoom
+                if (isUpdating) return
+                isUpdating = true
+
+                handler.postDelayed({
+                    updateMapStyle(zoom)
+                    isUpdating = false
+                }, 500)
+            }
+        })
+    }
+
+    private fun updateMapStyle(zoom: Float) {
+        binding.mapView.mapWindow.map.updateMapStyle(zoom, requireContext())
     }
 
     private fun initListeners() {
         binding.btnSelectLocation.setOnClickListener {
-            Log.i("Location", "Selected $locationOwner")
-            Log.i("Location", "Selected lat $selectedLatitude")
             val result = Bundle().apply {
                 putDouble("latitude", selectedLatitude)
                 putDouble("longitude", selectedLongitude)
@@ -141,9 +175,12 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
             }
 
             parentFragmentManager.setFragmentResult("location_key", result)
-            if (map.isValid) {
-                map.removeCameraListener(cameraListener)
-                Log.i("NavigationUp", "SelectLocationFragment: $selectedLatitude, $selectedLongitude")
+            if (map?.isValid == true) {
+                map?.removeCameraListener(cameraListener)
+                Log.i(
+                    "NavigationUp",
+                    "SelectLocationFragment: $selectedLatitude, $selectedLongitude"
+                )
                 findNavController().navigateUp()
             }
         }
@@ -174,43 +211,11 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
         floatLandAnimation = FloatLandAnimation(binding.iconCenter)
     }
 
-    @SuppressLint("MissingPermission")
-    override fun onResume() {
-        super.onResume()
-        if (PermissionHelper.arePermissionsGranted(
-                requireContext(),
-                listOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            )
-        ) {
-            locationManager?.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER,
-                0,
-                0f,
-                currentLocationListener
-            )
-        }
-
-    }
-
-    override fun onPause() {
-        super.onPause()
-        locationManager?.removeUpdates(currentLocationListener)
-    }
-
     override fun onStop() {
         binding.mapView.onStop()
         MapKitFactory.getInstance().onStop()
-        floatLandAnimation.stopAnimations()
-        locationManager = null
+        floatLandAnimation?.stopAnimations()
         super.onStop()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        locationManager = null
     }
 
     private fun initObservers() {
@@ -218,16 +223,14 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
             when (selectLocationUiState.searchState) {
                 SearchState.Error -> {
                     errorHandler.showToast("Error to find location name")
-                    Log.i("Select Location", "Error")
                 }
+
                 SearchState.Loading -> {
                     binding.itemSelectLocation.tvTitle.text = "Updating..."
-                    Log.i("Select Location", "Loading")
                 }
 
                 SearchState.Off -> binding.itemSelectLocation.tvTitle.text = "Searching..."
                 is SearchState.Success -> {
-                    Log.i("Select Location", "Success: ${selectLocationUiState.searchState.items.size}")
                     val address = selectLocationUiState.searchState.items.firstOrNull()?.geoObject
                         ?.metadataContainer
                         ?.getItem(ToponymObjectMetadata::class.java)
@@ -256,9 +259,14 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
                     Log.i("Search", "$street, $house, $address")
                     /*selectLocationUiState.searchState.items.firstOrNull()?.geoObject?.name ?: "Unknown Location",*/
                     viewModel.selectLocation(
-                        selectLocationUiState.searchState.items.firstOrNull()?.geoObject?.name ?: "Unknown Location",
-                        selectLocationUiState.searchState.items.firstOrNull()?.geoObject?.descriptionText ?: "",
-                        selectLocationUiState.searchState.items.firstOrNull()?.point ?: Point(0.0, 0.0)
+                        selectLocationUiState.searchState.items.firstOrNull()?.geoObject?.name
+                            ?: "Unknown Location",
+                        selectLocationUiState.searchState.items.firstOrNull()?.geoObject?.descriptionText
+                            ?: "",
+                        selectLocationUiState.searchState.items.firstOrNull()?.point ?: Point(
+                            0.0,
+                            0.0
+                        )
                     )
                 }
             }
@@ -283,65 +291,55 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
         }
     }
 
+    private fun showCurrentLocation() {
+        if (PermissionHelper.arePermissionsGranted(
+                requireContext(),
+                listOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        ) {
+            fusedLocationClient?.lastLocation
+                ?.addOnSuccessListener { location: Location? ->
+                    // Got last known location. In some rare situations this can be null.
+                    location?.let {
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            moveCamera(
+                                Point(
+                                    it.latitude,
+                                    it.longitude
+                                )
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
     private fun updatePlacemarkAndSearchLocation(point: Point) {
-        viewModel.submitLocation(point, 17, map.visibleRegion)
-        /* searchManager.submit(point, 17, searchOptions, object : SearchListener {
-             override fun onSearchResponse(response: Response) {
-                 val geoObjects = response.collection.children.mapNotNull { it.obj }
-                 val names = geoObjects.filter { it.name != null }.map { it.name }
-                 selectedLongitude = geoObjects.firstOrNull()?.geometry?.get(0)?.point?.longitude ?: 0.0
-                 selectedLatitude = geoObjects.firstOrNull()?.geometry?.get(0)?.point?.latitude ?: 0.0
-                 if (view != null) {
-                     if (names.isNotEmpty()) {
-                         binding.itemSelectLocation.tvTitle.text = names[0]
-                         binding.itemSelectLocation.tvSubtitle.text = names.toString()
-                     } else {
-                         binding.itemSelectLocation.tvTitle.text = "Unknown Location"
-                     }
-                 }
-
-             }
-
-             override fun onSearchError(error: Error) {
-                 errorHandler.showToast("Error to find location name")
-             }
-         })*/
+        map?.let { viewModel.submitLocation(point, 17, it.visibleRegion) }
     }
-
-    private fun displayGpsStatus(enabled: Boolean) {
-        if (!enabled) {
-            errorHandler.showToast("GPS is disabled")
-        }
-    }
-
-    private fun updateMapPosition(point: Point) {
-        val cameraPosition = CameraPosition(point, 17.0f, 150.0f, 30.0f)
-        if (this::map.isInitialized) {
-            if (map.isValid) {
-                map.move(cameraPosition)
-            }
-        }
-    }
-
 
     private fun updateFocusInfo() {
         val defaultPadding = resources.getDimension(R.dimen.default_focus_rect_padding)
-        mapWindow.focusRect = ScreenRect(
-            ScreenPoint(defaultPadding, defaultPadding),
-            ScreenPoint(
-                mapWindow.width() - defaultPadding,
-                mapWindow.height() - defaultPadding,
+        mapWindow?.let {
+            it.focusRect = ScreenRect(
+                ScreenPoint(defaultPadding, defaultPadding),
+                ScreenPoint(
+                    it.width() - defaultPadding,
+                    it.height() - defaultPadding,
+                )
             )
-        )
-        mapWindow.focusPoint = ScreenPoint(
-            mapWindow.width() / 2f,
-            mapWindow.height() / 2f,
-        )
+            it.focusPoint = ScreenPoint(
+                it.width() / 2f,
+                it.height() / 2f,
+            )
+        }
     }
 
 
     companion object {
-        private const val ZOOM = 17f
         private const val LOCATION_OWNER_FROM = 0
         private const val LOCATION_OWNER_TO = 1
         private const val LOCATION_OWNER_UNSPECIFIED = -1

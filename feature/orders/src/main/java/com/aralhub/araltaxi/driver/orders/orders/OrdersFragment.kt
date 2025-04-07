@@ -42,8 +42,6 @@ import com.aralhub.ui.dialog.LoadingDialog
 import com.aralhub.ui.model.OrderItem
 import com.aralhub.ui.utils.GlideEx
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
-import com.aralhub.ui.utils.ViewEx.invisible
-import com.aralhub.ui.utils.ViewEx.show
 import com.aralhub.ui.utils.setOnSafeClickListener
 import com.aralhub.ui.utils.viewBinding
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -148,23 +146,11 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
         val status = arguments?.getString("Status") ?: ""
         when (status) {
             "driver_on_the_way" -> {
-                if (!goingToPickUpModalBottomSheet.isAdded) {
-                    goingToPickUpModalBottomSheet.arguments = arguments
-                    goingToPickUpModalBottomSheet.show(
-                        childFragmentManager,
-                        GoingToPickUpModalBottomSheet.TAG
-                    )
-                }
+                showGoingToPickUpSheet(arguments)
             }
 
             "agreed_with_driver" -> {
-                if (!goingToPickUpModalBottomSheet.isAdded) {
-                    goingToPickUpModalBottomSheet.arguments = arguments
-                    goingToPickUpModalBottomSheet.show(
-                        childFragmentManager,
-                        GoingToPickUpModalBottomSheet.TAG
-                    )
-                }
+                showGoingToPickUpSheet(arguments)
             }
 
             "driver_waiting_client" -> {
@@ -189,6 +175,16 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
         }
     }
 
+    private fun showGoingToPickUpSheet(arguments: Bundle?) {
+        if (!goingToPickUpModalBottomSheet.isAdded) {
+            goingToPickUpModalBottomSheet.arguments = arguments
+            goingToPickUpModalBottomSheet.show(
+                childFragmentManager,
+                GoingToPickUpModalBottomSheet.TAG
+            )
+        }
+    }
+
     private fun startService() {
         val intent = Intent(requireContext(), LocationService::class.java)
         requireActivity().startForegroundService(intent)
@@ -202,13 +198,16 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
     private fun initObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.ordersListState.collect { orders ->
+
                 val sortedOrders = orders.sortedByDescending { it.pickUpDistance }
-                dismissLoading()
                 adapter.submitList(sortedOrders)
+
                 binding.tvOrdersNotFound.visibility =
                     if (orders.isEmpty()) View.VISIBLE else View.GONE
-                binding.swiperefresh.visibility =
+                binding.rvOrders.visibility =
                     if (orders.isEmpty()) View.GONE else View.VISIBLE
+
+                dismissLoading()
             }
         }
 
@@ -242,12 +241,9 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
                                     "OrderDetail",
                                     result.data
                                 )
-                                goingToPickUpModalBottomSheet.arguments = bundle
-                                if (!goingToPickUpModalBottomSheet.isAdded)
-                                    goingToPickUpModalBottomSheet.show(
-                                        childFragmentManager,
-                                        GoingToPickUpModalBottomSheet.TAG
-                                    )
+
+                                showGoingToPickUpSheet(bundle)
+
                                 viewModel.updateRideStatus(
                                     result.data.id,
                                     RideStatus.DRIVER_ON_THE_WAY.status
@@ -258,12 +254,6 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
 
                             is GetActiveOrdersUiState.GetExistOrder -> {
                                 dismissLoading()
-                                if (result.data.isNotEmpty()) {
-                                    binding.tvOrdersNotFound.invisible()
-                                    adapter.submitList(result.data)
-                                } else {
-                                    binding.tvOrdersNotFound.show()
-                                }
                             }
 
                             is GetActiveOrdersUiState.RideCanceledByPassenger -> {
@@ -293,12 +283,14 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
 
                                 val bundle = Bundle()
                                 bundle.putParcelable("RideCompletedDetail", result.data)
-                                rideFinishedModalBottomSheet.arguments = bundle
-                                rideFinishedModalBottomSheet.show(
-                                    childFragmentManager,
-                                    RideFinishedModalBottomSheet.TAG
-                                )
-                                viewModel.switchBackToOrdersSocket()
+
+                                if (!rideFinishedModalBottomSheet.isAdded) {
+                                    rideFinishedModalBottomSheet.arguments = bundle
+                                    rideFinishedModalBottomSheet.show(
+                                        childFragmentManager,
+                                        RideFinishedModalBottomSheet.TAG
+                                    )
+                                }
                                 startService()
                             }
                         }
@@ -434,6 +426,7 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
                 RideStatus.RIDE_COMPLETED.status
             )
             getExistingOrders()
+            viewModel.setIdleState()
         }
         rideModalBottomSheet.setOnRideCanceledListener { order -> showCancelTripBottomSheet(order) }
     }
@@ -486,6 +479,7 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
                 order!!.id,
                 RideStatus.DRIVER_WAITING_CLIENT.status
             )
+            viewModel.setIdleState()
         }
         goingToPickUpModalBottomSheet.setOnRideCanceledListener { order ->
             showCancelTripBottomSheet(

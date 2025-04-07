@@ -247,7 +247,6 @@ class LocationService : Service() {
                                         }
 
                                         RIDE_FIELD_UPDATED -> {
-//                                            {"type":"ride_field_updated","data":{"ride_id":"0285cb9e-2863-4468-9baf-c48e82d00aa1","field":"updated_amount","value":9000.0}}
                                             val data =
                                                 Gson().fromJson<WebSocketServerResponse<NetworkRideFieldUpdatedResponse>>(
                                                     jsonString,

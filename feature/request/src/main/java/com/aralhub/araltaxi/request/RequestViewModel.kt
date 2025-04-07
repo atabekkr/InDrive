@@ -48,17 +48,16 @@ class RequestViewModel @Inject constructor(
     private val clientGetSearchRideUseCase: ClientGetSearchRideUseCase
 ) : ViewModel() {
 
-
     // Search configuration
     private val searchManager: SearchManager = SearchFactory.getInstance()
         .createSearchManager(SearchManagerType.COMBINED)
     private val suggestSession: SuggestSession = searchManager.createSuggestSession()
     private val searchOptions = SearchOptions().apply {
-        searchTypes = SearchType.GEO.value
+        searchTypes = SearchType.GEO.value or SearchType.BIZ.value
         resultPageSize = 55
     }
     private val suggestOptions = SuggestOptions().apply {
-        suggestTypes = SuggestType.BIZ.value
+        suggestTypes = SuggestType.GEO.value or SuggestType.BIZ.value
     }
 
     // Karakalpakstan region bounding box
