@@ -31,6 +31,7 @@
     </fragment>
 
     <fragment
+        tools:layout="@layout/bottom_sheet_driver_is_waiting"
         android:id="@+id/driverIsWaitingBottomSheet"
         android:name="com.aralhub.araltaxi.ride.sheet.standard.DriverIsWaitingBottomSheet">
 
@@ -72,4 +73,5 @@
         android:id="@+id/rateDriverBottomSheet"
         android:name="com.aralhub.araltaxi.ride.sheet.standard.RateDriverBottomSheet"
         tools:layout="@layout/bottom_sheet_ride_finished" />
+
 </navigation>

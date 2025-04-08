@@ -1,65 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/logoFragment">
 
     <fragment
         android:id="@+id/logoFragment"
-        android:name="com.aralhub.client.clientauth.LogoFragment">
+        android:name="com.aralhub.client.clientauth.LogoFragment"
+        tools:layout="@layout/fragment_logo">
         <action
             android:id="@+id/action_logoFragment_to_addPhoneFragment"
+            app:destination="@id/addPhoneFragment"
             app:popUpTo="@id/logoFragment"
-            app:popUpToInclusive="true"
-            app:destination="@id/addPhoneFragment" />
+            app:popUpToInclusive="true" />
 
         <action
             android:id="@+id/action_logoFragment_to_requestFragment"
-            app:destination="@id/requestFragment"/>
+            app:destination="@id/requestFragment" />
 
     </fragment>
     <fragment
         android:id="@+id/addPhoneFragment"
-        android:name="com.aralhub.client.clientauth.addphone.AddPhoneFragment">
+        android:name="com.aralhub.client.clientauth.addphone.AddPhoneFragment"
+        tools:layout="@layout/fragment_add_phone">
 
         <action
             android:id="@+id/action_addPhoneFragment_to_addSmsFragment"
+            app:destination="@id/addSmsFragment"
             app:popUpTo="@id/addPhoneFragment"
-            app:popUpToInclusive="true"
-            app:destination="@id/addSmsFragment" />
+            app:popUpToInclusive="true" />
 
     </fragment>
-
     <fragment
         android:id="@+id/addSmsFragment"
-        android:name="com.aralhub.client.clientauth.addsms.AddSMSFragment">
+        android:name="com.aralhub.client.clientauth.addsms.AddSMSFragment"
+        tools:layout="@layout/fragment_add_sms">
 
         <action
             android:id="@+id/action_addSmsFragment_to_addNameFragment"
+            app:destination="@id/addNameFragment"
             app:popUpTo="@id/addSmsFragment"
-            app:popUpToInclusive="true"
-            app:destination="@id/addNameFragment" />
+            app:popUpToInclusive="true" />
 
     </fragment>
-
     <fragment
         android:id="@+id/addNameFragment"
-        android:name="com.aralhub.client.clientauth.addname.AddNameFragment">
+        android:name="com.aralhub.client.clientauth.addname.AddNameFragment"
+        tools:layout="@layout/fragment_add_name">
 
         <action
             android:id="@+id/action_addNameFragment_to_requestFragment"
+            app:destination="@id/requestFragment"
             app:popUpTo="@id/addNameFragment"
-            app:popUpToInclusive="true"
-            app:destination="@id/requestFragment"/>
+            app:popUpToInclusive="true" />
 
     </fragment>
-
     <fragment
         android:id="@+id/selectLocationFragment"
-        android:name="com.aralhub.araltaxi.select_location.SelectLocationFragment"/>
+        android:name="com.aralhub.araltaxi.select_location.SelectLocationFragment"
+        tools:layout="@layout/fragment_select_location" />
     <fragment
         android:id="@+id/requestFragment"
-        android:name="com.aralhub.araltaxi.request.RequestFragment">
+        android:name="com.aralhub.araltaxi.request.RequestFragment"
+        tools:layout="@layout/fragment_request">
 
         <action
             android:id="@+id/action_requestFragment_to_offersFragment"
@@ -67,7 +71,7 @@
             app:enterAnim="@anim/to_right"
             app:exitAnim="@anim/to_left"
             app:popEnterAnim="@anim/from_left"
-            app:popExitAnim="@anim/from_right"/>
+            app:popExitAnim="@anim/from_right" />
 
         <action
             android:id="@+id/action_requestFragment_to_profileFragment"
@@ -75,37 +79,41 @@
             app:enterAnim="@anim/to_right"
             app:exitAnim="@anim/to_left"
             app:popEnterAnim="@anim/from_left"
-            app:popExitAnim="@anim/from_right"/>
+            app:popExitAnim="@anim/from_right" />
 
-        <action android:id="@+id/action_requestFragment_to_selectLocationFragment"
+        <action
+            android:id="@+id/action_requestFragment_to_selectLocationFragment"
             app:destination="@id/selectLocationFragment"
             app:enterAnim="@anim/to_right"
             app:exitAnim="@anim/to_left"
-            app:popUpTo="@id/requestFragment"
-            app:popUpToInclusive="false"
             app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/fade_out"/>
+            app:popExitAnim="@anim/fade_out"
+            app:popUpTo="@id/requestFragment"
+            app:popUpToInclusive="false" />
 
-        <action android:id="@+id/action_requestFragment_to_supportFragment"
+        <action
+            android:id="@+id/action_requestFragment_to_supportFragment"
             app:destination="@id/supportFragment"
             app:enterAnim="@anim/to_right"
             app:exitAnim="@anim/to_left"
             app:popEnterAnim="@anim/from_left"
-            app:popExitAnim="@anim/from_right"/>
+            app:popExitAnim="@anim/from_right" />
 
-        <action android:id="@+id/action_requestFragment_to_historyFragment"
+        <action
+            android:id="@+id/action_requestFragment_to_historyFragment"
             app:destination="@id/historyFragment"
             app:enterAnim="@anim/to_right"
             app:exitAnim="@anim/to_left"
             app:popEnterAnim="@anim/from_left"
-            app:popExitAnim="@anim/from_right"/>
+            app:popExitAnim="@anim/from_right" />
 
-        <action android:id="@+id/action_requestFragment_to_savedPlacesFragment"
+        <action
+            android:id="@+id/action_requestFragment_to_savedPlacesFragment"
             app:destination="@id/savedPlacesFragment"
             app:enterAnim="@anim/to_right"
             app:exitAnim="@anim/to_left"
             app:popEnterAnim="@anim/from_left"
-            app:popExitAnim="@anim/from_right"/>
+            app:popExitAnim="@anim/from_right" />
 
         <action
             android:id="@+id/action_requestFragment_to_createOrderFragment"
@@ -113,44 +121,45 @@
             app:enterAnim="@anim/to_right"
             app:exitAnim="@anim/to_left"
             app:popEnterAnim="@anim/from_left"
-            app:popExitAnim="@anim/from_right"/>
+            app:popExitAnim="@anim/from_right" />
 
         <action
             android:id="@+id/action_requestFragment_to_logoFragment"
+            app:destination="@id/logoFragment"
             app:popUpTo="@id/requestFragment"
-            app:popUpToInclusive="true"
-            app:destination="@id/logoFragment"/>
+            app:popUpToInclusive="true" />
 
         <action
             android:id="@+id/action_requestFragment_to_rideFragment"
-            app:destination="@id/rideFragment"/>
+            app:destination="@id/rideFragment" />
 
     </fragment>
-
     <fragment
         android:id="@+id/createOrderFragment"
-        android:name="com.aralhub.araltaxi.create_order.CreateOrderFragment">
+        android:name="com.aralhub.araltaxi.create_order.CreateOrderFragment"
+        tools:layout="@layout/fragment_create_order">
 
-        <action android:id="@+id/action_createOrderFragment_to_offersFragment"
+        <action
+            android:id="@+id/action_createOrderFragment_to_offersFragment"
+            app:destination="@id/offersFragment"
             app:popUpTo="@id/requestFragment"
-            app:popUpToInclusive="true"
-            app:destination="@id/offersFragment"/>
+            app:popUpToInclusive="true" />
 
         <action
             android:id="@+id/action_createOrderFragment_to_selectLocationFragment"
-            app:destination="@id/selectLocationFragment"
-            />
+            app:destination="@id/selectLocationFragment" />
 
     </fragment>
-
     <fragment
         android:id="@+id/offersFragment"
-        android:name="com.aralhub.offers.OffersFragment">
+        android:name="com.aralhub.offers.OffersFragment"
+        tools:layout="@layout/fragment_offers">
 
-        <action android:id="@+id/action_offersFragment_to_rideFragment"
+        <action
+            android:id="@+id/action_offersFragment_to_rideFragment"
+            app:destination="@id/rideFragment"
             app:popUpTo="@id/offersFragment"
-            app:popUpToInclusive="true"
-            app:destination="@id/rideFragment" />
+            app:popUpToInclusive="true" />
 
         <!--<action
             android:id="@+id/action_offersFragment_to_requestFragment"
@@ -159,56 +168,55 @@
             />-->
 
     </fragment>
-
     <fragment
         android:id="@+id/rideFragment"
-        android:name="com.aralhub.araltaxi.ride.RideFragment"/>
-
+        android:name="com.aralhub.araltaxi.ride.RideFragment"
+        tools:layout="@layout/fragment_ride" />
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.aralhub.araltaxi.profile.client.profile.ProfileFragment">
+        android:name="com.aralhub.araltaxi.profile.client.profile.ProfileFragment"
+        tools:layout="@layout/fragment_profile">
 
         <action
             android:id="@+id/action_profileFragment_to_logoFragment"
             app:destination="@id/logoFragment"
             app:popUpTo="@id/requestFragment"
-            app:popUpToInclusive="true"/>
+            app:popUpToInclusive="true" />
 
     </fragment>
-
     <fragment
         android:id="@+id/supportFragment"
-        android:name="com.aralhub.araltaxi.profile.client.SupportFragment"/>
-
+        android:name="com.aralhub.araltaxi.profile.client.SupportFragment"
+        tools:layout="@layout/fragment_support" />
     <fragment
         android:id="@+id/historyFragment"
-        android:name="com.aralhub.araltaxi.history.client.HistoryFragment"/>
-
+        android:name="com.aralhub.araltaxi.history.client.HistoryFragment"
+        tools:layout="@layout/fragment_history" />
     <fragment
         android:id="@+id/savedPlacesFragment"
-        android:name="com.aralhub.araltaxi.savedplaces.SavedPlacesFragment">
+        android:name="com.aralhub.araltaxi.savedplaces.SavedPlacesFragment"
+        tools:layout="@layout/fragment_saved_places">
 
         <action
             android:id="@+id/action_savedPlacesFragment_to_editSavedPlaceFragment"
-            app:destination="@id/editSavedPlaceFragment"/>
+            app:destination="@id/editSavedPlaceFragment" />
 
         <action
             android:id="@+id/action_savedPlacesFragment_to_selectLocationFragment"
-            app:destination="@id/selectLocationFragment"/>
+            app:destination="@id/selectLocationFragment" />
 
         <action
             android:id="@+id/action_savedPlacesFragment_to_saveAddressFragment"
-            app:destination="@id/saveAddressFragment"/>
+            app:destination="@id/saveAddressFragment" />
 
     </fragment>
-
     <fragment
         android:id="@+id/saveAddressFragment"
-        android:name="com.aralhub.araltaxi.savedplaces.saveaddress.SaveAddressFragment"/>
+        android:name="com.aralhub.araltaxi.savedplaces.saveaddress.SaveAddressFragment"
+        tools:layout="@layout/fragment_save_address" />
     <fragment
         android:id="@+id/editSavedPlaceFragment"
-        android:name="com.aralhub.araltaxi.savedplaces.editsavedplace.EditSavedPlaceFragment"/>
-
-
+        android:name="com.aralhub.araltaxi.savedplaces.editsavedplace.EditSavedPlaceFragment"
+        tools:layout="@layout/fragment_edit_saved_place" />
 
 </navigation>
