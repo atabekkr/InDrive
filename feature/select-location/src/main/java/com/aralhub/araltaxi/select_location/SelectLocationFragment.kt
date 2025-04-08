@@ -13,6 +13,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.aralhub.araltaxi.core.common.error.ErrorHandler
 import com.aralhub.araltaxi.core.common.permission.PermissionHelper
+import com.aralhub.araltaxi.core.common.utils.MapStyles
+import com.aralhub.araltaxi.core.common.utils.loadJsonFromAssets
 import com.aralhub.araltaxi.select_location.databinding.FragmentSelectLocationBinding
 import com.aralhub.offers.utils.updateMapStyle
 import com.aralhub.ui.utils.FloatLandAnimation
@@ -35,6 +37,7 @@ import com.yandex.mapkit.map.MapWindow
 import com.yandex.mapkit.map.SizeChangedListener
 import com.yandex.mapkit.search.Address
 import com.yandex.mapkit.search.ToponymObjectMetadata
+import com.yandex.mapkit.user_location.UserLocationLayer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -57,6 +60,8 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
     private var isUpdating = false
 
     private var fusedLocationClient: FusedLocationProviderClient? = null
+
+    private var userLocationLayer: UserLocationLayer? = null
 
     private val cameraListener =
         CameraListener { map, cameraPosition, cameraUpdateReason, finished ->
@@ -127,6 +132,12 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
             updateFocusInfo()
         }
 
+        val mapkit = MapKitFactory.getInstance()
+        userLocationLayer = mapkit.createUserLocationLayer(binding.mapView.mapWindow)
+
+        userLocationLayer?.isVisible = true
+
+        setDefaultMapStyle()
         showCurrentLocation()
         mapCameraListener()
 
@@ -138,6 +149,12 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
             Animation(Animation.Type.SMOOTH, 1f),
             null
         )
+    }
+
+    private fun setDefaultMapStyle() {
+        val minimalisticMapStyle =
+            loadJsonFromAssets(requireContext(), MapStyles.MINIMALISTIC_MAP_STYLE)
+        binding.mapView.map.setMapStyle(minimalisticMapStyle)
     }
 
     private fun mapCameraListener() {
@@ -184,6 +201,9 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
                 findNavController().navigateUp()
             }
         }
+
+        binding.btnCurrentLocation.setOnClickListener { showCurrentLocation() }
+        binding.btnBack.setOnClickListener { findNavController().navigateUp() }
     }
 
     private fun initArgs() {

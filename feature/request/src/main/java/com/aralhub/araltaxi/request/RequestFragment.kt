@@ -586,6 +586,9 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
         val etFromLocation = binding.bottomSheetSearchAddress.dynamicLayout.etFromLocation
         val etToLocation = binding.bottomSheetSearchAddress.dynamicLayout.etToLocation
 
+        startLocationName?.let { etFromLocation.text = it }
+        endLocationName?.let { etToLocation.text = it }
+
         when (locationItemClickOwner) {
             LocationItemClickOwner.FROM -> {
                 etFromLocation.showKeyboardAndFocus()
@@ -595,9 +598,6 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
                 etToLocation.showKeyboardAndFocus()
             }
         }
-
-        startLocationName?.let { etFromLocation.text = it }
-        endLocationName?.let { etToLocation.text = it }
 
     }
 

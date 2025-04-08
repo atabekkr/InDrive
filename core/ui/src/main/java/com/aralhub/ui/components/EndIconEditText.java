@@ -47,6 +47,14 @@ public class EndIconEditText extends LinearLayout {
         editText.setBackground(null);
         LayoutParams editTextParams = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1);
         editTextParams.setMargins(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8));
+        editText.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                editText.post(() -> {
+                    editText.setSelection(editText.getText().length());
+                });
+            }
+        });
+
         addView(editText, editTextParams);
 
         FrameLayout endIconContainer = new FrameLayout(context);
@@ -71,6 +79,12 @@ public class EndIconEditText extends LinearLayout {
             editText.setHint(a.getString(R.styleable.EndIconEditText_hint));
             a.recycle();
         }
+    }
+
+    public void setTextAndMoveCursorToEnd(String text) {
+        AppCompatEditText editText = (AppCompatEditText) getChildAt(0);
+        editText.setText(text);
+        editText.setSelection(editText.getText().length());
     }
 
     private int dpToPx(float dp) {

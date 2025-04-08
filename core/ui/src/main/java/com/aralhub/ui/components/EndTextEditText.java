@@ -10,6 +10,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
@@ -67,14 +68,25 @@ public class EndTextEditText extends LinearLayout {
 
         // Create EditText
         AppCompatEditText editText = new AppCompatEditText(context, attrs);
-        editText.setMaxLines(1);
-        editText.setSingleLine(true);
         editText.setEllipsize(TextUtils.TruncateAt.END);
         editText.setHorizontallyScrolling(false);
+        editText.setMaxLines(3);
+        editText.setMinLines(1); // Optional: sets minimum number of lines
         editText.setTextSize(14f);
         editText.setTextColor(ContextCompat.getColor(context, R.color.color_content_secondary));
         editText.setBackground(null);
-        editText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS); // No suggestions/autocorrect
+
+// Set input type to enable multi-line input
+        editText.setInputType(InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_FLAG_MULTI_LINE |
+                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+
+// Prevent auto single line mode
+        editText.setSingleLine(false);
+
+// Optional: control vertical scroll behavior
+        editText.setVerticalScrollBarEnabled(true);
+
         editText.setTextIsSelectable(true);
         editText.setOnFocusChangeListener((v, hasFocus) -> setActivated(hasFocus));
         LayoutParams editTextParams = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f);
@@ -117,9 +129,12 @@ public class EndTextEditText extends LinearLayout {
             }
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
 
@@ -141,6 +156,8 @@ public class EndTextEditText extends LinearLayout {
         endTextView.setFocusable(true);
         endTextView.setTextColor(ContextCompat.getColor(context, R.color.color_content_secondary));
         endTextView.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.ripple_text));
+        endTextView.setPadding(12, 12, 12, 12);
+        endTextView.setTextSize(14f);
         endTextContainer.addView(endTextView, endTextViewParams);
 
         endTextView.setOnClickListener(v -> {
@@ -215,6 +232,7 @@ public class EndTextEditText extends LinearLayout {
         isProgrammaticChange = true; // Set flag before programmatic change
         editText.setText(text);
         isProgrammaticChange = false; // Reset flag after change
+        editText.setSelection(editText.getText().length());
     }
 
     public void setHint(String hint) {
