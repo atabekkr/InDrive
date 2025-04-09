@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_marginTop="12dp"
+    android:background="?attr/selectableItemBackground"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tv_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="12 000 som"
+        android:fontFamily="@font/inter_semibold"
+        android:textColor="@color/color_content_primary_text"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tv_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="16:34, Jaslıq kóshesi → M. Jumanazarov"
+        android:fontFamily="@font/inter"
+        android:layout_marginBottom="8dp"
+        android:textColor="@color/color_content_tertiary"
+        android:textSize="12sp" />
+
+</LinearLayout>

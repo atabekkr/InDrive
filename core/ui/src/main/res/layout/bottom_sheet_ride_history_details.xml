@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+        style="@style/Widget.InDrive.BottomSheet.DragHandle"
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:padding="0dp"
+        android:paddingBottom="0dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_small"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/padding_small">
+
+        <TextView
+            android:id="@+id/tv_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAppearance="@style/TextAppearance.InDrive.Text.TitleBody"
+            tools:text="7-fevral, 20:38" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_from_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_small"
+        android:layout_marginTop="8dp"
+        android:gravity="top"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="24dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="@dimen/margin_small"
+            android:background="@drawable/ic_from_location" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_from_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.InDrive.BodyLarge"
+                tools:text="Uy" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/padding_small"
+                android:text="@string/label_pick_up_location"
+                android:textAppearance="@style/TextAppearance.InDrive.TitleSmall" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_to_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_small"
+        android:layout_marginTop="@dimen/margin_small"
+        android:gravity="top"
+        android:orientation="horizontal">
+
+        <View
+            android:id="@+id/layout_to_location_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginHorizontal="@dimen/margin_small"
+            android:background="@drawable/ic_material_symbols_radio_button_checked" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_to_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.InDrive.BodyLarge"
+                tools:text="Uy" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/padding_small"
+                android:text="@string/label_address_location"
+                android:textAppearance="@style/TextAppearance.InDrive.TitleSmall" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_navigator"
+        style="@style/Widget.InDrive.Button.Variant"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_small"
+        android:layout_marginVertical="24dp"
+        android:text="Показать маршрут"
+        android:textColor="@color/color_content_secondary" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_small"
+        android:layout_marginTop="@dimen/margin_small"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAppearance="@style/TextAppearance.InDrive.Text.TitleBody"
+            tools:text="10 000 som" />
+
+        <ImageView
+            android:id="@+id/iv_payment_method"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="@dimen/margin_small"
+            android:contentDescription="@string/cd_payment_method_icon"
+            tools:src="@drawable/ic_cash"
+            tools:text="4 min" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/padding_small"
+        android:text="Jámi"
+        android:textAppearance="@style/TextAppearance.InDrive.TitleSmall" />
+
+    <TextView
+        android:id="@+id/tv_client_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="12dp"
+        android:textAppearance="@style/TextAppearance.InDrive.Text.TitleBody"
+        tools:text="Babur" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:paddingHorizontal="@dimen/padding_small"
+        android:text="Jolawshı"
+        android:textAppearance="@style/TextAppearance.InDrive.TitleSmall" />
+
+</LinearLayout>
