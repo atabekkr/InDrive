@@ -1,5 +1,6 @@
 package com.aralhub.araltaxi.driver.orders.orders
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aralhub.araltaxi.core.common.utils.rejectOfferState
@@ -199,9 +200,14 @@ class OrdersViewModel @Inject constructor(
     }
 
     private fun updateOrder(rideId: String, value: Int) {
+        val previousPrice = _ordersListState.value.find { it.uuid == rideId }?.roadPrice
         _ordersListState.value = _ordersListState.value.map {
             if (it.uuid == rideId) {
-                it.copy(roadPrice = value.toString())
+                val isPriceIncreased = previousPrice?.let {
+                    it.toInt() < value
+                }
+                it.copy(roadPrice = value.toString(),
+                    isPriceIncreased = isPriceIncreased ?: false)
             } else {
                 it
             }

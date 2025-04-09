@@ -2,12 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/margin_small"
     android:layout_marginTop="@dimen/margin_small"
-    android:padding="@dimen/padding_small"
     android:background="@drawable/shape_item_order"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="@dimen/padding_small">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -75,18 +75,48 @@
                 android:id="@+id/tv_price"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:text="11 000 som"
-                android:textAppearance="@style/TextAppearance.InDrive.BodyLarge" />
+                android:textSize="16sp"
+                android:fontFamily="@font/inter_semibold"
+                android:textAppearance="@style/TextAppearance.InDrive.BodyLarge"
+                tools:text="11 000 som" />
 
             <TextView
                 android:id="@+id/tv_distance_road"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:text="5 km"
-                android:textAppearance="@style/TextAppearance.InDrive.TitleSmall" />
+                android:textAppearance="@style/TextAppearance.InDrive.TitleSmall"
+                tools:text="5 km" />
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/layout_updated_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            android:background="@drawable/bg_updated_price"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginVertical="4dp"
+                android:fontFamily="@font/inter"
+                android:textFontWeight="450"
+                android:textColor="@color/color_text_primary"
+                android:text="kóterildi" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:src="@drawable/ic_storm" />
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/iv_payment_method"
@@ -103,8 +133,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/padding_small"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/padding_small">
 
 
         <ImageView

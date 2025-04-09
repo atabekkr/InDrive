@@ -17,7 +17,8 @@ data class OrderItem(
     val paymentType: PaymentType,
     val pickUpAddress: String?,
     val destinationAddress: String? = null,
-    val locations: List<ClientRideLocationsUI>
+    val locations: List<ClientRideLocationsUI>,
+    val isPriceIncreased: Boolean = false,
 ) : Parcelable
 
 @Parcelize
