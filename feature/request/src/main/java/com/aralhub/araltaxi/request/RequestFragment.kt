@@ -1,11 +1,8 @@
 package com.aralhub.araltaxi.request
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -22,7 +19,6 @@ import androidx.fragment.app.viewModels
 import com.aralhub.araltaxi.client.request.R
 import com.aralhub.araltaxi.client.request.databinding.FragmentRequestBinding
 import com.aralhub.araltaxi.core.common.error.ErrorHandler
-import com.aralhub.araltaxi.core.common.permission.PermissionHelper
 import com.aralhub.araltaxi.core.common.utils.MapStyles
 import com.aralhub.araltaxi.core.common.utils.loadJsonFromAssets
 import com.aralhub.araltaxi.request.navigation.FeatureRequestNavigation
@@ -57,25 +53,25 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-internal class RequestFragment : Fragment(R.layout.fragment_request) {
+class RequestFragment : Fragment(R.layout.fragment_request) {
 
-    private companion object {
+    companion object {
 
         //To fetch args when go back from SelectLocationFragment
-        private const val SELECT_LOCATION_OWNER_FROM = 0
-        private const val SELECT_LOCATION_OWNER_TO = 1
-        private const val SELECT_LOCATION_REQUEST_KEY = "location_key"
-        private const val SELECT_LOCATION_KEY_LATITUDE = "latitude"
-        private const val SELECT_LOCATION_KEY_LONGITUDE = "longitude"
-        private const val SELECT_LOCATION_KEY_LOCATION_NAME = "locationName"
-        private const val SELECT_LOCATION_KEY_LOCATION_OWNER = "owner"
-        private const val NULL_STRING = "null" //locationName can be null
+        const val SELECT_LOCATION_OWNER_FROM = 0
+        const val SELECT_LOCATION_OWNER_TO = 1
+        const val SELECT_LOCATION_REQUEST_KEY = "location_key"
+        const val SELECT_LOCATION_KEY_LATITUDE = "latitude"
+        const val SELECT_LOCATION_KEY_LONGITUDE = "longitude"
+        const val SELECT_LOCATION_KEY_LOCATION_NAME = "locationName"
+        const val SELECT_LOCATION_KEY_LOCATION_OWNER = "owner"
+        const val EMPTY_STRING = "null" //locationName can be null
 
         //To fetch args when go back from CreateOrderFragment
-        private const val CREATE_ORDER_REQUEST_KEY = "cancel"
+        const val CREATE_ORDER_REQUEST_KEY = "cancel"
 
         //CurrentLocation values
-        private const val CURRENT_LOCATION_NOT_INITIALISED_VALUE = 0.0
+        const val CURRENT_LOCATION_NOT_INITIALISED_VALUE = 0.0
         private var currentLongitude = CURRENT_LOCATION_NOT_INITIALISED_VALUE
         private var currentLatitude = CURRENT_LOCATION_NOT_INITIALISED_VALUE
 
@@ -97,7 +93,6 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
     private val adapter = LocationItemAdapter()
     private val viewModel by viewModels<RequestViewModel>()
     private val requestViewModel2 by viewModels<RequestViewModel2>()
-    private var locationManager: LocationManager? = null
 
     // Variables to track latest states
     private var latestSearchRideState: SearchRideUiState? = null
@@ -108,7 +103,6 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
     private var isFullscreen = false
     private var mapWindow: MapWindow? = null
     private var map: Map? = null
-    private var isProgrammaticChange = false
 
     private var fusedLocationClient: FusedLocationProviderClient? = null
 
@@ -125,7 +119,6 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
         super.onStop()
         MapKitFactory.getInstance().onStop()
         binding.mapView.onStop()
-        locationManager = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -133,8 +126,8 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
 
         mapWindow = binding.mapView.mapWindow
         map = mapWindow?.map
-        locationManager =
-            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        map?.isRotateGesturesEnabled = false
+
         observeStates()
         initViews()
         initListeners()
@@ -175,30 +168,6 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
 
     private fun updateMapStyle(zoom: Float) {
         map?.updateMapStyle(zoom, requireContext())
-    }
-
-    override fun onResume() {
-        super.onResume()
-        locationManager?.let { observeLocationUpdates() }
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun observeLocationUpdates() {
-        if (PermissionHelper.arePermissionsGranted(
-                requireContext(),
-                listOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            )
-        ) {
-            /*locationManager.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER,
-                LOCATION_REQUEST_MIN_TIME,
-                LOCATION_REQUEST_MIN_DISTANCE,
-                locationListener
-            )*/
-        }
     }
 
     private fun observeStates() {
@@ -263,7 +232,6 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
             }
         }
         observeState(viewModel.profileUiState) { profileUiState ->
-            Log.i("Profile", "${profileUiState}")
             when (profileUiState) {
                 is ProfileUiState.Error -> errorHandler.showToast(profileUiState.message)
                 ProfileUiState.Loading -> {}
@@ -308,7 +276,7 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
             BottomSheetBehavior.from(binding.bottomSheetSearchAddress.bottomSheetSearchAddress)
         searchAddressBottomSheetBehavior?.peekHeight =
             (resources.displayMetrics.heightPixels * 0.95).toInt()
-        searchAddressBottomSheetBehavior!!.apply {
+        searchAddressBottomSheetBehavior?.apply {
             state = BottomSheetBehavior.STATE_HIDDEN
             isHideable = true
             expandedOffset = 0  // Убирает отступ сверху в раскрытом состоянии
@@ -342,7 +310,6 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
 
         etFromLocation.setOnTextChangedListener {
             if (it.isNotEmpty() && !it.isNullOrBlank()) {
-                Log.i("Suggest", "Suggest Location")
                 viewModel.suggestLocation(it, LocationItemClickOwner.FROM)
             } else {
                 adapter.submitList(null)
@@ -351,7 +318,6 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
 
         etToLocation.setOnTextChangedListener {
             if (it.isNotEmpty() && !it.isNullOrBlank()) {
-                Log.i("Suggest 2", "Suggest Location 2")
                 viewModel.suggestLocation(it, LocationItemClickOwner.TO)
             } else {
                 adapter.submitList(null)
@@ -445,13 +411,11 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
         ) { _, bundle ->
             val latitude = bundle.getDouble(SELECT_LOCATION_KEY_LATITUDE)
             val longitude = bundle.getDouble(SELECT_LOCATION_KEY_LONGITUDE)
-            val locationName = bundle.getString(SELECT_LOCATION_KEY_LOCATION_NAME) ?: NULL_STRING
+            val locationName = bundle.getString(SELECT_LOCATION_KEY_LOCATION_NAME) ?: EMPTY_STRING
             val locationOwner = bundle.getInt(SELECT_LOCATION_KEY_LOCATION_OWNER)
             when (locationOwner) {
                 SELECT_LOCATION_OWNER_FROM -> {
-                    isProgrammaticChange = true
                     setStartLocationName(locationName)
-                    isProgrammaticChange = false
                     requestViewModel2.setFromLocation(
                         SelectedLocation(
                             name = locationName,
@@ -628,7 +592,6 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
     }
 
     private fun updateMap(longitude: Double, latitude: Double) {
-        Log.i("RequestFragment", "Update Map")
         placeMarkObject?.let {
             binding.mapView.mapWindow.map.mapObjects.clear()
         }
@@ -656,19 +619,17 @@ internal class RequestFragment : Fragment(R.layout.fragment_request) {
     }
 
     private fun showLoadingDialog() {
-        Log.i("Dialog", "Show")
         LoadingModalBottomSheet.show(childFragmentManager)
     }
 
     private fun hideLoadingDialog() {
-        Log.i("Dialog", "Hide")
         LoadingModalBottomSheet.hide(childFragmentManager)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         LoadingModalBottomSheet.hide(childFragmentManager)
+        endLocationName = null
     }
-
 
 }

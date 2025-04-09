@@ -191,6 +191,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/layout_from_location"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginVertical="@dimen/margin_small"
@@ -225,6 +226,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/layout_to_location"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginVertical="@dimen/margin_small"
@@ -349,6 +351,10 @@
 
 
     </androidx.core.widget.NestedScrollView>
+
+    <include
+        android:id="@+id/bottom_sheet_search_address"
+        layout="@layout/layout_search_address" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

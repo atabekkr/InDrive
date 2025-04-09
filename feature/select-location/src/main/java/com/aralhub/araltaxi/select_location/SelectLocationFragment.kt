@@ -201,7 +201,6 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
                 findNavController().navigateUp()
             }
         }
-
         binding.btnCurrentLocation.setOnClickListener { showCurrentLocation() }
         binding.btnBack.setOnClickListener { findNavController().navigateUp() }
     }

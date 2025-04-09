@@ -313,4 +313,10 @@ class ShowOrderRouteFragment : Fragment(R.layout.fragment_show_order_route),
         )
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        drivingRouter=null
+        drivingRoute=null
+    }
+
 }

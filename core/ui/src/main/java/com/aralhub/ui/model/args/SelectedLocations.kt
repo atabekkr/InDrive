@@ -5,8 +5,8 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class SelectedLocations(
-    val from: SelectedLocation,
-    val to: SelectedLocation
+    var from: SelectedLocation,
+    var to: SelectedLocation
 ) : Parcelable
 
 @Parcelize

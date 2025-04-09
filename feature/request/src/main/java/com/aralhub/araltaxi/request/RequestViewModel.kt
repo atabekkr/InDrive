@@ -14,18 +14,11 @@ import com.aralhub.indrive.core.data.result.Result
 import com.aralhub.indrive.core.data.result.fold
 import com.aralhub.ui.model.LocationItem
 import com.aralhub.ui.model.LocationItemClickOwner
-import com.aralhub.ui.model.args.LocationType
-import com.aralhub.ui.model.args.SelectedLocation
-import com.aralhub.ui.model.args.SelectedLocations
 import com.yandex.mapkit.geometry.BoundingBox
 import com.yandex.mapkit.geometry.Point
-import com.yandex.mapkit.search.Response
 import com.yandex.mapkit.search.SearchFactory
 import com.yandex.mapkit.search.SearchManager
 import com.yandex.mapkit.search.SearchManagerType
-import com.yandex.mapkit.search.SearchOptions
-import com.yandex.mapkit.search.SearchType
-import com.yandex.mapkit.search.Session
 import com.yandex.mapkit.search.SuggestOptions
 import com.yandex.mapkit.search.SuggestResponse
 import com.yandex.mapkit.search.SuggestSession
@@ -34,7 +27,6 @@ import com.yandex.runtime.Error
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -52,10 +44,6 @@ class RequestViewModel @Inject constructor(
     private val searchManager: SearchManager = SearchFactory.getInstance()
         .createSearchManager(SearchManagerType.COMBINED)
     private val suggestSession: SuggestSession = searchManager.createSuggestSession()
-    private val searchOptions = SearchOptions().apply {
-        searchTypes = SearchType.GEO.value or SearchType.BIZ.value
-        resultPageSize = 55
-    }
     private val suggestOptions = SuggestOptions().apply {
         suggestTypes = SuggestType.GEO.value or SuggestType.BIZ.value
     }
@@ -77,15 +65,6 @@ class RequestViewModel @Inject constructor(
         MutableStateFlow<SuggestionsUiState>(SuggestionsUiState.Loading)
     val suggestionsUiState = _suggestionsUiState.asStateFlow()
 
-    private val _locationEnabled = MutableStateFlow(false)
-    val locationEnabled = _locationEnabled.asStateFlow()
-
-    private val _fromLocationUiState = MutableSharedFlow<FromLocationUiState>()
-    val fromLocationUiState = _fromLocationUiState.asSharedFlow()
-
-    private val _selectedLocations = MutableStateFlow<SelectedLocations?>(null)
-    val selectedLocations: StateFlow<SelectedLocations?> = _selectedLocations.asStateFlow()
-
     private val _profileUiState = MutableSharedFlow<ProfileUiState>()
     val profileUiState = _profileUiState.asSharedFlow()
 
@@ -97,12 +76,6 @@ class RequestViewModel @Inject constructor(
 
     private val _logOutUiState = MutableSharedFlow<LogOutUiState>()
     val logOutUiState = _logOutUiState.asSharedFlow()
-
-    // Location tracking
-    private val _fromLocation = MutableStateFlow<SelectedLocation?>(null)
-    private val _toLocation = MutableStateFlow<SelectedLocation?>(null)
-    private var isFromLocationManuallySelected = false
-    private var lastLocation = Point(0.0, 0.0)
 
     init {
         getProfile()
@@ -145,90 +118,6 @@ class RequestViewModel @Inject constructor(
                     }
                 }
             )
-        }
-    }
-
-    // Location management
-    fun updateLocationEnabled(enabled: Boolean) {
-        _locationEnabled.value = enabled
-    }
-
-    fun updateLocation(location: SelectedLocation) {
-        viewModelScope.launch {
-            when (location.locationType) {
-                LocationType.FROM -> {
-                    _fromLocation.value = location
-                    isFromLocationManuallySelected = true
-                }
-
-                LocationType.TO -> _toLocation.value = location
-            }
-            updateSelectedLocations()
-        }
-    }
-
-    fun setFromLocation(latitude: Double, longitude: Double) {
-        if (!isFromLocationManuallySelected) {
-            lastLocation = Point(latitude, longitude)
-            searchName(latitude, longitude)
-        }
-    }
-
-    fun clearToLocation() {
-        _selectedLocations.value = null
-        _toLocation.value = null
-        _fromLocation.value = null
-    }
-
-    private fun searchName(latitude: Double, longitude: Double) {
-        viewModelScope.launch {
-            _fromLocationUiState.emit(FromLocationUiState.Loading)
-            searchManager.submit(
-                Point(latitude, longitude),
-                17,
-                searchOptions,
-                object : Session.SearchListener {
-                    override fun onSearchResponse(response: Response) {
-                        val geoObjects = response.collection.children.mapNotNull { it.obj }
-
-                        val name = geoObjects.firstOrNull { it.name != null }?.name
-                            ?: "Anıqlap bolmadı"
-                        emitFromLocationSuccess(latitude, longitude, name)
-                    }
-
-                    override fun onSearchError(error: Error) {
-                        emitFromLocationError("Error finding location name")
-                    }
-                })
-        }
-    }
-
-    private fun updateSelectedLocations() {
-        val from = _fromLocation.value
-        val to = _toLocation.value
-        if (from != null && to != null) {
-            _selectedLocations.value = SelectedLocations(from, to)
-        }
-    }
-
-    private fun emitFromLocationSuccess(latitude: Double, longitude: Double, name: String) {
-        viewModelScope.launch {
-            _fromLocationUiState.emit(
-                FromLocationUiState.Success(
-                    SelectedLocation(
-                        locationType = LocationType.FROM,
-                        name = name,
-                        latitude = latitude,
-                        longitude = longitude
-                    )
-                )
-            )
-        }
-    }
-
-    private fun emitFromLocationError(message: String) {
-        viewModelScope.launch {
-            _fromLocationUiState.emit(FromLocationUiState.Error(message))
         }
     }
 
@@ -291,12 +180,6 @@ sealed interface SuggestionsUiState {
     data object Loading : SuggestionsUiState
     data class Success(val suggestions: List<LocationItem>) : SuggestionsUiState
     data class Error(val message: String) : SuggestionsUiState
-}
-
-sealed interface FromLocationUiState {
-    data object Loading : FromLocationUiState
-    data class Success(val location: SelectedLocation) : FromLocationUiState
-    data class Error(val message: String) : FromLocationUiState
 }
 
 sealed interface ProfileUiState {

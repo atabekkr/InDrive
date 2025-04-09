@@ -12,6 +12,7 @@ import android.os.Looper
 import android.text.Editable
 import android.util.Log
 import android.view.View
+import android.widget.LinearLayout
 import androidx.activity.addCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -25,18 +26,36 @@ import com.aralhub.araltaxi.create_order.databinding.FragmentCreateOrderBinding
 import com.aralhub.araltaxi.create_order.navigation.FeatureCreateOrderNavigation
 import com.aralhub.araltaxi.create_order.utils.NewCurrentLocationListener
 import com.aralhub.araltaxi.create_order.utils.updateMapStyle
+import com.aralhub.araltaxi.create_order.viewmodel.SearchAddressViewModel
+import com.aralhub.araltaxi.request.RequestFragment.Companion.EMPTY_STRING
+import com.aralhub.araltaxi.request.RequestFragment.Companion.SELECT_LOCATION_KEY_LATITUDE
+import com.aralhub.araltaxi.request.RequestFragment.Companion.SELECT_LOCATION_KEY_LOCATION_NAME
+import com.aralhub.araltaxi.request.RequestFragment.Companion.SELECT_LOCATION_KEY_LOCATION_OWNER
+import com.aralhub.araltaxi.request.RequestFragment.Companion.SELECT_LOCATION_KEY_LONGITUDE
+import com.aralhub.araltaxi.request.RequestFragment.Companion.SELECT_LOCATION_OWNER_FROM
+import com.aralhub.araltaxi.request.RequestFragment.Companion.SELECT_LOCATION_OWNER_TO
+import com.aralhub.araltaxi.request.RequestFragment.Companion.SELECT_LOCATION_REQUEST_KEY
+import com.aralhub.araltaxi.request.RequestViewModel
+import com.aralhub.araltaxi.request.SuggestionsUiState
 import com.aralhub.indrive.core.data.model.client.GeoPoint
 import com.aralhub.indrive.core.data.model.client.RecommendedPrice
 import com.aralhub.indrive.core.data.model.payment.PaymentMethodType
 import com.aralhub.indrive.core.data.model.ride.RecommendedAmount
+import com.aralhub.ui.adapter.location.LocationItemAdapter
 import com.aralhub.ui.adapter.option.RideOptionItemAdapter
+import com.aralhub.ui.model.LocationItemClickOwner
+import com.aralhub.ui.model.args.LocationType
+import com.aralhub.ui.model.args.SelectedLocation
 import com.aralhub.ui.model.args.SelectedLocations
 import com.aralhub.ui.sheets.ChangePaymentMethodModalBottomSheet
 import com.aralhub.ui.sheets.CommentToDriverModalBottomSheet
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.ViewEx.disable
 import com.aralhub.ui.utils.ViewEx.enable
+import com.aralhub.ui.utils.hideKeyboard
+import com.aralhub.ui.utils.showKeyboardAndFocus
 import com.aralhub.ui.utils.viewBinding
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.RequestPoint
@@ -87,6 +106,14 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
     private var map: Map? = null
     private var mapObjects: MapObjectCollection? = null
     private lateinit var drivingSession: DrivingSession
+
+    private var searchAddressBottomSheetBehavior: BottomSheetBehavior<LinearLayout>? = null
+
+    private var startLocationName: String? = null
+    private var endLocationName: String? = null
+
+    private val requestViewModel by viewModels<RequestViewModel>()
+    private val searchAddressViewModel by viewModels<SearchAddressViewModel>()
 
     private val drivingRouteListener = object : DrivingRouteListener {
         override fun onDrivingRoutes(drivingRoutes: MutableList<DrivingRoute>) {
@@ -139,13 +166,14 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
         },
         onProviderEnabledListener = { }
     )
-    private var currentLocationPlaceMarkObject: PlacemarkMapObject? = null
     private var fromRoutePlaceMarkObject: PlacemarkMapObject? = null
     private var toRoutePlaceMarkObject: PlacemarkMapObject? = null
     private var imageProvider: ImageProvider? = null
 
     private val handler = Handler(Looper.getMainLooper())
     private var isUpdating = false
+
+    private val adapter = LocationItemAdapter()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -180,6 +208,7 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
         mapObjects = mapWindow.map.mapObjects.addCollection()
         imageProvider =
             ImageProvider.fromResource(requireContext(), com.aralhub.ui.R.drawable.ic_vector)
+        map?.isRotateGesturesEnabled = false
 
         setDefaultMapStyle()
         mapCameraListener()
@@ -270,28 +299,12 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
                     )
                 )
             )
-
-            Log.i(
-                "Locations", "${
-                    listOf(
-                        GeoPoint(
-                            latitude = it.from.latitude,
-                            longitude = it.from.longitude,
-                            name = it.from.name
-                        ),
-                        GeoPoint(
-                            latitude = it.to.latitude,
-                            longitude = it.to.longitude,
-                            name = it.to.name
-                        )
-                    )
-                }"
-            )
             requestRoutes(it)
-            binding.tvFromLocationName.text = it.from.name
-            binding.tvToLocationName.text = it.to.name
+            startLocationName = it.from.name
+            endLocationName = it.to.name
+            binding.tvFromLocationName.text = startLocationName
+            binding.tvToLocationName.text = endLocationName
         }
-
 
     }
 
@@ -329,31 +342,76 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
     }
 
     private fun initViews() {
+        binding.bottomSheetSearchAddress.recyclerViewAddress.adapter = adapter
         binding.rvRideOptions.adapter = rideOptionItemAdapter
         binding.btnSendOffer.disable()
+
+        searchAddressBottomSheetBehavior =
+            BottomSheetBehavior.from(binding.bottomSheetSearchAddress.bottomSheetSearchAddress)
+        searchAddressBottomSheetBehavior?.peekHeight =
+            (resources.displayMetrics.heightPixels * 0.95).toInt()
+        searchAddressBottomSheetBehavior?.apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+            isHideable = true
+            expandedOffset = 0  // Убирает отступ сверху в раскрытом состоянии
+        }
     }
 
     private fun initListeners() {
+
+        initFragmentResultListener()
+        initAdapterListener()
+        initSearchBottomSheetStateListener()
+
+        val etFromLocation = binding.bottomSheetSearchAddress.dynamicLayout.etFromLocation
+        val etToLocation = binding.bottomSheetSearchAddress.dynamicLayout.etToLocation
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             true
         ) {
-            val result = Bundle().apply {
-                putBoolean("cancel", true)
+            if (searchAddressBottomSheetBehavior?.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                searchAddressBottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+            } else {
+                val result = Bundle().apply {
+                    putBoolean("cancel", true)
+                }
+                parentFragmentManager.setFragmentResult("cancel", result)
+                findNavController().navigateUp()
             }
-            parentFragmentManager.setFragmentResult("cancel", result)
-            findNavController().navigateUp()
         }
 
-        binding.tvFromLocationName.setOnClickListener {
-            //  navigation.goToSelectFromLocationFromCreateOrderFragment()
+        etFromLocation.setOnTextChangedListener {
+            if (it.isNotEmpty() && !it.isNullOrBlank()) {
+                requestViewModel.suggestLocation(it, LocationItemClickOwner.FROM)
+            } else {
+//                adapter.submitList(null)
+            }
         }
 
-        binding.tvToLocationName.setOnClickListener {
-            // navigation.goToSelectToLocationFromCreateOrderFragment()
+        etToLocation.setOnTextChangedListener {
+            if (it.isNotEmpty() && !it.isNullOrBlank()) {
+                requestViewModel.suggestLocation(it, LocationItemClickOwner.TO)
+            } else {
+//                adapter.submitList(null)
+            }
         }
 
+        etFromLocation.setEndTextClickListener {
+            navigation.goToSelectFromLocationFromCreateOrderFragment()
+        }
+
+        etToLocation.setEndTextClickListener {
+            navigation.goToSelectToLocationFromCreateOrderFragment()
+        }
+
+        binding.layoutFromLocation.setOnClickListener {
+            showFullScreenBottomSheet(locationItemClickOwner = LocationItemClickOwner.FROM)
+        }
+
+        binding.layoutToLocation.setOnClickListener {
+            showFullScreenBottomSheet(locationItemClickOwner = LocationItemClickOwner.TO)
+        }
 
         initChangePaymentMethodListener()
         initCommentToDriverListener()
@@ -397,6 +455,138 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
         binding.layoutCommentToDriver.setOnClickListener {
             commentToDriverModalBottomSheet.show(requireActivity().supportFragmentManager, "")
         }
+    }
+
+    private fun initFragmentResultListener() {
+        parentFragmentManager.clearFragmentResultListener(SELECT_LOCATION_REQUEST_KEY)
+        parentFragmentManager.setFragmentResultListener(
+            SELECT_LOCATION_REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val latitude = bundle.getDouble(SELECT_LOCATION_KEY_LATITUDE)
+            val longitude = bundle.getDouble(SELECT_LOCATION_KEY_LONGITUDE)
+            val locationName = bundle.getString(SELECT_LOCATION_KEY_LOCATION_NAME) ?: EMPTY_STRING
+            val locationOwner = bundle.getInt(SELECT_LOCATION_KEY_LOCATION_OWNER)
+            when (locationOwner) {
+                SELECT_LOCATION_OWNER_FROM -> {
+                    setStartLocationName(locationName)
+                    searchAddressViewModel.setFromLocation(
+                        SelectedLocation(
+                            name = locationName,
+                            longitude = longitude,
+                            latitude = latitude,
+                            locationType = LocationType.FROM
+                        )
+                    )
+                }
+
+                SELECT_LOCATION_OWNER_TO -> {
+                    searchAddressViewModel.setToLocation(
+                        SelectedLocation(
+                            name = locationName,
+                            longitude = longitude,
+                            latitude = latitude,
+                            locationType = LocationType.TO
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun initSearchBottomSheetStateListener() {
+        searchAddressBottomSheetBehavior?.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_EXPANDED -> {
+                        Log.d("BottomSheet", "Развернут (STATE_EXPANDED)")
+                    }
+
+                    BottomSheetBehavior.STATE_COLLAPSED -> {
+                        Log.d("BottomSheet", "Свернут (STATE_COLLAPSED)")
+                    }
+
+                    BottomSheetBehavior.STATE_DRAGGING -> {
+                        binding.root.hideKeyboard()
+                        Log.d("BottomSheet", "Перетаскивается (STATE_DRAGGING)")
+                    }
+
+                    BottomSheetBehavior.STATE_SETTLING -> {
+                        Log.d("BottomSheet", "Фиксируется (STATE_SETTLING)")
+                    }
+
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        binding.root.hideKeyboard()
+                    }
+
+                    BottomSheetBehavior.STATE_HALF_EXPANDED -> {
+                        Log.d("BottomSheet", "Частично развернут (STATE_HALF_EXPANDED)")
+                    }
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                Log.d("BottomSheet", "Скролл, offset: $slideOffset")
+            }
+        })
+    }
+
+    private fun initAdapterListener() {
+        adapter.setOnItemClickListener {
+            when (it.clickOwner) {
+                LocationItemClickOwner.FROM -> {
+                    searchAddressViewModel.setFromLocation(
+                        SelectedLocation(
+                            name = it.title,
+                            longitude = it.longitude,
+                            latitude = it.latitude,
+                            locationType = LocationType.FROM
+                        )
+                    )
+                    adapter.submitList(null)
+                }
+
+                LocationItemClickOwner.TO -> {
+                    searchAddressViewModel.setToLocation(
+                        SelectedLocation(
+                            name = it.title,
+                            longitude = it.longitude,
+                            latitude = it.latitude,
+                            locationType = LocationType.TO
+                        )
+                    )
+                    adapter.submitList(null)
+                }
+            }
+            searchAddressBottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+        }
+    }
+
+    private fun showFullScreenBottomSheet(locationItemClickOwner: LocationItemClickOwner) {
+        searchAddressBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
+
+        val etFromLocation = binding.bottomSheetSearchAddress.dynamicLayout.etFromLocation
+        val etToLocation = binding.bottomSheetSearchAddress.dynamicLayout.etToLocation
+
+        startLocationName?.let { etFromLocation.text = it }
+        endLocationName?.let { etToLocation.text = it }
+
+        when (locationItemClickOwner) {
+            LocationItemClickOwner.FROM -> {
+                etFromLocation.showKeyboardAndFocus()
+            }
+
+            LocationItemClickOwner.TO -> {
+                etToLocation.showKeyboardAndFocus()
+            }
+        }
+
+    }
+
+    private fun setStartLocationName(startLocationName: String?) {
+        this.startLocationName = startLocationName
+        binding.tvFromLocationName.text = startLocationName
     }
 
     private fun initCommentToDriverListener() {
@@ -487,20 +677,43 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
                 is RideOptionsUiState.Success -> rideOptionItemAdapter.submitList(rideOptionsUiState.rideOptions)
             }
         }
-    }
 
-
-    private fun createCurrentLocationPlaceMarkObject(point: Point) {
-        map?.let {
-            if (it.isValid) {
-                if (currentLocationPlaceMarkObject == null) {
-                    currentLocationPlaceMarkObject = it.mapObjects.addPlacemark().apply {
-                        geometry = point
-                        imageProvider?.let { imageProvider -> setIcon(imageProvider) }
-                    }
-                } else {
-                    currentLocationPlaceMarkObject?.geometry = point
+        observeState(requestViewModel.suggestionsUiState) { suggestionsUiState ->
+            when (suggestionsUiState) {
+                is SuggestionsUiState.Error -> errorHandler.showToast(suggestionsUiState.message)
+                SuggestionsUiState.Loading -> {}
+                is SuggestionsUiState.Success -> {
+                    adapter.submitList(suggestionsUiState.suggestions)
                 }
+            }
+        }
+
+        observeState(searchAddressViewModel.fromLocationFlow) {
+            it?.let { fromLocation ->
+                Log.d("LocationFromViewModel", "From Location: $fromLocation")
+                setStartLocationName(fromLocation.name)
+                selectedLocations?.from = SelectedLocation(
+                    name = fromLocation.name,
+                    longitude = fromLocation.longitude,
+                    latitude = fromLocation.latitude,
+                    locationType = LocationType.FROM
+                )
+                selectedLocations?.let { it1 -> requestRoutes(it1) }
+            }
+        }
+        observeState(searchAddressViewModel.toLocationFlow) {
+            it?.let { toLocation ->
+//                isNavigatedToCreateOrderFragment = false
+                Log.d("LocationFromViewModel", "To Location: $toLocation")
+                binding.tvToLocationName.text = toLocation.name
+                endLocationName = toLocation.name
+                selectedLocations?.to = SelectedLocation(
+                    name = toLocation.name,
+                    longitude = toLocation.longitude,
+                    latitude = toLocation.latitude,
+                    locationType = LocationType.TO
+                )
+                selectedLocations?.let { it1 -> requestRoutes(it1) }
             }
         }
     }
@@ -548,7 +761,6 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
                     fromRoutePlaceMarkObject?.geometry = point
                 }
             }
-            //it.move(CameraPosition(point, 17.0f, 150.0f, 30.0f))
         }
     }
 
@@ -576,7 +788,6 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
             }
         }
     }
-
 
     companion object {
         fun args(selectedLocations: SelectedLocations) = Bundle().apply {
