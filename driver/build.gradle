@@ -14,7 +14,7 @@ android {
         applicationId "com.aralhub.araltaxi.driver"
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdk 34
-        versionCode 5
+        versionCode 6
         versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

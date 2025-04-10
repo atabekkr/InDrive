@@ -7,7 +7,7 @@ import android.text.Editable
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.aralhub.araltaxi.core.common.error.ErrorHandler
+import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.araltaxi.core.common.utils.rejectOfferState
 import com.aralhub.araltaxi.driver.orders.R
 import com.aralhub.araltaxi.driver.orders.databinding.ModalBottomSheetOrderBinding

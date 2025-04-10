@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.aralhub.araltaxi.core.common.error.ErrorHandler
+import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.araltaxi.core.common.permission.PermissionHelper
 import com.aralhub.araltaxi.core.common.utils.MapStyles
 import com.aralhub.araltaxi.core.common.utils.loadJsonFromAssets

@@ -9,7 +9,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
 import com.aralhub.araltaxi.client.offers.R
 import com.aralhub.araltaxi.client.offers.databinding.FragmentOffersBinding
-import com.aralhub.araltaxi.core.common.error.ErrorHandler
+import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.araltaxi.core.common.utils.MapStyles
 import com.aralhub.araltaxi.core.common.utils.loadJsonFromAssets
 import com.aralhub.offers.navigation.FeatureOffersNavigation

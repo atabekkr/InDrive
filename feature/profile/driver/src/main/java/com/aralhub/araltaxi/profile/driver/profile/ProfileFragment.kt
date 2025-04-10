@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
-import com.aralhub.araltaxi.core.common.error.ErrorHandler
+import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.araltaxi.core.common.file.UriEx.getFileFromUri
 import com.aralhub.araltaxi.core.common.sharedpreference.DriverSharedPreference
 import com.aralhub.araltaxi.profile.driver.R

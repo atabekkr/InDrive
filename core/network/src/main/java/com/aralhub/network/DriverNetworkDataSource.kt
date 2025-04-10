@@ -1,5 +1,6 @@
 package com.aralhub.network
 
+import androidx.paging.PagingData
 import com.aralhub.network.models.NetworkResult
 import com.aralhub.network.models.ServerResponseEmpty
 import com.aralhub.network.models.WebSocketServerResponse
@@ -21,6 +22,7 @@ import com.aralhub.network.models.ride.RideHistoryNetwork
 import com.aralhub.network.requests.auth.NetworkDriverAuthRequest
 import com.aralhub.network.requests.logout.NetworkLogoutRequest
 import com.aralhub.network.requests.verify.NetworkVerifyRequest
+import kotlinx.coroutines.flow.Flow
 import java.io.File
 
 interface DriverNetworkDataSource {
@@ -46,5 +48,5 @@ interface DriverNetworkDataSource {
     suspend fun updateRideStatus(rideId: Int, status: String): NetworkResult<NetworkRideCompletedResponse?>
     suspend fun getCancelCauses(): NetworkResult<List<NetworkDriverCancelCause>>
     suspend fun getWaitTime(rideId: Int): NetworkResult<NetworkWaitAmount>
-    suspend fun getRideHistory(): NetworkResult<List<RideHistoryNetwork>>
+    suspend fun getRideHistory(): Flow<PagingData<RideHistoryNetwork>>
 }

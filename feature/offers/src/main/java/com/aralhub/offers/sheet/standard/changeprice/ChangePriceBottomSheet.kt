@@ -8,13 +8,11 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.aralhub.araltaxi.client.offers.R
 import com.aralhub.araltaxi.client.offers.databinding.BottomSheetChangePriceBinding
-import com.aralhub.araltaxi.core.common.error.ErrorHandler
+import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
-import com.aralhub.ui.utils.MoneyFormatter
 import com.aralhub.ui.utils.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlin.math.max
 
 @AndroidEntryPoint
 class ChangePriceBottomSheet: Fragment(R.layout.bottom_sheet_change_price) {

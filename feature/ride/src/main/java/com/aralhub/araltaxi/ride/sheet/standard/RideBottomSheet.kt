@@ -7,14 +7,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.aralhub.araltaxi.client.ride.R
 import com.aralhub.araltaxi.client.ride.databinding.BottomSheetRideBinding
-import com.aralhub.araltaxi.core.common.error.ErrorHandler
+import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.araltaxi.ride.ActiveRideUiState
 import com.aralhub.araltaxi.ride.RideStateUiState
 import com.aralhub.araltaxi.ride.RideViewModel
 import com.aralhub.araltaxi.ride.navigation.sheet.FeatureRideBottomSheetNavigation
 import com.aralhub.araltaxi.ride.navigation.sheet.FeatureRideNavigation
 import com.aralhub.araltaxi.ride.sheet.modal.CancelTripFragment
-import com.aralhub.araltaxi.ride.sheet.modal.TripCanceledByDriverFragment
 import com.aralhub.araltaxi.ride.utils.FragmentEx.sendPhoneNumberToDial
 import com.aralhub.indrive.core.data.model.payment.PaymentMethodType
 import com.aralhub.indrive.core.data.model.ride.ActiveRide

@@ -2,6 +2,7 @@ package com.aralhub.araltaxi.history.driver
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -11,7 +12,7 @@ import com.aralhub.ui.utils.setOnSafeClickListener
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
-class HistoryAdapter : ListAdapter<RideHistoryUI, HistoryAdapter.HistoryItemViewHolder>(
+class HistoryAdapter : PagingDataAdapter<RideHistoryUI, HistoryAdapter.HistoryItemViewHolder>(
     HistoryItemDiffCallback
 ) {
 
@@ -54,7 +55,7 @@ class HistoryAdapter : ListAdapter<RideHistoryUI, HistoryAdapter.HistoryItemView
     }
 
     override fun onBindViewHolder(holder: HistoryItemViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        getItem(position)?.let { holder.bind(it) }
     }
 
     object HistoryItemDiffCallback : DiffUtil.ItemCallback<RideHistoryUI>() {

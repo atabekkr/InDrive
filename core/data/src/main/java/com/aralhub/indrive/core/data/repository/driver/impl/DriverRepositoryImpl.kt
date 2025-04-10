@@ -1,5 +1,7 @@
 package com.aralhub.indrive.core.data.repository.driver.impl
 
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.aralhub.indrive.core.data.model.cancel.DriverCancelCause
 import com.aralhub.indrive.core.data.model.cancel.toDomain
 import com.aralhub.indrive.core.data.model.driver.RideCompleted
@@ -12,6 +14,8 @@ import com.aralhub.indrive.core.data.repository.driver.DriverRepository
 import com.aralhub.indrive.core.data.result.Result
 import com.aralhub.network.DriverNetworkDataSource
 import com.aralhub.network.models.NetworkResult
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class DriverRepositoryImpl @Inject constructor(
@@ -86,12 +90,10 @@ class DriverRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRideHistory(): Result<List<RideHistory>> {
-        return driverNetworkDataSource.getRideHistory().let {
-            when (it) {
-                is NetworkResult.Error -> Result.Error(it.message)
-                is NetworkResult.Success -> Result.Success(it.data.toDomain())
+    override suspend fun getRideHistory(): Flow<PagingData<RideHistory>> {
+        return driverNetworkDataSource.getRideHistory()
+            .map { pagingData ->
+                pagingData.map { it.toDomain() }
             }
-        }
     }
 }

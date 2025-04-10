@@ -6,13 +6,11 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.aralhub.araltaxi.core.common.error.ErrorHandler
+import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.araltaxi.saved_places.R
 import com.aralhub.araltaxi.saved_places.databinding.FragmentSavedPlacesBinding
 import com.aralhub.araltaxi.savedplaces.navigation.FeatureSavedPlaceNavigation
 import com.aralhub.ui.adapter.AddressItemAdapter
-import com.aralhub.ui.model.args.LocationType
-import com.aralhub.ui.model.args.SelectedLocation
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.ViewEx.hide
 import com.aralhub.ui.utils.ViewEx.show

@@ -98,6 +98,6 @@ interface DriverNetworkApi {
     suspend fun getWaitAmount(@Path("ride_id") rideId: Int): Response<ServerResponse<NetworkWaitAmount>>
 
     @GET("/ride/get_rides_history/")
-    suspend fun getRideHistory(): Response<ServerResponse<List<RideHistoryNetwork>>>
+    suspend fun getRideHistory(@Query("page") page: Int, @Query("page_size")pageSize: Int): Response<ServerResponse<List<RideHistoryNetwork>>>
 
 }

@@ -38,6 +38,7 @@ class RideHistoryDetailsBottomSheet : BottomSheetDialogFragment(
         tvToLocation.text = historyDetails?.locations?.getOrNull(1)?.name
         tvPrice.text = getString(R.string.standard_uzs_price, historyDetails?.amount.toString())
         tvClientName.text = historyDetails?.amount.toString()
+        historyDetails?.paymentType?.resId?.let { ivPaymentMethod.setImageResource(it) }
     }
 
 }

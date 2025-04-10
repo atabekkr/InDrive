@@ -40,4 +40,6 @@ dependencies {
     //Dagger-Hilt for Dependency Injection
     implementation(libs.dagger)
     ksp(libs.dagger.compiler)
+
+    implementation libs.androidx.paging.runtime.ktx
 }

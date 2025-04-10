@@ -1,13 +1,12 @@
 package com.aralhub.araltaxi.ride.sheet.modal.cause
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.aralhub.araltaxi.client.ride.R
 import com.aralhub.araltaxi.client.ride.databinding.FragmentReasonCancelBinding
-import com.aralhub.araltaxi.core.common.error.ErrorHandler
+import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.araltaxi.ride.ActiveRideUiState
 import com.aralhub.araltaxi.ride.CancelRideUiState
 import com.aralhub.araltaxi.ride.RideViewModel

@@ -7,10 +7,9 @@ import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.aralhub.araltaxi.client.offers.R
 import com.aralhub.araltaxi.client.offers.databinding.BottomSheetChangeOrCancelRequestBinding
-import com.aralhub.araltaxi.core.common.error.ErrorHandler
+import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.offers.OffersUiState
 import com.aralhub.offers.OffersViewModel
 import com.aralhub.offers.navigation.FeatureOffersNavigation

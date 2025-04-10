@@ -13,25 +13,23 @@ data class RideHistory(
     val createdAt: String
 )
 
-fun List<RideHistoryNetwork>.toDomain(): List<RideHistory> =
+fun RideHistoryNetwork.toDomain(): RideHistory =
     with(this) {
-        map { rideHistoryNetwork ->
-            RideHistory(
-                amount = rideHistoryNetwork.amount,
-                waitAmount = rideHistoryNetwork.waitAmount,
-                locations = rideHistoryNetwork.locations.points.map {
-                    ClientRideLocationsItems(
-                        ClientRideLocationsItemsCoordinates(
-                            it.coordinates.longitude,
-                            it.coordinates.latitude
-                        ),
-                        it.name
-                    )
-                },
-                distance = rideHistoryNetwork.distance,
-                status = rideHistoryNetwork.status,
-                createdAt = rideHistoryNetwork.createdAt
-            )
+        RideHistory(
+            amount = amount,
+            waitAmount = waitAmount,
+            locations = locations.points.map {
+                ClientRideLocationsItems(
+                    ClientRideLocationsItemsCoordinates(
+                        it.coordinates.longitude,
+                        it.coordinates.latitude
+                    ),
+                    it.name
+                )
+            },
+            distance = distance,
+            status = status,
+            createdAt = createdAt
+        )
 
-        }
-         }
+    }

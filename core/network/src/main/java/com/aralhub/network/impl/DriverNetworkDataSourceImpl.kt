@@ -1,6 +1,9 @@
 package com.aralhub.network.impl
 
 import android.util.Log
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.aralhub.network.DriverNetworkDataSource
 import com.aralhub.network.api.DriverNetworkApi
 import com.aralhub.network.models.NetworkResult
@@ -23,11 +26,13 @@ import com.aralhub.network.models.ride.RideHistoryNetwork
 import com.aralhub.network.requests.auth.NetworkDriverAuthRequest
 import com.aralhub.network.requests.logout.NetworkLogoutRequest
 import com.aralhub.network.requests.verify.NetworkVerifyRequest
+import com.aralhub.network.utils.HistoryPagingSource
 import com.aralhub.network.utils.ex.MultipartEx
 import com.aralhub.network.utils.ex.NetworkEx.safeRequest
 import com.aralhub.network.utils.ex.NetworkEx.safeRequestEmpty
 import com.aralhub.network.utils.ex.NetworkEx.safeRequestServerResponse
 import com.aralhub.network.utils.ex.NetworkEx.safeRequestServerResponseWithNullData
+import kotlinx.coroutines.flow.Flow
 import java.io.File
 import javax.inject.Inject
 
@@ -113,8 +118,12 @@ class DriverNetworkDataSourceImpl @Inject constructor(private val api: DriverNet
         return api.getWaitAmount(rideId).safeRequestServerResponse()
     }
 
-    override suspend fun getRideHistory(): NetworkResult<List<RideHistoryNetwork>> {
-        return api.getRideHistory().safeRequestServerResponse()
+    val NETWORK_PAGE_SIZE = 10
+    override suspend fun getRideHistory(): Flow<PagingData<RideHistoryNetwork>> {
+        return Pager(config = PagingConfig(
+            pageSize = NETWORK_PAGE_SIZE,
+            enablePlaceholders = false
+        ),
+            pagingSourceFactory = { HistoryPagingSource(api) }).flow
     }
-
 }
