@@ -8,7 +8,7 @@ import com.aralhub.network.api.PaymentMethodsNetworkApi
 import com.aralhub.network.api.ReviewsNetworkApi
 import com.aralhub.network.api.RideOptionNetworkApi
 import com.aralhub.network.api.UserNetworkApi
-import com.aralhub.network.api.WebSocketClientNetworkApi
+import com.aralhub.network.api.ClientNetworkApi
 import com.aralhub.network.utils.AuthInterceptor
 import com.aralhub.network.utils.DriverAuthInterceptor
 import com.aralhub.network.utils.NetworkErrorInterceptor
@@ -23,7 +23,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -103,8 +102,8 @@ object NetworkModule {
         retrofit.create(DriverNetworkApi::class.java)
 
     @[Provides Singleton]
-    fun provideWebsocketClientNetworkApi(@Named("Client")retrofit: Retrofit): WebSocketClientNetworkApi =
-        retrofit.create(WebSocketClientNetworkApi::class.java)
+    fun provideWebsocketClientNetworkApi(@Named("Client")retrofit: Retrofit): ClientNetworkApi =
+        retrofit.create(ClientNetworkApi::class.java)
 
     @[Provides Singleton]
     fun providePaymentMethodNetworkApi(@Named("Client")retrofit: Retrofit): PaymentMethodsNetworkApi =

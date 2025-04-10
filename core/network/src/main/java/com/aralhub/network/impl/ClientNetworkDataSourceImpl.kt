@@ -1,7 +1,10 @@
 package com.aralhub.network.impl
 
-import com.aralhub.network.WebSocketClientNetworkDataSource
-import com.aralhub.network.api.WebSocketClientNetworkApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.aralhub.network.ClientNetworkDataSource
+import com.aralhub.network.api.ClientNetworkApi
 import com.aralhub.network.models.NetworkResult
 import com.aralhub.network.models.ServerResponseEmpty
 import com.aralhub.network.models.driver.NetworkDriverCard
@@ -11,14 +14,17 @@ import com.aralhub.network.models.price.NetworkStandardPrice
 import com.aralhub.network.models.ride.NetworkRideActive
 import com.aralhub.network.models.ride.NetworkRideSearch
 import com.aralhub.network.models.ride.NetworkWaitAmount
+import com.aralhub.network.models.ride.RideHistoryNetwork
 import com.aralhub.network.requests.price.NetworkRecommendedRidePriceRequest
 import com.aralhub.network.requests.ride.NetworkClientRideRequest
+import com.aralhub.network.utils.ClientHistoryPagingSource
 import com.aralhub.network.utils.ex.NetworkEx.safeRequest
 import com.aralhub.network.utils.ex.NetworkEx.safeRequestServerResponse
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class WebSocketClientNetworkDataSourceImpl @Inject constructor(private val api: WebSocketClientNetworkApi) :
-    WebSocketClientNetworkDataSource {
+class ClientNetworkDataSourceImpl @Inject constructor(private val api: ClientNetworkApi) :
+    ClientNetworkDataSource {
 
     override suspend fun cancelRide(
         rideId: Int,
@@ -76,5 +82,14 @@ class WebSocketClientNetworkDataSourceImpl @Inject constructor(private val api: 
 
     override suspend fun getDriverCard(driverId: Int): NetworkResult<NetworkDriverCard> {
         return api.getCardInfo(driverId).safeRequestServerResponse()
+    }
+
+    val NETWORK_PAGE_SIZE = 10
+    override suspend fun getRideHistory(): Flow<PagingData<RideHistoryNetwork>> {
+        return Pager(config = PagingConfig(
+            pageSize = NETWORK_PAGE_SIZE,
+            enablePlaceholders = false
+        ),
+            pagingSourceFactory = { ClientHistoryPagingSource(api) }).flow
     }
 }

@@ -8,6 +8,7 @@ import com.aralhub.network.models.price.NetworkStandardPrice
 import com.aralhub.network.models.ride.NetworkRideActive
 import com.aralhub.network.models.ride.NetworkRideSearch
 import com.aralhub.network.models.ride.NetworkWaitAmount
+import com.aralhub.network.models.ride.RideHistoryNetwork
 import com.aralhub.network.requests.price.NetworkRecommendedRidePriceRequest
 import com.aralhub.network.requests.ride.NetworkClientRideRequest
 import retrofit2.Response
@@ -18,7 +19,7 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface WebSocketClientNetworkApi {
+interface ClientNetworkApi {
     @POST("/websocket/ride/create")
     suspend fun clientRide(@Body networkClientRideRequest: NetworkClientRideRequest): Response<ServerResponse<NetworkRideSearch>>
 
@@ -66,4 +67,8 @@ interface WebSocketClientNetworkApi {
 
     @GET("/ride/get_card_info/{driver_id}")
     suspend fun getCardInfo(@Path("driver_id") driverId: Int): Response<ServerResponse<NetworkDriverCard>>
+
+    @GET("/ride/get_rides_history/")
+    suspend fun getRideHistory(@Query("page") page: Int, @Query("page_size")pageSize: Int): Response<ServerResponse<List<RideHistoryNetwork>>>
+
 }

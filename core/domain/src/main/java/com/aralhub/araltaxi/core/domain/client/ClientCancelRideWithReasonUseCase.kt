@@ -1,10 +1,10 @@
 package com.aralhub.araltaxi.core.domain.client
 
-import com.aralhub.indrive.core.data.repository.client.ClientWebSocketRepository
+import com.aralhub.indrive.core.data.repository.client.ClientRepository
 import javax.inject.Inject
 
 class ClientCancelRideWithReasonUseCase @Inject constructor(
-    private val clientWebSocketRepository: ClientWebSocketRepository
+    private val clientWebSocketRepository: ClientRepository
 ) {
     suspend operator fun invoke(rideId: Int, cancelCauseId: Int) =
         clientWebSocketRepository.cancelRide(rideId, cancelCauseId)

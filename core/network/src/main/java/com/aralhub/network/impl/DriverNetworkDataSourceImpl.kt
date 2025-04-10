@@ -26,7 +26,7 @@ import com.aralhub.network.models.ride.RideHistoryNetwork
 import com.aralhub.network.requests.auth.NetworkDriverAuthRequest
 import com.aralhub.network.requests.logout.NetworkLogoutRequest
 import com.aralhub.network.requests.verify.NetworkVerifyRequest
-import com.aralhub.network.utils.HistoryPagingSource
+import com.aralhub.network.utils.DriverHistoryPagingSource
 import com.aralhub.network.utils.ex.MultipartEx
 import com.aralhub.network.utils.ex.NetworkEx.safeRequest
 import com.aralhub.network.utils.ex.NetworkEx.safeRequestEmpty
@@ -124,6 +124,6 @@ class DriverNetworkDataSourceImpl @Inject constructor(private val api: DriverNet
             pageSize = NETWORK_PAGE_SIZE,
             enablePlaceholders = false
         ),
-            pagingSourceFactory = { HistoryPagingSource(api) }).flow
+            pagingSourceFactory = { DriverHistoryPagingSource(api) }).flow
     }
 }

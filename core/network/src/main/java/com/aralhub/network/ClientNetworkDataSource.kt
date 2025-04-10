@@ -1,5 +1,6 @@
 package com.aralhub.network
 
+import androidx.paging.PagingData
 import com.aralhub.network.models.NetworkResult
 import com.aralhub.network.models.ServerResponseEmpty
 import com.aralhub.network.models.driver.NetworkDriverCard
@@ -9,9 +10,11 @@ import com.aralhub.network.models.price.NetworkStandardPrice
 import com.aralhub.network.models.ride.NetworkRideActive
 import com.aralhub.network.models.ride.NetworkRideSearch
 import com.aralhub.network.models.ride.NetworkWaitAmount
+import com.aralhub.network.models.ride.RideHistoryNetwork
 import com.aralhub.network.requests.ride.NetworkClientRideRequest
+import kotlinx.coroutines.flow.Flow
 
-interface WebSocketClientNetworkDataSource {
+interface ClientNetworkDataSource {
 
     suspend fun cancelRide(rideId: Int, cancelCauseId: Int): NetworkResult<ServerResponseEmpty>
 
@@ -37,4 +40,5 @@ interface WebSocketClientNetworkDataSource {
 
     suspend fun getDriverCard(driverId: Int): NetworkResult<NetworkDriverCard>
 
+    suspend fun getRideHistory(): Flow<PagingData<RideHistoryNetwork>>
 }

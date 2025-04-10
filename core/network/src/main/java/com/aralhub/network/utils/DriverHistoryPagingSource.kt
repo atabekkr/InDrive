@@ -7,7 +7,7 @@ import com.aralhub.network.models.NetworkResult
 import com.aralhub.network.models.ride.RideHistoryNetwork
 import com.aralhub.network.utils.ex.NetworkEx.safeRequestServerResponse
 
-class HistoryPagingSource(private val api: DriverNetworkApi) :
+class DriverHistoryPagingSource(private val api: DriverNetworkApi) :
     PagingSource<Int, RideHistoryNetwork>() {
 
     companion object {

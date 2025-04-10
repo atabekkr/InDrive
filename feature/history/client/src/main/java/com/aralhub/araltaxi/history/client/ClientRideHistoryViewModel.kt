@@ -1,11 +1,11 @@
-package com.aralhub.araltaxi.history.driver
+package com.aralhub.araltaxi.history.client
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
-import com.aralhub.araltaxi.core.domain.ridehistory.GetRideHistoryUseCase
+import com.aralhub.araltaxi.core.domain.ridehistory.GetClientRideHistoryUseCase
 import com.aralhub.ui.model.RideHistoryUI
 import com.aralhub.ui.model.asUI
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,9 +17,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RideHistoryViewModel @Inject constructor(
-    private val useCase: GetRideHistoryUseCase
-) : ViewModel() {
+class ClientRideHistoryViewModel @Inject
+constructor(private val useCase: GetClientRideHistoryUseCase) : ViewModel() {
 
     private val _rideHistoryFlow = MutableStateFlow<PagingData<RideHistoryUI>>(PagingData.empty())
     val rideHistoryFlow: StateFlow<PagingData<RideHistoryUI>> = _rideHistoryFlow

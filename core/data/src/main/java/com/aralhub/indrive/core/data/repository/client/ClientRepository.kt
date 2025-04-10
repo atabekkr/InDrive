@@ -1,19 +1,21 @@
 package com.aralhub.indrive.core.data.repository.client
 
+import androidx.paging.PagingData
 import com.aralhub.indrive.core.data.model.client.ClientRide
 import com.aralhub.indrive.core.data.model.client.ClientRideRequest
 import com.aralhub.indrive.core.data.model.client.GeoPoint
 import com.aralhub.indrive.core.data.model.client.RecommendedPrice
 import com.aralhub.indrive.core.data.model.driver.DriverCard
 import com.aralhub.indrive.core.data.model.ride.ActiveRide
+import com.aralhub.indrive.core.data.model.ride.RideHistory
 import com.aralhub.indrive.core.data.model.ride.SearchRide
 import com.aralhub.indrive.core.data.model.ride.StandardPrice
 import com.aralhub.indrive.core.data.model.ride.WaitAmount
 import com.aralhub.indrive.core.data.result.Result
-import java.sql.Driver
+import kotlinx.coroutines.flow.Flow
 
 
-interface ClientWebSocketRepository {
+interface ClientRepository {
     suspend fun getRecommendedPrice(points: List<GeoPoint>): Result<RecommendedPrice>
     suspend fun createRide(clientRideRequest: ClientRideRequest): Result<ClientRide>
     suspend fun getActiveRideByPassenger(): Result<ActiveRide>
@@ -26,4 +28,5 @@ interface ClientWebSocketRepository {
     suspend fun getWaitAmount(rideId: Int): Result<WaitAmount>
     suspend fun getStandardPrice(): Result<StandardPrice>
     suspend fun getDriverCard(driverId: Int): Result<DriverCard>
+    suspend fun getRideHistory(): Flow<PagingData<RideHistory>>
 }

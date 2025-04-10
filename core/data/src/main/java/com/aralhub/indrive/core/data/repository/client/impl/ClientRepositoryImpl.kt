@@ -1,5 +1,7 @@
 package com.aralhub.indrive.core.data.repository.client.impl
 
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.aralhub.indrive.core.data.model.client.ClientRide
 import com.aralhub.indrive.core.data.model.client.ClientRideRequest
 import com.aralhub.indrive.core.data.model.client.ClientRideResponseDistanceItemPoint
@@ -29,20 +31,23 @@ import com.aralhub.indrive.core.data.model.ride.SearchRideLocations
 import com.aralhub.indrive.core.data.model.ride.StandardPrice
 import com.aralhub.indrive.core.data.model.ride.WaitAmount
 import com.aralhub.indrive.core.data.model.ride.toDomain
-import com.aralhub.indrive.core.data.repository.client.ClientWebSocketRepository
+import com.aralhub.indrive.core.data.repository.client.ClientRepository
 import com.aralhub.indrive.core.data.result.Result
-import com.aralhub.network.WebSocketClientNetworkDataSource
+import com.aralhub.network.ClientNetworkDataSource
 import com.aralhub.araltaxi.core.common.sharedpreference.ClientSharedPreference
+import com.aralhub.indrive.core.data.model.ride.RideHistory
 import com.aralhub.network.models.NetworkResult
 import com.aralhub.network.models.location.NetworkLocationPoint
 import com.aralhub.network.models.location.NetworkLocationPointCoordinates
 import com.aralhub.network.models.location.NetworkLocations
 import com.aralhub.network.models.price.NetworkRecommendedPrice
 import com.aralhub.network.requests.ride.NetworkClientRideRequest
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class ClientWebSocketRepositoryImpl @Inject constructor(private val localStorage: ClientSharedPreference, private val dataSource: WebSocketClientNetworkDataSource) :
-    ClientWebSocketRepository {
+class ClientRepositoryImpl @Inject constructor(private val localStorage: ClientSharedPreference, private val dataSource: ClientNetworkDataSource) :
+    ClientRepository {
     override suspend fun getRecommendedPrice(points: List<GeoPoint>): Result<RecommendedPrice> {
        return dataSource.getRecommendedPrice(points.map { NetworkLocationPoint(
            coordinates = NetworkLocationPointCoordinates(it.longitude, it.latitude),
@@ -348,6 +353,13 @@ class ClientWebSocketRepositoryImpl @Inject constructor(private val localStorage
                 ))
             }
         }
+    }
+
+    override suspend fun getRideHistory(): Flow<PagingData<RideHistory>> {
+        return dataSource.getRideHistory()
+            .map { pagingData ->
+                pagingData.map { it.toDomain() }
+            }
     }
 
 }

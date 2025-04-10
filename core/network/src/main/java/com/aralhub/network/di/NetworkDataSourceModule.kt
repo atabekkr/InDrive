@@ -24,7 +24,7 @@ import com.aralhub.network.PaymentMethodNetworkDataSource
 import com.aralhub.network.ReviewsNetworkDataSource
 import com.aralhub.network.RideOptionNetworkDataSource
 import com.aralhub.network.UserNetworkDataSource
-import com.aralhub.network.WebSocketClientNetworkDataSource
+import com.aralhub.network.ClientNetworkDataSource
 import com.aralhub.network.impl.AddressNetworkDataSourceImpl
 import com.aralhub.network.impl.CancelCauseNetworkDataSourceImpl
 import com.aralhub.network.impl.ClientOffersNetworkDataSourceImpl
@@ -33,7 +33,7 @@ import com.aralhub.network.impl.PaymentMethodNetworkDataSourceImpl
 import com.aralhub.network.impl.ReviewsNetworkDataSourceImpl
 import com.aralhub.network.impl.RideOptionNetworkDataSourceImpl
 import com.aralhub.network.impl.UserNetworkDataSourceImpl
-import com.aralhub.network.impl.WebSocketClientNetworkDataSourceImpl
+import com.aralhub.network.impl.ClientNetworkDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -51,7 +51,7 @@ abstract class NetworkDataSourceModule {
     abstract fun bindDriverNetworkDataSource(driverNetworkDataSourceImpl: DriverNetworkDataSourceImpl): DriverNetworkDataSource
 
     @[Binds Singleton]
-    abstract fun bindClientWebsocketNetworkDataSource(clientWebsocketNetworkDataSourceImpl: WebSocketClientNetworkDataSourceImpl): WebSocketClientNetworkDataSource
+    abstract fun bindClientWebsocketNetworkDataSource(clientWebsocketNetworkDataSourceImpl: ClientNetworkDataSourceImpl): ClientNetworkDataSource
 
     @[Binds Singleton]
     abstract fun bindPaymentMethodDataSource(paymentMethodNetworkDataSourceImpl: PaymentMethodNetworkDataSourceImpl): PaymentMethodNetworkDataSource

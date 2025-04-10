@@ -7,11 +7,11 @@ import com.aralhub.indrive.core.data.repository.cancel.impl.CancelRepositoryImpl
 import com.aralhub.indrive.core.data.repository.client.ClientAuthRepository
 import com.aralhub.indrive.core.data.repository.client.ClientOffersRepository
 import com.aralhub.indrive.core.data.repository.client.ClientRideRepository
-import com.aralhub.indrive.core.data.repository.client.ClientWebSocketRepository
+import com.aralhub.indrive.core.data.repository.client.ClientRepository
 import com.aralhub.indrive.core.data.repository.client.impl.ClientAuthRepositoryImpl
 import com.aralhub.indrive.core.data.repository.client.impl.ClientOffersRepositoryImpl
 import com.aralhub.indrive.core.data.repository.client.impl.ClientRideRepositoryImpl
-import com.aralhub.indrive.core.data.repository.client.impl.ClientWebSocketRepositoryImpl
+import com.aralhub.indrive.core.data.repository.client.impl.ClientRepositoryImpl
 import com.aralhub.indrive.core.data.repository.driver.DriverAuthRepository
 import com.aralhub.indrive.core.data.repository.driver.DriverOfferRepository
 import com.aralhub.indrive.core.data.repository.driver.DriverRepository
@@ -45,8 +45,8 @@ abstract class DataModule {
 
     @Binds
     internal abstract fun bindsClientWebSocketRepository(
-        topicsRepository: ClientWebSocketRepositoryImpl,
-    ): ClientWebSocketRepository
+        topicsRepository: ClientRepositoryImpl,
+    ): ClientRepository
 
     @Binds
     internal abstract fun bindsPaymentRepository(

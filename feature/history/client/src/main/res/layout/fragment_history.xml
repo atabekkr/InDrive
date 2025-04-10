@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -9,15 +11,31 @@
         android:id="@+id/tb_history"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:title="Saparlar tariyxı"
+        android:contentInsetStartWithNavigation="0dp"
         android:navigationIcon="@drawable/ic_material_symbols_arrow_back"
-        android:contentInsetStartWithNavigation="0dp"/>
+        android:title="Buyırtpalar tariyxı" />
 
-    <TextView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.InDrive.TitleGroup"
-        android:text="Siziń juwmaqlanǵan saparlarıńız usı jerde kórinedi"/>
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_history"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            android:fitsSystemWindows="true"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_driver_history" />
+
+        <TextView
+            android:id="@+id/tv_not_found"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Siziń juwmaqlanǵan buyırtpalarıńız usı jerde kórinedi"
+            android:textAppearance="@style/TextAppearance.InDrive.TitleGroup" />
+    </FrameLayout>
 
 </LinearLayout>
