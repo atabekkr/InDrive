@@ -310,6 +310,8 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
             driverSharedPreference.avatar,
             binding.navigationView.getHeaderView(0).findViewById(R.id.iv_avatar)
         )
+
+        binding.textAppVersion.text = driverSharedPreference.appVersion
     }
 
     private fun initListeners() {

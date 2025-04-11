@@ -26,7 +26,7 @@ class UserNetworkDataSourceImpl @Inject constructor(private val api: UserNetwork
         return api.userVerify(networkUserVerifyRequest).safeRequestServerResponse()
     }
 
-    override suspend fun userProfile(networkUserProfileRequest: NetworkUserProfileRequest): NetworkResult<NetworkClient> {
+    override suspend fun userProfile(networkUserProfileRequest: NetworkUserProfileRequest): NetworkResult<ServerResponseEmpty> {
         return api.userProfile(networkUserProfileRequest).safeRequest()
     }
 

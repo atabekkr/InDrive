@@ -16,6 +16,8 @@ class DriverSharedPreference(private val preference: SharedPreferences) {
 
     var isLogin by BooleanPreference(preference, false)
 
+    var appVersion by StringPreference(preference)
+
     fun clear() {
         preference.edit().clear().apply()
     }

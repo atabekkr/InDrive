@@ -10,6 +10,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.aralhub.araltaxi.core.common.sharedpreference.DriverSharedPreference
+import com.aralhub.araltaxi.driver.BuildConfig
 import com.aralhub.araltaxi.driver.R
 import com.aralhub.araltaxi.navigation.Navigator
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,7 +25,13 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         setPadding()
+
+        val versionName = BuildConfig.VERSION_NAME
+        val versionCode = BuildConfig.VERSION_CODE
+        localStorage.appVersion = "Version $versionName ($versionCode)"
+
         if (localStorage.isLogin){
             setStartDestination(R.id.overviewFragment)
         } else {

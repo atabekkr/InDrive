@@ -27,7 +27,7 @@ interface UserNetworkApi {
     suspend fun userVerify(@Body networkUserVerifyRequest: NetworkVerifyRequest): Response<ServerResponse<NetworkAuthToken>>
 
     @POST("/user/profile/")
-    suspend fun userProfile(@Body networkUserProfileRequest: NetworkUserProfileRequest): Response<NetworkClient>
+    suspend fun userProfile(@Body networkUserProfileRequest: NetworkUserProfileRequest): Response<ServerResponseEmpty>
 
     @GET("/user/me/")
     suspend fun getUserMe(): Response<ServerResponse<NetworkClient>>

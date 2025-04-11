@@ -16,4 +16,6 @@ class ClientSharedPreference(preference: SharedPreferences) {
 
     var isLogin by BooleanPreference(preference, false)
 
+    var appVersion by StringPreference(preference)
+
 }

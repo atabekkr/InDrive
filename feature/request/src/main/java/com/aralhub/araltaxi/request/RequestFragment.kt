@@ -1,6 +1,8 @@
 package com.aralhub.araltaxi.request
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
@@ -12,6 +14,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.addCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
@@ -20,11 +23,11 @@ import com.aralhub.araltaxi.client.request.R
 import com.aralhub.araltaxi.client.request.databinding.FragmentRequestBinding
 import com.aralhub.araltaxi.core.common.sharedpreference.ClientSharedPreference
 import com.aralhub.araltaxi.core.common.utils.MapStyles
+import com.aralhub.araltaxi.core.common.utils.isGPSEnabled
 import com.aralhub.araltaxi.core.common.utils.loadJsonFromAssets
 import com.aralhub.araltaxi.request.navigation.FeatureRequestNavigation
 import com.aralhub.araltaxi.request.utils.BottomSheetBehaviorDrawerListener
 import com.aralhub.araltaxi.request.utils.updateMapStyle
-import com.aralhub.indrive.core.data.model.client.ClientProfile
 import com.aralhub.ui.adapter.location.LocationItemAdapter
 import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.ui.model.LocationItemClickOwner
@@ -37,8 +40,12 @@ import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.hideKeyboard
 import com.aralhub.ui.utils.showKeyboardAndFocus
 import com.aralhub.ui.utils.viewBinding
+import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.Priority
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
@@ -49,9 +56,11 @@ import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapWindow
 import com.yandex.mapkit.map.PlacemarkMapObject
+import com.yandex.maps.mobile.BuildConfig
 import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class RequestFragment : Fragment(R.layout.fragment_request) {
@@ -78,6 +87,13 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
 
         private val SMOOTH_ANIMATION = Animation(Animation.Type.SMOOTH, 0.4f)
     }
+
+    private val requiredPermissions = arrayOf(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    )
+    private val locationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions -> permissions.forEach { permission -> } }
 
     private var startLocationName: String? = null
     private var endLocationName: String? = null
@@ -144,6 +160,11 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
 
         displayProfile()
 
+        askPermissions()
+    }
+
+    private fun askPermissions() {
+        locationPermissionLauncher.launch(requiredPermissions)
     }
 
     private fun setDefaultMapStyle() {
@@ -266,6 +287,7 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initViews() {
         binding.bottomSheetSearchAddress.recyclerViewAddress.adapter = adapter
         setUpBottomSheet()
@@ -278,6 +300,8 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
             isHideable = true
             expandedOffset = 0  // Убирает отступ сверху в раскрытом состоянии
         }
+
+        binding.textAppVersion.text = clientSharedPreference.appVersion
     }
 
     private fun initListeners() {
@@ -329,11 +353,17 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
         }
 
         etFromLocation.setEndTextClickListener {
-            navigation.goToSelectFromLocationFromRequestFragment()
+            if (isGPSEnabled(requireContext()))
+                navigation.goToSelectFromLocationFromRequestFragment()
+            else
+                showGPSDialog()
         }
 
         etToLocation.setEndTextClickListener {
-            navigation.goToSelectToLocationFromRequestFragment()
+            if (isGPSEnabled(requireContext()))
+                navigation.goToSelectToLocationFromRequestFragment()
+            else
+                showGPSDialog()
         }
 
         binding.btnMenu.setOnClickListener {
@@ -628,5 +658,32 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
         LoadingModalBottomSheet.hide(childFragmentManager)
         endLocationName = null
     }
+
+    private fun showGPSDialog() {
+        val locationRequest = LocationRequest.create().apply {
+            priority = Priority.PRIORITY_HIGH_ACCURACY
+        }
+
+        val builder = LocationSettingsRequest.Builder()
+            .addLocationRequest(locationRequest)
+            .setAlwaysShow(true) // 👈 this ensures the dialog appears
+
+        val settingsClient = LocationServices.getSettingsClient(requireActivity())
+        val task = settingsClient.checkLocationSettings(builder.build())
+
+        task.addOnFailureListener { exception ->
+            if (exception is ResolvableApiException) {
+                try {
+                    // Show system dialog
+                    exception.startResolutionForResult(requireActivity(), REQUEST_GPS_CODE)
+                } catch (sendEx: IntentSender.SendIntentException) {
+                    sendEx.printStackTrace()
+                }
+            }
+        }
+    }
+
+    private val REQUEST_GPS_CODE = 1001
+
 
 }

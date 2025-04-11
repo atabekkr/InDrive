@@ -11,9 +11,9 @@ import com.aralhub.araltaxi.driver.orders.databinding.ModalBottomSheetWaitingFor
 import com.aralhub.araltaxi.driver.orders.sheet.sheetviewmodel.GetFreeWaitingTimeViewModel
 import com.aralhub.araltaxi.driver.orders.utils.RideTimerDriver
 import com.aralhub.araltaxi.driver.orders.utils.sendPhoneNumberToDial
-import com.aralhub.araltaxi.driver.orders.utils.showSnackBar
 import com.aralhub.indrive.core.data.result.Result
 import com.aralhub.ui.model.OrderItem
+import com.aralhub.ui.utils.showSnackBar
 import com.aralhub.ui.utils.viewBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions

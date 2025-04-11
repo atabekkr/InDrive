@@ -13,7 +13,7 @@ import java.io.File
 interface UserNetworkDataSource {
     suspend fun userAuth(networkUserAuthRequest: NetworkUserAuthRequest): NetworkResult<ServerResponseEmpty>
     suspend fun userVerify(networkUserVerifyRequest: NetworkVerifyRequest): NetworkResult<NetworkAuthToken>
-    suspend fun userProfile(networkUserProfileRequest: NetworkUserProfileRequest): NetworkResult<NetworkClient>
+    suspend fun userProfile(networkUserProfileRequest: NetworkUserProfileRequest): NetworkResult<ServerResponseEmpty>
     suspend fun getUserMe(): NetworkResult<NetworkClient>
     suspend fun userLogout(refreshToken: String): NetworkResult<ServerResponseEmpty>
     suspend fun userPhoto(file: File): NetworkResult<ServerResponseEmpty>

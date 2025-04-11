@@ -102,7 +102,6 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
             .load("https://araltaxi.aralhub.uz/${profile.profilePhoto}")
             .centerCrop()
             .placeholder(com.aralhub.ui.R.drawable.ic_user)
-            .signature(ObjectKey(System.currentTimeMillis()))
             .apply(RequestOptions.circleCropTransform())
             .into(binding.ivAvatar)
     }

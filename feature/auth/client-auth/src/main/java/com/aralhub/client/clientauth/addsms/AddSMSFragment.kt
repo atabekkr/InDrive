@@ -16,6 +16,7 @@ import com.aralhub.ui.dialog.LoadingDialog
 import com.aralhub.ui.utils.StringUtils
 import com.aralhub.ui.utils.ViewEx.hide
 import com.aralhub.ui.utils.ViewEx.show
+import com.aralhub.ui.utils.showKeyboardAndFocus
 import com.aralhub.ui.utils.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -118,6 +119,8 @@ class AddSMSFragment : Fragment(R.layout.fragment_add_sms) {
             boldText = _phone,
             boldTextColorHex = boldTextHex
         )
+
+        binding.etCode.showKeyboardAndFocus()
     }
 
     private fun startCountDownTimerOfConfirmationCode(

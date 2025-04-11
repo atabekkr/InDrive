@@ -58,9 +58,7 @@ class RequestViewModel2 @Inject constructor() : ViewModel() {
     }
 
     fun setToLocation(selectedLocation: SelectedLocation) {
-        if (setCurrentLocationUpdatesAsFromLocation) {
-            _fromLocationFlow.value = currentLocationFlow.value
-        }
+        _fromLocationFlow.value = currentLocationFlow.value
         _toLocationFlow.value = selectedLocation
     }
 
@@ -69,9 +67,7 @@ class RequestViewModel2 @Inject constructor() : ViewModel() {
         _navigateToCreateOrderFlow.emit(null)
     }
 
-    private var setCurrentLocationUpdatesAsFromLocation = true
     fun setFromLocation(selectedLocation: SelectedLocation) {
-        setCurrentLocationUpdatesAsFromLocation = false
         _fromLocationFlow.value = selectedLocation
     }
 
@@ -90,9 +86,7 @@ class RequestViewModel2 @Inject constructor() : ViewModel() {
     }
 
     fun setCurrentLocation(latitude: Double, longitude: Double) {
-        if (setCurrentLocationUpdatesAsFromLocation) {
-            fetchCurrentLocationName(latitude, longitude)
-        }
+        fetchCurrentLocationName(latitude, longitude)
     }
 
     private fun fetchCurrentLocationName(latitude: Double, longitude: Double) {
