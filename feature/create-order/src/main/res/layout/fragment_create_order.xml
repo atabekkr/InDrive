@@ -126,7 +126,6 @@
                             android:ellipsize="end"
                             android:gravity="center"
                             tools:text="5000"
-                            android:hint="..."
                             android:maxEms="5"
                             android:maxLength="9"
                             android:maxLines="1"

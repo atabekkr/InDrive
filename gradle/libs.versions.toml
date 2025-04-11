@@ -64,7 +64,7 @@ play-services-location = { group = "com.google.android.gms", name = "play-servic
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version = "1.9.24" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }
 dagger = { id = "com.google.dagger.hilt.android", version.ref = "daggerHiltVersion" }
 devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
 android-library = { id = "com.android.library", version.ref = "agp" }

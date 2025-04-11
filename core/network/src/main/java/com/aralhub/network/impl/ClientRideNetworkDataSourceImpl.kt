@@ -28,7 +28,9 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 
-class ClientRideNetworkDataSourceImpl(private val client: HttpClient) :
+class ClientRideNetworkDataSourceImpl(
+    private val client: HttpClient
+) :
     ClientRideNetworkDataSource {
     private var session: WebSocketSession? = null
     private val _rideStatusFlow = MutableSharedFlow<ClientWebSocketEventRideMessage>(replay = 1)
@@ -43,12 +45,10 @@ class ClientRideNetworkDataSourceImpl(private val client: HttpClient) :
         if (!isInitialized) {
             networkScope.launch {
                 try {
-                    Log.i("WebSocketLogClient", "Initializing session")
                     session = client.webSocketSession { url(RIDE_SOCKET_URL) }
                     isInitialized = true
 
                     session?.let { webSocketSession ->
-                        Log.i("WebSocketLogClient", "Session is getting data")
                         webSocketSession.incoming
                             .consumeAsFlow()
                             .filterIsInstance<Frame.Text>()
@@ -60,19 +60,10 @@ class ClientRideNetworkDataSourceImpl(private val client: HttpClient) :
                                         text,
                                         ClientWebSocketServerResponse::class.java
                                     )
-                                    Log.i("WebSocketLogClient", "Parsed type: ${data.type}")
                                     val event = when (data.type) {
                                         RIDE_STATUS_UPDATE -> {
-                                            Log.i(
-                                                "WebSocketLogClient",
-                                                "Parsed status: ${data.data.status}"
-                                            )
                                             when (data.data.status) {
                                                 NetworkRideStatus.DRIVER_ON_THE_WAY.status -> {
-                                                    Log.i(
-                                                        "WebSocketLogClient",
-                                                        "Parsed message: ${data.data.status}"
-                                                    )
                                                     val message =
                                                         Gson().fromJson<ClientWebSocketServerResponseUpdate<String>>(
                                                             text,
@@ -115,10 +106,6 @@ class ClientRideNetworkDataSourceImpl(private val client: HttpClient) :
                                                             object :
                                                                 TypeToken<ClientWebSocketServerResponseUpdate<String>>() {}.type
                                                         )
-                                                    Log.i(
-                                                        "WebSocketLogClient",
-                                                        "Parsed message: ${message.data.message}"
-                                                    )
                                                     ClientWebSocketEventRideMessage.PaidWaiting(
                                                         message.data.message
                                                     )

@@ -10,32 +10,39 @@ import com.aralhub.araltaxi.client.ride.databinding.BottomSheetRateDriverBinding
 import com.aralhub.araltaxi.ride.ActiveRideUiState
 import com.aralhub.araltaxi.ride.CreateReviewUiState
 import com.aralhub.araltaxi.ride.RideViewModel
+import com.aralhub.araltaxi.ride.navigation.sheet.FeatureRideBottomSheetNavigation
+import com.aralhub.araltaxi.ride.navigation.sheet.FeatureRideNavigation
 import com.aralhub.araltaxi.ride.utils.FragmentEx.loadAvatar
 import com.aralhub.indrive.core.data.model.review.PassengerReview
 import com.aralhub.indrive.core.data.model.review.Review
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class RateDriverBottomSheet : Fragment(R.layout.bottom_sheet_rate_driver) {
+
     private val rideViewModel: RideViewModel by activityViewModels()
     private val binding: BottomSheetRateDriverBinding by viewBinding(BottomSheetRateDriverBinding::bind)
     private var rideId = -1
     private var driverId = -1
+
+    @Inject
+    lateinit var navigation: FeatureRideNavigation
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initObservers()
         binding.btnSend.setOnClickListener {
-            requireActivity().onBackPressedDispatcher.onBackPressed()
-            /*rideViewModel.createReview(
+            rideViewModel.createReview(
                 PassengerReview(
                     driverId,
                     rideId,
                     binding.ratingBar.rating,
                     binding.etComment.text.toString()
                 )
-            )*/
+            )
 
         }
     }
@@ -60,7 +67,7 @@ class RateDriverBottomSheet : Fragment(R.layout.bottom_sheet_rate_driver) {
                 is CreateReviewUiState.Error -> {}
                 CreateReviewUiState.Loading -> {}
                 is CreateReviewUiState.Success -> {
-
+                    navigation.goBackToCreateOfferFromRide()
                 }
             }
         }

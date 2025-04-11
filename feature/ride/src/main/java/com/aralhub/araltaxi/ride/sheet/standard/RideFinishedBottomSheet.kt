@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -44,6 +45,7 @@ class RideFinishedBottomSheet : Fragment(R.layout.bottom_sheet_ride_finished) {
                 is ActiveRideUiState.Error -> {}
                 ActiveRideUiState.Loading -> {}
                 is ActiveRideUiState.Success -> {
+                    Log.e("RideFinishedBottomSheet", activeRideUiState.activeRide.locations.points.getOrNull(1)?.name.toString())
                     rideViewModel.getDriverCard(activeRideUiState.activeRide.driver.driverId)
                     binding.tvTotalMoney.text = "${activeRideUiState.activeRide.amount} + ${activeRideUiState.activeRide.waitAmount}"
                 }

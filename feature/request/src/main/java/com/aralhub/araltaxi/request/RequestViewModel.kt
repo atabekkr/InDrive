@@ -6,8 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.aralhub.araltaxi.core.domain.client.ClientGetActiveRideUseCase
 import com.aralhub.araltaxi.core.domain.client.ClientGetSearchRideUseCase
 import com.aralhub.araltaxi.core.domain.client.ClientLogOutUseCase
-import com.aralhub.araltaxi.core.domain.client.ClientProfileUseCase
-import com.aralhub.indrive.core.data.model.client.ClientProfile
 import com.aralhub.indrive.core.data.model.ride.ActiveRide
 import com.aralhub.indrive.core.data.model.ride.SearchRide
 import com.aralhub.indrive.core.data.result.Result
@@ -34,7 +32,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RequestViewModel @Inject constructor(
-    private val clientProfileUseCase: ClientProfileUseCase,
     private val clientLogOutUseCase: ClientLogOutUseCase,
     private val clientGetActiveRideUseCase: ClientGetActiveRideUseCase,
     private val clientGetSearchRideUseCase: ClientGetSearchRideUseCase
@@ -65,9 +62,6 @@ class RequestViewModel @Inject constructor(
         MutableStateFlow<SuggestionsUiState>(SuggestionsUiState.Loading)
     val suggestionsUiState = _suggestionsUiState.asStateFlow()
 
-    private val _profileUiState = MutableSharedFlow<ProfileUiState>()
-    val profileUiState = _profileUiState.asSharedFlow()
-
     private val _activeRideUiState = MutableSharedFlow<ActiveRideUiState>()
     val activeRideUiState = _activeRideUiState.asSharedFlow()
 
@@ -78,7 +72,6 @@ class RequestViewModel @Inject constructor(
     val logOutUiState = _logOutUiState.asSharedFlow()
 
     init {
-        getProfile()
         getSearchRide()
         getActiveRide()
     }
@@ -118,20 +111,6 @@ class RequestViewModel @Inject constructor(
                     }
                 }
             )
-        }
-    }
-
-    // API calls
-    private fun getProfile() {
-        viewModelScope.launch {
-            _profileUiState.emit(ProfileUiState.Loading)
-            when (val result = clientProfileUseCase()) {
-                is Result.Success -> _profileUiState.emit(
-                    ProfileUiState.Success(result.data.copy(profilePhoto = "${result.data.profilePhoto}"))
-                )
-
-                is Result.Error -> _profileUiState.emit(ProfileUiState.Error(result.message))
-            }
         }
     }
 
@@ -180,12 +159,6 @@ sealed interface SuggestionsUiState {
     data object Loading : SuggestionsUiState
     data class Success(val suggestions: List<LocationItem>) : SuggestionsUiState
     data class Error(val message: String) : SuggestionsUiState
-}
-
-sealed interface ProfileUiState {
-    data object Loading : ProfileUiState
-    data class Success(val profile: ClientProfile) : ProfileUiState
-    data class Error(val message: String) : ProfileUiState
 }
 
 sealed interface LogOutUiState {

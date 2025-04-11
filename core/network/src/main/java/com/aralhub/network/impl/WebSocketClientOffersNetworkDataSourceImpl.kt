@@ -29,16 +29,9 @@ class WebSocketClientOffersNetworkDataSourceImpl(private val client: HttpClient)
         session = client.webSocketSession { url("ws://araltaxi.aralhub.uz/websocket/wb/passenger") }
 
         return session?.let { webSocketSession ->
-            Log.i("WebSocketLogClient", "Session is not null")
             webSocketSession.incoming
                 .consumeAsFlow()
-                .onEach { frame ->
-                    Log.i("WebSocketLogClient", "Received a frame of type: ${frame::class.java.simpleName}")
-                }
                 .filterIsInstance<Frame.Text>()
-                .onEach { frame ->
-                    Log.i("WebSocketLogClient", "Processing Text frame")
-                }
                 .let { textFramesFlow ->
                     flow {
                         try {
@@ -49,7 +42,6 @@ class WebSocketClientOffersNetworkDataSourceImpl(private val client: HttpClient)
                                 // Rest of your processing logic
                                 try {
                                     val data = Gson().fromJson(text, ClientWebSocketServerResponse::class.java)
-                                    Log.i("WebSocketLogClient", "Parsed type: ${data.type}")
 
                                     val event = when (data.type) {
                                         DRIVER_OFFER -> {
@@ -82,7 +74,6 @@ class WebSocketClientOffersNetworkDataSourceImpl(private val client: HttpClient)
                     }
                 }
         } ?: flow {
-            Log.i("WebSocketLogClient", "Session is null")
             emit(ClientWebSocketEventNetwork.Unknown("Session initialization failed"))
         }
     }

@@ -1,7 +1,5 @@
 package com.aralhub.araltaxi.create_order
 
-import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.PointF
 import android.location.LocationManager
@@ -18,13 +16,10 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.aralhub.ui.components.ErrorHandler
-import com.aralhub.araltaxi.core.common.permission.PermissionHelper
 import com.aralhub.araltaxi.core.common.utils.MapStyles
 import com.aralhub.araltaxi.core.common.utils.loadJsonFromAssets
 import com.aralhub.araltaxi.create_order.databinding.FragmentCreateOrderBinding
 import com.aralhub.araltaxi.create_order.navigation.FeatureCreateOrderNavigation
-import com.aralhub.araltaxi.create_order.utils.NewCurrentLocationListener
 import com.aralhub.araltaxi.create_order.utils.updateMapStyle
 import com.aralhub.araltaxi.create_order.viewmodel.SearchAddressViewModel
 import com.aralhub.araltaxi.request.RequestFragment.Companion.EMPTY_STRING
@@ -43,6 +38,7 @@ import com.aralhub.indrive.core.data.model.payment.PaymentMethodType
 import com.aralhub.indrive.core.data.model.ride.RecommendedAmount
 import com.aralhub.ui.adapter.location.LocationItemAdapter
 import com.aralhub.ui.adapter.option.RideOptionItemAdapter
+import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.ui.model.LocationItemClickOwner
 import com.aralhub.ui.model.args.LocationType
 import com.aralhub.ui.model.args.SelectedLocation
@@ -94,7 +90,7 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
     private val changePaymentMethodModalBottomSheet by lazy { ChangePaymentMethodModalBottomSheet() }
     private val commentToDriverModalBottomSheet by lazy { CommentToDriverModalBottomSheet() }
     private var minimumPrice = 0
-    private var maximumPrice = 0
+    private var maximumPrice = 100000
     private var comment = ""
     private var recommendedPrice: RecommendedPrice? = null
     private val rideOptionItemAdapter by lazy { RideOptionItemAdapter() }
@@ -156,16 +152,7 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
 
     @Inject
     lateinit var navigation: FeatureCreateOrderNavigation
-    private val newCurrentLocationListener = NewCurrentLocationListener(
-        onInitMapPosition = { point ->
-            /* createCurrentLocationPlaceMarkObject(point)*/
-        },
-        onUpdateMapPosition = { point -> /*createCurrentLocationPlaceMarkObject(point) */ },
-        onProviderDisabledListener = { point ->
-            /*   createCurrentLocationPlaceMarkObject(point)*/
-        },
-        onProviderEnabledListener = { }
-    )
+
     private var fromRoutePlaceMarkObject: PlacemarkMapObject? = null
     private var toRoutePlaceMarkObject: PlacemarkMapObject? = null
     private var imageProvider: ImageProvider? = null
@@ -246,35 +233,6 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
         map?.updateMapStyle(zoom, requireContext())
     }
 
-    override fun onResume() {
-        super.onResume()
-        locationManager?.let { observeLocationUpdates(it) }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        locationManager?.removeUpdates(newCurrentLocationListener)
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun observeLocationUpdates(locationManager: LocationManager) {
-        if (PermissionHelper.arePermissionsGranted(
-                requireContext(),
-                listOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            )
-        ) {
-            locationManager.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER,
-                0,
-                0f,
-                newCurrentLocationListener
-            )
-        }
-    }
-
     private fun initArgs() {
         selectedLocations = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requireArguments().getParcelable(
@@ -344,7 +302,6 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
     private fun initViews() {
         binding.bottomSheetSearchAddress.recyclerViewAddress.adapter = adapter
         binding.rvRideOptions.adapter = rideOptionItemAdapter
-        binding.btnSendOffer.disable()
 
         searchAddressBottomSheetBehavior =
             BottomSheetBehavior.from(binding.bottomSheetSearchAddress.bottomSheetSearchAddress)
@@ -423,8 +380,6 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
 
         binding.btnSendOffer.setOnClickListener {
 
-            Log.i("Payment", "${viewModel.paymentMethod.value.id}")
-            Log.i("Payment", "${viewModel.paymentMethod.value}")
             val fakeRecommendedAmount = RecommendedAmount(
                 7000,
                 10000,
@@ -433,16 +388,14 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
 
             enabledOptionsIds.addAll(rideOptionItemAdapter.currentList.filter { it.isEnabled }
                 .map { it.id })
-            recommendedPrice?.let {
-                viewModel.createRide(
-                    baseAmount = binding.etPrice.text.toString().replace(" ", "").toInt(),
-                    recommendedAmount = fakeRecommendedAmount,
-                    selectedLocations = selectedLocations!!,
-                    comment = comment,
-                    paymentId = viewModel.paymentMethod.value.id,
-                    options = enabledOptionsIds
-                )
-            }
+            viewModel.createRide(
+                baseAmount = binding.etPrice.text.toString().replace(" ", "").toInt(),
+                recommendedAmount = fakeRecommendedAmount,
+                selectedLocations = selectedLocations!!,
+                comment = comment,
+                paymentId = viewModel.paymentMethod.value.id,
+                options = enabledOptionsIds
+            )
         }
 
         binding.ivChangePaymentMethod.setOnClickListener {
@@ -646,7 +599,7 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
             when (recommendedPriceUiState) {
                 is RecommendedPriceUiState.Error -> errorHandler.showToast(recommendedPriceUiState.message)
                 RecommendedPriceUiState.Loading -> {
-                    binding.etPrice.hint = "..."
+                    binding.etPrice.text = "10000"
                 }
 
                 is RecommendedPriceUiState.Success -> {
@@ -703,8 +656,6 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
         }
         observeState(searchAddressViewModel.toLocationFlow) {
             it?.let { toLocation ->
-//                isNavigatedToCreateOrderFragment = false
-                Log.d("LocationFromViewModel", "To Location: $toLocation")
                 binding.tvToLocationName.text = toLocation.name
                 endLocationName = toLocation.name
                 selectedLocations?.to = SelectedLocation(
@@ -731,7 +682,6 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
     }
 
     private fun drawDrivingRoutes(drivingRoutes: MutableList<DrivingRoute>) {
-        Log.i("Routes", "Route: $drivingRoutes")
         val route = drivingRoutes[0]
         mapObjects?.clear()
         mapObjects?.addPolyline(route.geometry)

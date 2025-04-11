@@ -18,7 +18,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.aralhub.araltaxi.client.request.R
 import com.aralhub.araltaxi.client.request.databinding.FragmentRequestBinding
-import com.aralhub.ui.components.ErrorHandler
+import com.aralhub.araltaxi.core.common.sharedpreference.ClientSharedPreference
 import com.aralhub.araltaxi.core.common.utils.MapStyles
 import com.aralhub.araltaxi.core.common.utils.loadJsonFromAssets
 import com.aralhub.araltaxi.request.navigation.FeatureRequestNavigation
@@ -26,6 +26,7 @@ import com.aralhub.araltaxi.request.utils.BottomSheetBehaviorDrawerListener
 import com.aralhub.araltaxi.request.utils.updateMapStyle
 import com.aralhub.indrive.core.data.model.client.ClientProfile
 import com.aralhub.ui.adapter.location.LocationItemAdapter
+import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.ui.model.LocationItemClickOwner
 import com.aralhub.ui.model.args.LocationType
 import com.aralhub.ui.model.args.SelectedLocation
@@ -89,6 +90,9 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
     lateinit var navigation: FeatureRequestNavigation
 
     @Inject
+    lateinit var clientSharedPreference: ClientSharedPreference
+
+    @Inject
     lateinit var errorHandler: ErrorHandler
     private val adapter = LocationItemAdapter()
     private val viewModel by viewModels<RequestViewModel>()
@@ -137,6 +141,8 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
 
         setDefaultMapStyle()
         mapCameraListener()
+
+        displayProfile()
 
     }
 
@@ -228,15 +234,6 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
                 is ActiveRideUiState.Success -> {
                     Log.i("RequestFragment", "Active Ride Success")
                     navigation.goToRideFragmentFromRequestFragment()
-                }
-            }
-        }
-        observeState(viewModel.profileUiState) { profileUiState ->
-            when (profileUiState) {
-                is ProfileUiState.Error -> errorHandler.showToast(profileUiState.message)
-                ProfileUiState.Loading -> {}
-                is ProfileUiState.Success -> {
-                    displayProfile(profileUiState.profile)
                 }
             }
         }
@@ -608,14 +605,14 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
         )
     }
 
-    private fun displayProfile(profile: ClientProfile) {
+    private fun displayProfile() {
         binding.navigationView.getHeaderView(0).findViewById<TextView>(R.id.tv_name).text =
-            profile.fullName
+            clientSharedPreference.userName
         binding.navigationView.getHeaderView(0).findViewById<TextView>(R.id.tv_phone).text =
-            profile.phone
+            clientSharedPreference.phoneNumber
         val imageView =
             binding.navigationView.getHeaderView(0).findViewById<ImageView>(R.id.iv_avatar)
-        displayAvatar(profile.profilePhoto, imageView)
+        displayAvatar(clientSharedPreference.avatar, imageView)
     }
 
     private fun showLoadingDialog() {

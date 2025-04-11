@@ -32,6 +32,7 @@ class ClientAuthRepositoryImpl @Inject constructor(private val localStorage: Cli
                     localStorage.access = it.data.accessToken
                     localStorage.refresh = it.data.refreshToken
                     localStorage.isLogin = true
+                    localStorage.phoneNumber = phone
                     Result.Success(data = true)
                 }
             }
@@ -42,7 +43,14 @@ class ClientAuthRepositoryImpl @Inject constructor(private val localStorage: Cli
         clientNetworkDataSource.userProfile(NetworkUserProfileRequest(fullName)).let {
             return when(it){
                 is NetworkResult.Error -> Result.Error(it.message)
-                is NetworkResult.Success -> Result.Success(data = true)
+                is NetworkResult.Success -> {
+                    localStorage.apply {
+                        userName = it.data.fullName
+                        avatar = it.data.profilePhotoUrl.toString()
+                        phoneNumber = it.data.phoneNumber
+                    }
+                    Result.Success(data = true)
+                }
             }
         }
     }

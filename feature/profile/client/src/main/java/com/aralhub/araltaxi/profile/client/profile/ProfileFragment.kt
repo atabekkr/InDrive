@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.aralhub.araltaxi.core.common.sharedpreference.ClientSharedPreference
 import com.aralhub.araltaxi.profile.client.R
 import com.aralhub.araltaxi.profile.client.databinding.FragmentProfileBinding
 import com.aralhub.araltaxi.profile.client.navigation.FeatureProfileNavigation
@@ -33,9 +34,16 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProfileFragment: Fragment(R.layout.fragment_profile) {
+
     private val binding by viewBinding(FragmentProfileBinding::bind)
+
     private val viewModel by viewModels<ProfileViewModel>()
+
     @Inject lateinit var navigation: FeatureProfileNavigation
+
+    @Inject
+    lateinit var clientSharedPreference: ClientSharedPreference
+
     private val pickMedia: ActivityResultLauncher<PickVisualMediaRequest?> = registerForActivityResult<PickVisualMediaRequest, Uri>(PickVisualMedia()) { uri: Uri? ->
         if (uri != null) {
                 val file = getFileFromUri(requireContext(), uri)
@@ -81,6 +89,13 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
     }
 
     private fun displayProfile(profile: ClientProfile) {
+
+        clientSharedPreference.apply {
+            userName = profile.fullName
+            avatar = profile.profilePhoto
+            phoneNumber = profile.phone
+        }
+
         binding.tvName.text = profile.fullName
         binding.tvPhone.text = profile.phone
         Glide.with(requireContext())
