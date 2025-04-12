@@ -363,6 +363,12 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
                     true
                 }
 
+                R.id.action_change_language -> {
+                    binding.drawerLayout.closeDrawer(GravityCompat.START)
+                    navigation.goToChangeLanguageFromOrders()
+                    true
+                }
+
                 else -> false
             }
         }

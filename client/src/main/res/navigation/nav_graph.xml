@@ -132,6 +132,9 @@
         <action
             android:id="@+id/action_requestFragment_to_rideFragment"
             app:destination="@id/rideFragment" />
+        <action
+            android:id="@+id/action_requestFragment_to_changeLanguageFragment"
+            app:destination="@id/changeLanguageFragment" />
 
     </fragment>
     <fragment
@@ -218,5 +221,10 @@
         android:id="@+id/editSavedPlaceFragment"
         android:name="com.aralhub.araltaxi.savedplaces.editsavedplace.EditSavedPlaceFragment"
         tools:layout="@layout/fragment_edit_saved_place" />
+    <fragment
+        android:id="@+id/changeLanguageFragment"
+        android:name="com.aralhub.araltaxi.language.client.ChangeLanguageFragment"
+        android:label="ChangeLanguageFragment"
+        tools:layout="@layout/fragment_change_language" />
 
 </navigation>

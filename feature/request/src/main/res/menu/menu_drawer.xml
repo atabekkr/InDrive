@@ -12,6 +12,10 @@
         android:title="Qollap-quwatlaw"
         android:icon="@drawable/ic_baseline_support_agent"/>
 
+    <item android:id="@+id/action_change_language"
+        android:title="Tildi ózgertiw"
+        android:icon="@drawable/ic_change_lang"/>
+
     <item android:id="@+id/action_log_out"
         android:title="Shıǵıw"
         android:icon="@drawable/ic_logout"/>

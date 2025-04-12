@@ -53,6 +53,7 @@ dependencies {
     implementation project(':feature:profile:driver')
     implementation project(':feature:history:driver')
     implementation project(':feature:revenue')
+    implementation project(':feature:language:driver')
 
     //Service
     implementation project(':services')
@@ -78,4 +79,6 @@ dependencies {
 
     implementation(libs.timber)
 
+    //Lingver
+    implementation(libs.lingver)
 }

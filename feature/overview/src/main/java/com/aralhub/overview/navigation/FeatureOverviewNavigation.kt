@@ -7,6 +7,7 @@ interface FeatureOverviewNavigation {
     fun goToProfileFromOverview()
     fun goToSupportFromOverview()
     fun goToHistoryFromOverview()
+    fun goToChangeLanguageFromOverview()
     fun goToRevenueFromOverview()
     fun goToLogoFromOverview()
 }

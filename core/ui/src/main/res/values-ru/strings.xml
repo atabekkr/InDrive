@@ -1,0 +1,103 @@
+<resources>
+    <string name="cd_phone">Taxi photo</string>
+    <string name="cd_success_icon">Success</string>
+    <string name="cd_menu">Menu</string>
+    <string name="cd_driver_avatar">Driver avatar</string>
+
+    <string name="drawer_open">Open</string>
+    <string name="drawer_closed">Closed</string>
+
+    <string name="app_name">In Drive</string>
+    <string name="app_name_driver">In Drive Driver</string>
+    <string name="label_continue">Dawam etiw</string>
+    <string name="label_save">Сохранить</string>
+    <string name="label_send">Jollaw</string>
+    <string name="label_delete">Óshiriw</string>
+    <string name="label_enter">Kiriw</string>
+    <string name="label_confirm">Tastıyıqlaw</string>
+    <string name="label_confirm_description">Siz kiritken  <b>%1$s</b> telefon nomerine tastıyıqlaw kodı jiberildi</string>
+    <string name="label_taxi_service">Taksi xizmeti</string>
+    <string name="label_taxi_service_description">Mánzilińizge ańsat hám qolaylı bahada jetip alıń. Buyırtpa beriwdi házir-aq baslań.</string>
+    <string name="label_welcome">Xosh keldińiz</string>
+    <string name="label_welcome_description">Óz jeke avtomashinańızda taksi xızmetlerin kórsetip, buyırtpalar alıń. Qolaylı waqıttı tańlań hám dáramatlarıńızdı basqarıń.</string>
+    <string name="label_start">Baslaw</string>
+    <string name="label_information">Maǵlıwmatlar</string>
+
+    <string name="label_car">Avtomobil</string>
+    <string name="label_pick_up_location">Alıp ketiw mánzili</string>
+    <string name="label_address_location">Barar mánzil</string>
+    <string name="label_add_location">Noqat qosıw</string>
+    <string name="label_cancel_trip">Sapardı biykarlaw</string>
+    <string name="label_call">Qońıraw etiw</string>
+    <string name="label_driver">Aydawshi</string>
+    <string name="label_driver_is_waiting">Aydawshı sizdi kútip tur</string>
+    <string name="label_driver_rating">%1$s★</string>
+    <string name="label_free_waiting_time">Biypul kútiw waqtı</string>
+    <string name="label_total_money">Jámi</string>
+    <string name="label_payment_method">Tólem usılı</string>
+    <string name="label_cash">Naq pul</string>
+    <string name="label_online_payment">Onlayn pul ótkeriw</string>
+
+    <string name="label_trip_ended">Sapar juwmaqlandı</string>
+    <string name="label_trip_ended_description_payment_online">Ótinish, tómendegi karta maǵlıwmatları arqalı jol haqın aydawshıǵa tikkeley ótkeriń.</string>
+    <string name="label_trip_ended_description_payment_cash">Jolawshı jol haqın %s arqalı tóleydi.</string>
+    <string name="label_card_number">Karta nomeri</string>
+    <string name="label_close">Jabıw</string>
+    
+    <string name="message_card_number_is_copied">Karta maǵlıwmatları nusqalandı!</string>
+
+    <string name="label_rate_quality_of_service">Xızmet sapasın bahalań</string>
+
+    <string name="hint_phone">Telefon</string>
+    <string name="hint_name">Atıńız</string>
+    <string name="hint_from_location">Alıp ketiw ornı?</string>
+    <string name="hint_address">Mánzil?</string>
+    <string name="hint_to_location">Mánzil?</string>
+    <string name="hint_comment_to_driver">Kommentariy</string>
+
+    <string name="error_network_connection">Internet baylanısı joq</string>
+    <string name="success_network_connection">Baylanıs qayta ornatıldı</string>
+
+    <string name="error_field_is_blank">Bos bo</string>
+
+    <string name="label_cancel_trip_description">Saparlardı jiyi-jiyi biykarlaw reytingińizdiń túsiwine alıp keliwi múmkin. Ótinish, zárúrli bolǵanda ǵana, bunı ámelge asırıń.</string>
+    <string name="label_cancel">Biykarlaw</string>
+    <string name="label_back">Artqa</string>
+    <string name="label_exit_line">Liniyadan shıǵıw</string>
+    <string name="label_exit_line_description">Buyırtpalardı qabıllaw rejiminen shıǵıwdı tastıyıqlaysız ba?</string>
+    <string name="label_exit">Shıǵıw</string>
+    <string name="label_apply">Qollanıw</string>
+    <string name="label_5_km">5 km</string>
+    <string name="label_4_km">4 km</string>
+    <string name="label_3_km">3 km</string>
+    <string name="label_2_km">2 km</string>
+    <string name="label_1_km">1 km</string>
+    <string name="label_accept_radius_description">Buyırtpalardı tek usı radiustaǵı aralıqtan alıw:</string>
+    <string name="label_filter">Filter</string>
+    <string name="label_clear">Tazalaw</string>
+    <string name="cd_payment_method_icon">Payment Method</string>
+    <string name="label_arrived">Keldim</string>
+    <string name="cd_avatar">Client avatar</string>
+    <string name="label_send_offer">Usınıstı jiberiw</string>
+    <string name="label_navigator">Navigator</string>
+    <string name="label_finish">Juwmaqlaw</string>
+    <string name="label_payment_method_online">Onlayn pul ótkeriw</string>
+    <string name="label_offline_payment">Naq pul</string>
+    <string name="label_total">Jámi</string>
+    <string name="label_total_distance">Ulıwma aralıq</string>
+    <string name="label_trip_duration">Sapar dawamlılıǵı</string>
+    <string name="label_paid_waiting_time_started">Tólemli kútiw waqtı baslandı</string>
+
+    <string name="label_account_info">Akkaunt maǵlıwmaları</string>
+    <string name="label_delete_account">Akkaunttı óshiriw</string>
+    <string name="label_support">Qollap-quwatlaw</string>
+    <string name="label_telegram_bot">Telegram-bot</string>
+    <string name="label_telegram_bot_description">Sorawlarıńızǵa operativ túrde juwap alıw ushın, Telegramdaǵı chat-botımız arqalı xabarlasıń.</string>
+    <string name="label_go_to_telegram">Telegramǵa ótiw</string>
+    <string name="label_exit_description">Siz akkauntı tárk etip atırsız. Ámeldi tastıyıqlaysız ba?</string>
+
+    <string name="standard_uzs_price">%s som</string>
+    <string name="placeholder_recommended_price">Usınıs etilgen baha %1$d som</string>
+
+    <string name="resend_code_label">%s tan soń qaytadan jiberiw múmkin</string>
+</resources>

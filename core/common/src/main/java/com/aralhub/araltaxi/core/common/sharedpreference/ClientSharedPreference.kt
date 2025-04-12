@@ -18,4 +18,6 @@ class ClientSharedPreference(preference: SharedPreferences) {
 
     var appVersion by StringPreference(preference)
 
+    var languageIndex by IntPreference(preference, 0)
+
 }

@@ -18,6 +18,8 @@ class DriverSharedPreference(private val preference: SharedPreferences) {
 
     var appVersion by StringPreference(preference)
 
+    var languageIndex by IntPreference(preference, 0)
+
     fun clear() {
         preference.edit().clear().apply()
     }

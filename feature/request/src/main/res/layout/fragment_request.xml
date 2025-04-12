@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:fitsSystemWindows="true">
 
     <androidx.drawerlayout.widget.DrawerLayout
@@ -60,7 +61,7 @@
                 android:paddingHorizontal="24dp"
                 android:paddingBottom="48dp"
                 android:background="@color/white"
-                android:text="Version 1.0.0"
+                tools:text="Version 1.0.0"
                 android:textColor="@android:color/darker_gray" />
 
         </LinearLayout>

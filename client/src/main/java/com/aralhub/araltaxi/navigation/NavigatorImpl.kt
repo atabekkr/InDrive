@@ -19,15 +19,17 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class NavigatorImpl @Inject constructor(): Navigator, FeatureClientAuthNavigation, FeatureRequestNavigation, FeatureOffersNavigation, FeatureProfileNavigation, FeatureSavedPlaceNavigation, FeatureCreateOrderNavigation, FeatureRideNavigation{
+class NavigatorImpl @Inject constructor() : Navigator, FeatureClientAuthNavigation,
+    FeatureRequestNavigation, FeatureOffersNavigation, FeatureProfileNavigation,
+    FeatureSavedPlaceNavigation, FeatureCreateOrderNavigation, FeatureRideNavigation {
 
     private var navController: NavController? = null
 
-    override fun bind(navController: NavController){
+    override fun bind(navController: NavController) {
         this.navController = navController
     }
 
-    override fun unbind(){
+    override fun unbind() {
         this.navController = null
     }
 
@@ -40,7 +42,10 @@ class NavigatorImpl @Inject constructor(): Navigator, FeatureClientAuthNavigatio
     }
 
     override fun goToAddSMSCode(phone: String) {
-        navController?.navigate(R.id.action_addPhoneFragment_to_addSmsFragment,  AddSMSFragment.args(phone))
+        navController?.navigate(
+            R.id.action_addPhoneFragment_to_addSmsFragment,
+            AddSMSFragment.args(phone)
+        )
     }
 
     override fun goToAddName() {
@@ -52,15 +57,24 @@ class NavigatorImpl @Inject constructor(): Navigator, FeatureClientAuthNavigatio
     }
 
     override fun goToSelectFromLocationFromRequestFragment() {
-        navController?.navigate(R.id.action_requestFragment_to_selectLocationFragment, SelectLocationFragment.args(owner = SelectLocationFragment.Companion.LocationOwner.FROM))
+        navController?.navigate(
+            R.id.action_requestFragment_to_selectLocationFragment,
+            SelectLocationFragment.args(owner = SelectLocationFragment.Companion.LocationOwner.FROM)
+        )
     }
 
     override fun goToSelectToLocationFromRequestFragment() {
-        navController?.navigate(R.id.action_requestFragment_to_selectLocationFragment, SelectLocationFragment.args(owner = SelectLocationFragment.Companion.LocationOwner.TO))
+        navController?.navigate(
+            R.id.action_requestFragment_to_selectLocationFragment,
+            SelectLocationFragment.args(owner = SelectLocationFragment.Companion.LocationOwner.TO)
+        )
     }
 
     override fun goToCreateOrderFromRequestFragment(selectedLocations: SelectedLocations) {
-        navController?.navigate(R.id.action_requestFragment_to_createOrderFragment, CreateOrderFragment.args(selectedLocations))
+        navController?.navigate(
+            R.id.action_requestFragment_to_createOrderFragment,
+            CreateOrderFragment.args(selectedLocations)
+        )
     }
 
     override fun goToGetOffersFromRequestFragment() {
@@ -81,6 +95,10 @@ class NavigatorImpl @Inject constructor(): Navigator, FeatureClientAuthNavigatio
 
     override fun goToHistoryFromRequestFragment() {
         navController?.navigate(R.id.action_requestFragment_to_historyFragment)
+    }
+
+    override fun goToChangeLanguageFromRequestFragment() {
+        navController?.navigate(R.id.action_requestFragment_to_changeLanguageFragment)
     }
 
     override fun goToLogoFromRequestFragment() {
@@ -104,15 +122,29 @@ class NavigatorImpl @Inject constructor(): Navigator, FeatureClientAuthNavigatio
     }
 
     override fun navigateToEditSavedPlace(savedPlaceId: Int) {
-        navController?.navigate(R.id.action_savedPlacesFragment_to_editSavedPlaceFragment, EditSavedPlaceFragment.args(savedPlaceId))
+        navController?.navigate(
+            R.id.action_savedPlacesFragment_to_editSavedPlaceFragment,
+            EditSavedPlaceFragment.args(savedPlaceId)
+        )
     }
 
     override fun navigateToSelectLocationFromSavedPlaces() {
-        navController?.navigate(R.id.action_savedPlacesFragment_to_selectLocationFragment, SelectLocationFragment.args(owner = SelectLocationFragment.Companion.LocationOwner.UNSPECIFIED))
+        navController?.navigate(
+            R.id.action_savedPlacesFragment_to_selectLocationFragment,
+            SelectLocationFragment.args(owner = SelectLocationFragment.Companion.LocationOwner.UNSPECIFIED)
+        )
     }
 
-    override fun navigateToSaveAddressFromSavedPlaces(name: String, address: String, latitude: Double, longitude: Double) {
-        navController?.navigate(R.id.action_savedPlacesFragment_to_saveAddressFragment, SaveAddressFragment.args(name, address, latitude, longitude))
+    override fun navigateToSaveAddressFromSavedPlaces(
+        name: String,
+        address: String,
+        latitude: Double,
+        longitude: Double
+    ) {
+        navController?.navigate(
+            R.id.action_savedPlacesFragment_to_saveAddressFragment,
+            SaveAddressFragment.args(name, address, latitude, longitude)
+        )
     }
 
     override fun goToOffersFromCreateOrderFragment() {
@@ -120,11 +152,17 @@ class NavigatorImpl @Inject constructor(): Navigator, FeatureClientAuthNavigatio
     }
 
     override fun goToSelectFromLocationFromCreateOrderFragment() {
-        navController?.navigate(R.id.action_createOrderFragment_to_selectLocationFragment, SelectLocationFragment.args(SelectLocationFragment.Companion.LocationOwner.FROM))
+        navController?.navigate(
+            R.id.action_createOrderFragment_to_selectLocationFragment,
+            SelectLocationFragment.args(SelectLocationFragment.Companion.LocationOwner.FROM)
+        )
     }
 
     override fun goToSelectToLocationFromCreateOrderFragment() {
-        navController?.navigate(R.id.action_createOrderFragment_to_selectLocationFragment, SelectLocationFragment.args(SelectLocationFragment.Companion.LocationOwner.TO))
+        navController?.navigate(
+            R.id.action_createOrderFragment_to_selectLocationFragment,
+            SelectLocationFragment.args(SelectLocationFragment.Companion.LocationOwner.TO)
+        )
     }
 
 

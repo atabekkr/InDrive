@@ -169,6 +169,12 @@ class OverviewFragment : Fragment(R.layout.fragment_overview) {
                     true
                 }
 
+                R.id.action_change_language -> {
+                    binding.drawerLayout.closeDrawer(GravityCompat.START)
+                    navigation.goToChangeLanguageFromOverview()
+                    true
+                }
+
                 else -> false
             }
         }

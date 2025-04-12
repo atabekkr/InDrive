@@ -69,6 +69,9 @@
             app:popUpTo="@id/overviewFragment"
             app:popUpToInclusive="true"
             app:destination="@id/logoFragment"/>
+        <action
+            android:id="@+id/action_overviewFragment_to_changeLanguageFragment"
+            app:destination="@id/changeLanguageFragment" />
 
     </fragment>
 
@@ -101,6 +104,9 @@
         <action
             android:id="@+id/action_ordersFragment_to_showOrderRouteFragment"
             app:destination="@id/showOrderRouteFragment" />
+        <action
+            android:id="@+id/action_ordersFragment_to_changeLanguageFragment"
+            app:destination="@id/changeLanguageFragment" />
 
     </fragment>
 
@@ -132,5 +138,9 @@
             android:name="order"
             app:argType="com.aralhub.ui.model.OrderItem" />
     </fragment>
+    <fragment
+        android:id="@+id/changeLanguageFragment"
+        android:name="com.aralhub.araltaxi.language.driver.ChangeLanguageFragment"
+        android:label="ChangeLanguageFragment" />
 
 </navigation>

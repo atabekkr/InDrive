@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.maps.mobile.BuildConfig
+import com.yariksoffice.lingver.Lingver
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
@@ -16,5 +17,6 @@ class InDriveDriverApplication : Application() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
+        Lingver.init(this, "kaa")
     }
 }

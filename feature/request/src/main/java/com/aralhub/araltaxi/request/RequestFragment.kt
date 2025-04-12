@@ -56,7 +56,6 @@ import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapWindow
 import com.yandex.mapkit.map.PlacemarkMapObject
-import com.yandex.maps.mobile.BuildConfig
 import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -559,6 +558,12 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
                 R.id.action_trip_history -> {
                     binding.drawerLayout.closeDrawer(GravityCompat.START)
                     navigation.goToHistoryFromRequestFragment()
+                    true
+                }
+
+                R.id.action_change_language -> {
+                    binding.drawerLayout.closeDrawer(GravityCompat.START)
+                    navigation.goToChangeLanguageFromRequestFragment()
                     true
                 }
 

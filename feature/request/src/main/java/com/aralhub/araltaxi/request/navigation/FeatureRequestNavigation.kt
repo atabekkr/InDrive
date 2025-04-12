@@ -12,6 +12,7 @@ interface FeatureRequestNavigation {
     fun goToSupportFromRequestFragment()
     fun goToSavedPlacesFromRequestFragment()
     fun goToHistoryFromRequestFragment()
+    fun goToChangeLanguageFromRequestFragment()
     fun goToLogoFromRequestFragment()
     fun goToRideFragmentFromRequestFragment()
 }

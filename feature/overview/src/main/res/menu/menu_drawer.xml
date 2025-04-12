@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_my_revenue"
         android:icon="@drawable/ic_material_symbols_money_bag_outline"
@@ -13,6 +12,9 @@
         android:id="@+id/action_support"
         android:icon="@drawable/ic_baseline_support_agent"
         android:title="Qollap-quwatlaw" />
+    <item android:id="@+id/action_change_language"
+        android:title="Tildi ózgertiw"
+        android:icon="@drawable/ic_change_lang"/>
     <item
         android:id="@+id/action_log_out"
         android:icon="@drawable/ic_logout"
