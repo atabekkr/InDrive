@@ -22,24 +22,16 @@ internal class SheetNavigatorImpl @Inject constructor() : SheetNavigator,
         navController?.navigate(R.id.waitingForDriverBottomSheet)
     }
 
-    override fun goToRideFromWaitingForDriver() {
-        navController?.navigate(R.id.action_waitingForDriverBottomSheet_toRideBottomSheet)
-    }
-
-    override fun goToRideFinishedFromWaitingForDriver() {
-        navController?.navigate(R.id.action_waitingForDriverBottomSheet_toRideFinishedBottomSheet)
-    }
-
     override fun goToDriverIsWaiting() {
-        navController?.navigate(R.id.action_waitingForDriverBottomSheet_toDriverIsWaitingBottomSheet)
+        navController?.navigate(R.id.driverIsWaitingBottomSheet)
     }
 
     override fun goToRide() {
-        navController?.navigate(R.id.action_driverIsWaitingBottomSheet_toRideBottomSheet)
+        navController?.navigate(R.id.rideBottomSheet)
     }
 
     override fun goToRideFinished() {
-        navController?.navigate(R.id.action_rideBottomSheet_to_rideFinishedBottomSheet)
+        navController?.navigate(R.id.rideFinishedBottomSheet)
     }
 
     override fun goToRateDriverFromRideFinished() {

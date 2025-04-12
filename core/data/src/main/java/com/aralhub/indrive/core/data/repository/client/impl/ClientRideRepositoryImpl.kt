@@ -8,9 +8,11 @@ import com.aralhub.network.utils.ClientWebSocketEventRideMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,9 +23,8 @@ class ClientRideRepositoryImpl @Inject constructor(private val clientRideNetwork
     // Coroutine scope for the collection
     private val repositoryScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    override suspend fun getRideStatus(): SharedFlow<RideStatus> {
-
-        repositoryScope.launch {
+    override suspend fun getRideStatus(): Flow<RideStatus> = callbackFlow {
+        val job = repositoryScope.launch {
             clientRideNetworkDataSource.getRide().collect { event ->
                 val status = when(event) {
                     is ClientWebSocketEventRideMessage.DriverOnTheWay -> RideStatus.DriverOnTheWay(event.message)
@@ -37,18 +38,30 @@ class ClientRideRepositoryImpl @Inject constructor(private val clientRideNetwork
                     is ClientWebSocketEventRideMessage.PaidWaitingStarted -> RideStatus.PaidWaitingStarted(event.message)
                     is ClientWebSocketEventRideMessage.RideCompleted -> {
                         clientRideNetworkDataSource.close()
-                        RideStatus.RideCompleted(event.message)
+                        RideStatus.RideCompleted(event.message).also {
+                            trySend(it)
+                            close() // Закрываем поток
+                            return@collect
+                        }
                     }
                     is ClientWebSocketEventRideMessage.RideStarted -> RideStatus.RideStarted(event.message.message)
                     is ClientWebSocketEventRideMessage.Unknown -> RideStatus.Unknown(event.error)
                     is ClientWebSocketEventRideMessage.CancelledByDriver -> RideStatus.CanceledByDriver(event.message)
                 }
-                _rideStatusFlow.emit(status)
-                Log.i("ClientRideRepositoryImpl", "Emitted ride status: $status")
+
+                trySend(status).isSuccess
             }
         }
-        return rideStatusFlow
+
+        awaitClose {
+            job.cancel()
+            repositoryScope.launch {
+                clientRideNetworkDataSource.close()
+            }
+        }
+
     }
+
     override suspend fun close() {
         clientRideNetworkDataSource.close()
     }

@@ -12,7 +12,6 @@ import com.aralhub.araltaxi.core.domain.client.GetClientRideStatusUseCase
 import com.aralhub.araltaxi.core.domain.client.GetDriverCardUseCase
 import com.aralhub.araltaxi.core.domain.client.GetStandardPriceUseCase
 import com.aralhub.araltaxi.core.domain.client.GetWaitAmountUseCase
-import com.aralhub.araltaxi.core.domain.review.CreateReviewUseCase
 import com.aralhub.indrive.core.data.model.driver.DriverCard
 import com.aralhub.indrive.core.data.model.review.PassengerReview
 import com.aralhub.indrive.core.data.model.review.Review
@@ -27,6 +26,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -43,10 +43,12 @@ class RideViewModel @Inject constructor(
     private val createPassengerReviewUseCase: CreatePassengerReviewUseCase
 ) : ViewModel() {
 
+    private val _rideStateUiState = MutableSharedFlow<RideStateUiState>()
+    val rideStateUiState = _rideStateUiState.asSharedFlow()
+
     init {
         getClientRideState()
         getActiveRide()
-
     }
 
     private var _activeRideState = MutableStateFlow<ActiveRideUiState>(ActiveRideUiState.Loading)
@@ -77,6 +79,7 @@ class RideViewModel @Inject constructor(
                 is Result.Error -> {
                     _cancelRideState.emit(CancelRideUiState.Error(it.message))
                 }
+
                 is Result.Success -> {
                     disconnectClientActiveRideUseCase()
                     _cancelRideState.emit(CancelRideUiState.Success)
@@ -99,40 +102,38 @@ class RideViewModel @Inject constructor(
         }
     }
 
-    private var _rideStateUiState = MutableSharedFlow<RideStateUiState>()
-    val rideStateUiState = _rideStateUiState.asSharedFlow()
-
-    private var _waitingForDriverRideState = MutableSharedFlow<RideStateUiState>()
-    val waitingForDriverRideState = _waitingForDriverRideState.asSharedFlow()
-
     private fun getClientRideState() = viewModelScope.launch {
-        getClientRideStatusUseCase().collect {
-            _waitingForDriverRideState.emit(RideStateUiState.Success(it))
+        getClientRideStatusUseCase().collectLatest {
+            Log.e("RideViewModel", "getClientRideState: $it")
             _rideStateUiState.emit(RideStateUiState.Success(it))
         }
+    }
+
+    fun setRideStateIdle() = viewModelScope.launch {
+        _rideStateUiState.emit(RideStateUiState.Idle)
     }
 
     private var _getWaitAmountUiState = MutableSharedFlow<GetWaitAmountUiState>()
     val getWaitAmountUiState = _getWaitAmountUiState.asSharedFlow()
     fun getWaitAmount(rideId: Int) = viewModelScope.launch {
-       _getWaitAmountUiState.emit(
-           getWaitAmountUseCase(rideId).fold(
-               onSuccess = {
-                 GetWaitAmountUiState.Success(it)
-               },
-               onError = {
-                  GetWaitAmountUiState.Error(it)
-               }
-           )
-       )
+        _getWaitAmountUiState.emit(
+            getWaitAmountUseCase(rideId).fold(
+                onSuccess = {
+                    GetWaitAmountUiState.Success(it)
+                },
+                onError = {
+                    GetWaitAmountUiState.Error(it)
+                }
+            )
+        )
     }
 
     private var _getStandardPriceUiState = MutableSharedFlow<GetStandardPriceUiState>()
     val getStandardPriceUiState = _getStandardPriceUiState.asSharedFlow()
-    fun getStandardPrice() =  viewModelScope.launch {
+    fun getStandardPrice() = viewModelScope.launch {
         _getStandardPriceUiState.emit(
             getStandardPriceUseCase().let {
-                when(it){
+                when (it) {
                     is Result.Error -> GetStandardPriceUiState.Error(it.message)
                     is Result.Success -> {
                         Log.i("RideViewModel", "${it.data}")
@@ -143,12 +144,13 @@ class RideViewModel @Inject constructor(
         )
     }
 
-    private val _getDriverCardUiState = MutableStateFlow<GetDriverCardUiState>(GetDriverCardUiState.Loading)
+    private val _getDriverCardUiState =
+        MutableStateFlow<GetDriverCardUiState>(GetDriverCardUiState.Loading)
     val getDriverCardUiState = _getDriverCardUiState.asStateFlow()
-    fun getDriverCard(driverId: Int)  = viewModelScope.launch {
+    fun getDriverCard(driverId: Int) = viewModelScope.launch {
         _getDriverCardUiState.emit(
             getDriverCardUseCase(driverId).let {
-                when(it){
+                when (it) {
                     is Result.Error -> GetDriverCardUiState.Error(it.message)
                     is Result.Success -> GetDriverCardUiState.Success(it.data)
                 }
@@ -156,12 +158,13 @@ class RideViewModel @Inject constructor(
         )
     }
 
-    private val _createReviewUiState = MutableStateFlow<CreateReviewUiState>(CreateReviewUiState.Loading)
+    private val _createReviewUiState =
+        MutableStateFlow<CreateReviewUiState>(CreateReviewUiState.Loading)
     val createReviewUiState = _createReviewUiState.asStateFlow()
     fun createReview(review: PassengerReview) = viewModelScope.launch {
         _createReviewUiState.emit(
             createPassengerReviewUseCase(review).let {
-                when(it){
+                when (it) {
                     is Result.Error -> CreateReviewUiState.Error(it.message)
                     is Result.Success -> CreateReviewUiState.Success(it.data)
                 }
@@ -179,6 +182,7 @@ sealed interface GetWaitAmountUiState {
 }
 
 sealed interface RideStateUiState {
+    data object Idle : RideStateUiState
     data object Loading : RideStateUiState
     data class Success(val rideState: RideStatus) : RideStateUiState
     data class Error(val message: String) : RideStateUiState
@@ -197,19 +201,19 @@ sealed interface CancelRideUiState {
 }
 
 sealed interface GetStandardPriceUiState {
-    data object Loading: GetStandardPriceUiState
-    data class Success(val standardPrice: StandardPrice): GetStandardPriceUiState
-    data class Error(val message: String): GetStandardPriceUiState
+    data object Loading : GetStandardPriceUiState
+    data class Success(val standardPrice: StandardPrice) : GetStandardPriceUiState
+    data class Error(val message: String) : GetStandardPriceUiState
 }
 
 sealed interface GetDriverCardUiState {
-    data object Loading: GetDriverCardUiState
-    data class Success(val driverCard: DriverCard): GetDriverCardUiState
-    data class Error(val message: String): GetDriverCardUiState
+    data object Loading : GetDriverCardUiState
+    data class Success(val driverCard: DriverCard) : GetDriverCardUiState
+    data class Error(val message: String) : GetDriverCardUiState
 }
 
 sealed interface CreateReviewUiState {
-    data object Loading: CreateReviewUiState
-    data class Success(val review: Review): CreateReviewUiState
-    data class Error(val message: String): CreateReviewUiState
+    data object Loading : CreateReviewUiState
+    data class Success(val review: Review) : CreateReviewUiState
+    data class Error(val message: String) : CreateReviewUiState
 }

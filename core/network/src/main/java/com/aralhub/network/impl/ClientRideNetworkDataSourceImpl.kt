@@ -21,6 +21,7 @@ import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -30,8 +31,8 @@ import kotlinx.coroutines.launch
 
 class ClientRideNetworkDataSourceImpl(
     private val client: HttpClient
-) :
-    ClientRideNetworkDataSource {
+) : ClientRideNetworkDataSource {
+
     private var session: WebSocketSession? = null
     private val _rideStatusFlow = MutableSharedFlow<ClientWebSocketEventRideMessage>(replay = 1)
     private val rideStatusFlow = _rideStatusFlow.asSharedFlow()
@@ -41,7 +42,7 @@ class ClientRideNetworkDataSourceImpl(
 
     private var isInitialized = false
 
-    override suspend fun getRide(): SharedFlow<ClientWebSocketEventRideMessage> {
+    override suspend fun getRide(): Flow<ClientWebSocketEventRideMessage> {
         if (!isInitialized) {
             networkScope.launch {
                 try {
@@ -153,7 +154,6 @@ class ClientRideNetworkDataSourceImpl(
 
                                         else -> ClientWebSocketEventRideMessage.Unknown("Unknown type: ${data.type}")
                                     }
-                                    Log.i("WebSocketLogClient", "$event")
                                     _rideStatusFlow.emit(event)
                                 } catch (e: Exception) {
                                     _rideStatusFlow.emit(ClientWebSocketEventRideMessage.Unknown("Parsing error: ${e.message}"))

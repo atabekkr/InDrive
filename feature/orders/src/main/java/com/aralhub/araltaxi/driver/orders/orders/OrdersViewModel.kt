@@ -89,6 +89,7 @@ class OrdersViewModel @Inject constructor(
         }
     }
 
+
     init {
         startOrdersWebSocket()
     }
@@ -143,8 +144,6 @@ class OrdersViewModel @Inject constructor(
         }
     }
 
-    private val webSocketOrdersState =
-        MutableStateFlow<GetActiveOrdersUiState>(GetActiveOrdersUiState.Loading)
     val ordersState = merge(
         existingOrdersState,
         webSocketOrdersState

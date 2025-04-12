@@ -415,7 +415,6 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
             dismissAllBottomSheets()
             getExistingOrders()
             startService()
-            viewModel.switchBackToOrdersSocket()
         }
 
         reasonCancelModalBottomSheet.setOnRideCancelledListener {

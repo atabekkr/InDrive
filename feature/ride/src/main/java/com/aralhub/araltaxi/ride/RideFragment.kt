@@ -5,12 +5,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.aralhub.araltaxi.client.ride.R
 import com.aralhub.araltaxi.client.ride.databinding.FragmentRideBinding
-import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.araltaxi.core.common.utils.MapStyles
 import com.aralhub.araltaxi.core.common.utils.loadJsonFromAssets
 import com.aralhub.araltaxi.ride.navigation.sheet.FeatureRideBottomSheetNavigation
@@ -18,6 +17,8 @@ import com.aralhub.araltaxi.ride.navigation.sheet.FeatureRideNavigation
 import com.aralhub.araltaxi.ride.navigation.sheet.SheetNavigator
 import com.aralhub.araltaxi.ride.sheet.modal.CancelTripFragment
 import com.aralhub.araltaxi.ride.sheet.modal.TripCanceledByDriverFragment
+import com.aralhub.indrive.core.data.model.ride.RideStatus
+import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.viewBinding
 import com.yandex.mapkit.geometry.Point
@@ -27,6 +28,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 internal class RideFragment : Fragment(R.layout.fragment_ride) {
+
     private val binding by viewBinding(FragmentRideBinding::bind)
 
     @Inject
@@ -40,7 +42,8 @@ internal class RideFragment : Fragment(R.layout.fragment_ride) {
 
     @Inject
     lateinit var errorHandler: ErrorHandler
-    private val rideViewModel by activityViewModels<RideViewModel>()
+
+    private val rideViewModel by viewModels<RideViewModel>()
 
     override fun onStart() {
         super.onStart()
@@ -49,10 +52,12 @@ internal class RideFragment : Fragment(R.layout.fragment_ride) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setUpMapView()
         initObservers()
         startService()
         setMapStyle()
+
     }
 
     private fun setMapStyle() {
@@ -81,30 +86,27 @@ internal class RideFragment : Fragment(R.layout.fragment_ride) {
                 is ActiveRideUiState.Error -> {}
                 ActiveRideUiState.Loading -> {}
                 is ActiveRideUiState.Success -> {
-                    Log.i("Status", "${activeRideUiState.activeRide.status}")
                     when (activeRideUiState.activeRide.status) {
                         FragmentRideStatus.DRIVER_ON_THE_WAY.status -> {
-                            setStartDestination(R.id.waitingForDriverBottomSheet)
+                            bottomSheetNavigation.goToWaitingForDriver()
                         }
 
                         FragmentRideStatus.DRIVER_WAITING_CLIENT.status -> {
-                            setStartDestination(R.id.driverIsWaitingBottomSheet)
+                            bottomSheetNavigation.goToDriverIsWaiting()
                         }
 
                         FragmentRideStatus.PAID_WAITING_STARTED.status -> {
-                            setStartDestination(R.id.driverIsWaitingBottomSheet)
                         }
 
                         FragmentRideStatus.PAID_WAITING.status -> {
-                            setStartDestination(R.id.driverIsWaitingBottomSheet)
                         }
 
                         FragmentRideStatus.RIDE_STARTED.status -> {
-                            setStartDestination(R.id.rideBottomSheet)
+                            bottomSheetNavigation.goToRide()
                         }
 
                         FragmentRideStatus.RIDE_COMPLETED.status -> {
-                            setStartDestination(R.id.rideFinishedBottomSheet)
+                            bottomSheetNavigation.goToRideFinished()
                         }
 
                         FragmentRideStatus.CANCELED_BY_DRIVER.status -> {
@@ -119,17 +121,54 @@ internal class RideFragment : Fragment(R.layout.fragment_ride) {
                 }
             }
         }
+        observeState(rideViewModel.rideStateUiState) { rideStateUiState ->
+            when (rideStateUiState) {
+                is RideStateUiState.Error -> {}
+                RideStateUiState.Loading -> {}
+                is RideStateUiState.Success -> {
+                    Log.e("RideFragment", rideStateUiState.rideState.toString())
+                    when (rideStateUiState.rideState) {
+                        is RideStatus.DriverOnTheWay -> {
+                            bottomSheetNavigation.goToWaitingForDriver()
+                        }
+
+                        is RideStatus.DriverWaitingClient -> {
+                            bottomSheetNavigation.goToDriverIsWaiting()
+                        }
+
+                        is RideStatus.PaidWaiting -> {}
+                        is RideStatus.PaidWaitingStarted -> {}
+                        is RideStatus.RideStarted -> {
+                            bottomSheetNavigation.goToRide()
+                        }
+
+                        is RideStatus.RideCompleted -> {
+                            bottomSheetNavigation.goToRideFinished()
+                        }
+
+                        is RideStatus.Unknown -> {}
+                        is RideStatus.CanceledByDriver -> {
+                            TripCanceledByDriverFragment(
+                                onClearClick = {
+                                    rideViewModel.setRideStateIdle()
+                                    navigation.goBackToCreateOfferFromRide()
+                                }
+                            ).show(childFragmentManager, CancelTripFragment.TAG)
+                        }
+                    }
+                }
+
+                RideStateUiState.Idle -> {}
+            }
+        }
     }
 
-    private fun setStartDestination(fragment: Int) {
+    override fun onResume() {
+        super.onResume()
         val navHostFragment =
             childFragmentManager.findFragmentById(R.id.ride_nav_host) as NavHostFragment
         val navController = navHostFragment.navController
         navController.let { navigator.bind(navController) }
-        val inflater = navController.navInflater
-        val graph = inflater.inflate(R.navigation.nav_ride)
-        graph.setStartDestination(fragment)
-        navController.graph = graph
     }
 
     private fun setUpMapView() {
@@ -146,6 +185,11 @@ internal class RideFragment : Fragment(R.layout.fragment_ride) {
     override fun onStop() {
         binding.mapView.onStop()
         super.onStop()
+    }
+
+    override fun onPause() {
+        navigator.unbind()
+        super.onPause()
     }
 
     override fun onDestroyView() {

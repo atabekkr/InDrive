@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
     <com.google.android.material.bottomsheet.BottomSheetDragHandleView
         style="@style/Widget.InDrive.BottomSheet.DragHandle"
         android:layout_width="match_parent"
@@ -294,7 +293,6 @@
 
     </LinearLayout>
 
-
     <com.google.android.material.divider.MaterialDivider
         android:layout_width="match_parent"
         android:layout_height="1dp" />
@@ -303,7 +301,7 @@
         android:id="@+id/btn_go_to_ride"
         style="@style/Widget.InDrive.Button.Primary"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_small"
         android:text="Jolǵa shıǵıw" />
 

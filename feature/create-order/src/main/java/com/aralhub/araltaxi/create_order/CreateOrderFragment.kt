@@ -389,7 +389,7 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
             enabledOptionsIds.addAll(rideOptionItemAdapter.currentList.filter { it.isEnabled }
                 .map { it.id })
             viewModel.createRide(
-                baseAmount = binding.etPrice.text.toString().replace(" ", "").toInt(),
+                baseAmount = binding.etPrice.text.toString().filter { it.isDigit() }.replace(" ", "").toInt(),
                 recommendedAmount = fakeRecommendedAmount,
                 selectedLocations = selectedLocations!!,
                 comment = comment,
