@@ -47,7 +47,8 @@ class RideFinishedBottomSheet : Fragment(R.layout.bottom_sheet_ride_finished) {
                 is ActiveRideUiState.Success -> {
                     Log.e("RideFinishedBottomSheet", activeRideUiState.activeRide.locations.points.getOrNull(1)?.name.toString())
                     rideViewModel.getDriverCard(activeRideUiState.activeRide.driver.driverId)
-                    binding.tvTotalMoney.text = "${activeRideUiState.activeRide.amount} + ${activeRideUiState.activeRide.waitAmount}"
+                    val commonPrice = getString(com.aralhub.ui.R.string.standard_uzs_price, "${activeRideUiState.activeRide.amount + activeRideUiState.activeRide.waitAmount}")
+                    binding.tvTotalMoney.text = commonPrice
                 }
             }
         }

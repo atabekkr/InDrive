@@ -60,40 +60,40 @@ class RideService : Service() {
 
     private fun observeStates() {
         scope.launch {
-//            useCase().collect { rideStatus ->
-//                val (message, shouldPlaySound) = when (rideStatus) {
-//                    is RideStatus.DriverOnTheWay -> Pair(rideStatus.message, false)
-//                    is RideStatus.DriverWaitingClient -> Pair(
-//                        rideStatus.message,
-//                        true
-//                    ) // Play sound when driver is waiting
-//                    is RideStatus.PaidWaiting -> Pair(rideStatus.message, false)
-//                    is RideStatus.PaidWaitingStarted -> Pair(
-//                        rideStatus.message,
-//                        true
-//                    ) // Play sound for paid waiting
-//                    is RideStatus.RideCompleted -> {
-//                        Pair(
-//                            rideStatus.message,
-//                            true
-//                        )
-//                    } // Play sound for ride completion
-//                    is RideStatus.RideStarted -> Pair(rideStatus.message, false)
-//                    is RideStatus.Unknown -> Pair(rideStatus.error, false)
-//                    is RideStatus.CanceledByDriver -> Pair(rideStatus.message, false)
-//                }
-//
-//                Log.i("RideService", "Status update: $message")
-//
-//                if (!isServiceStarted) {
-//                    // First time - start the foreground service
-//                    val notification = buildNotification(message, shouldPlaySound)
-//                    startForegroundService(notification)
-//                } else {
-//                    // Update the existing notification
-//                    updateNotification(message, shouldPlaySound)
-//                }
-//            }
+            useCase().collect { rideStatus ->
+                val (message, shouldPlaySound) = when (rideStatus) {
+                    is RideStatus.DriverOnTheWay -> Pair(rideStatus.message, false)
+                    is RideStatus.DriverWaitingClient -> Pair(
+                        rideStatus.message,
+                        true
+                    ) // Play sound when driver is waiting
+                    is RideStatus.PaidWaiting -> Pair(rideStatus.message, false)
+                    is RideStatus.PaidWaitingStarted -> Pair(
+                        rideStatus.message,
+                        true
+                    ) // Play sound for paid waiting
+                    is RideStatus.RideCompleted -> {
+                        Pair(
+                            rideStatus.message,
+                            true
+                        )
+                    } // Play sound for ride completion
+                    is RideStatus.RideStarted -> Pair(rideStatus.message, false)
+                    is RideStatus.Unknown -> Pair(rideStatus.error, false)
+                    is RideStatus.CanceledByDriver -> Pair(rideStatus.message, false)
+                }
+
+                Log.i("RideService", "Status update: $message")
+
+                if (!isServiceStarted) {
+                    // First time - start the foreground service
+                    val notification = buildNotification(message, shouldPlaySound)
+                    startForegroundService(notification)
+                } else {
+                    // Update the existing notification
+                    updateNotification(message, shouldPlaySound)
+                }
+            }
         }
     }
 

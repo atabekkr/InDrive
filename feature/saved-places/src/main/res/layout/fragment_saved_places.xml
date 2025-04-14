@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
@@ -11,16 +11,16 @@
         android:id="@+id/tb_saved_places"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:title="Mánzillerim"
+        android:contentInsetStartWithNavigation="0dp"
         android:navigationIcon="@drawable/ic_material_symbols_arrow_back"
-        android:contentInsetStartWithNavigation="0dp"/>
+        android:title="Mánzillerim" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_saved_places"
-        tools:itemCount="5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:itemCount="5" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,26 +29,30 @@
         android:orientation="vertical">
 
         <TextView
-            android:visibility="gone"
             android:id="@+id/tv_no_saved_places"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:text="Sizde saqlanǵan mánziller joq"
             android:textAppearance="@style/TextAppearance.InDrive.TitleGroup"
-            android:text="Sizde saqlanǵan mánziller joq"/>
+            android:visibility="gone" />
 
-        <Button
-            android:id="@+id/btn_add_place"
-            android:text="Mánzil qosıw"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_small"
-            style="@style/Widget.InDrive.Button.Variant"/>
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/btn_add_place"
+                style="@style/Widget.InDrive.Button.Variant"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_margin="@dimen/margin_small"
+                android:text="Mánzil qosıw" />
+        </LinearLayout>
 
     </LinearLayout>
-
-
-
 
 
 </LinearLayout>

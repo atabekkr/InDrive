@@ -116,7 +116,6 @@ class OffersFragment : Fragment(R.layout.fragment_offers) {
                 AutoTakeOfferUiState.Loading -> {}
                 is AutoTakeOfferUiState.Success -> {
                     viewModel.closeOffersWebSocket()
-                    Log.i("OffersFragment", "going to ride")
                     featureOffersNavigation.goToRideFragment()
                 }
             }

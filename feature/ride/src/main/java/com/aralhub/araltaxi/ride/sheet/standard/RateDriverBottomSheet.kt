@@ -17,11 +17,12 @@ import com.aralhub.indrive.core.data.model.review.PassengerReview
 import com.aralhub.indrive.core.data.model.review.Review
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.viewBinding
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class RateDriverBottomSheet : Fragment(R.layout.bottom_sheet_rate_driver) {
+class RateDriverBottomSheet : BottomSheetDialogFragment(R.layout.bottom_sheet_rate_driver) {
 
     private val rideViewModel: RideViewModel by activityViewModels()
     private val binding: BottomSheetRateDriverBinding by viewBinding(BottomSheetRateDriverBinding::bind)

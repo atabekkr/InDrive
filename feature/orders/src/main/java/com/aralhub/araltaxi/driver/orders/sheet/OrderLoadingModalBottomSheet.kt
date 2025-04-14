@@ -1,7 +1,6 @@
 package com.aralhub.araltaxi.driver.orders.sheet
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import com.aralhub.araltaxi.driver.orders.R
 import com.aralhub.araltaxi.driver.orders.databinding.ModalBottomSheetOrderLoadingBinding
@@ -34,7 +33,6 @@ class OrderLoadingModalBottomSheet :
 
     private fun initUI() {
         val offerAmount = arguments?.getString("OfferAmount")
-        Log.d(TAG, offerAmount.toString())
         binding.tvOfferAmount.text = getString(R.string.driver_offer_loading, offerAmount)
     }
 

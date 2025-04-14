@@ -1,4 +1,4 @@
-package com.aralhub.araltaxi.savedplaces
+package com.aralhub.araltaxi.request
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.aralhub.araltaxi.core.domain.address.GetAllSavedAddressesUseCase
 import com.aralhub.indrive.core.data.model.address.Address
 import com.aralhub.indrive.core.data.result.fold
-import com.aralhub.ui.model.AddressCategory
-import com.aralhub.ui.model.AddressItem
+import com.aralhub.ui.model.LocationItem
+import com.aralhub.ui.model.LocationItemClickOwner
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SavedPlacesViewModel @Inject constructor(
+class SavedAddressesViewModel @Inject constructor(
     private val getAllSavedAddressesUseCase: GetAllSavedAddressesUseCase
 ) : ViewModel() {
 
@@ -23,13 +23,12 @@ class SavedPlacesViewModel @Inject constructor(
         MutableStateFlow<SavedPlacesUiState>(SavedPlacesUiState.Loading)
     val savedPlacesUiState = _savedPlacesUiState.asStateFlow()
 
-
     fun getAllSavedAddresses() {
+        Log.i("SavedPlacesViewModel", "getAllSavedAddresses")
         viewModelScope.launch {
             _savedPlacesUiState.value = getAllSavedAddressesUseCase().fold(
                 onSuccess = {
-                    Log.i("Locations", "$it")
-                    SavedPlacesUiState.Success(it.map { address -> address.toAddressItem() })
+                    SavedPlacesUiState.Success(it.map { address -> address.toLocationItem() })
                 },
                 onError = SavedPlacesUiState::Error
             )
@@ -37,17 +36,17 @@ class SavedPlacesViewModel @Inject constructor(
     }
 }
 
-fun Address.toAddressItem() = AddressItem(
+fun Address.toLocationItem() = LocationItem(
     id = this.id,
-    name = this.name,
-    address = this.address,
-    category = AddressCategory.OTHER,
-    latitude = this.latitude,
-    longitude = this.longitude
+    title = this.name,
+    subtitle = this.address,
+    longitude = this.longitude.toDouble(),
+    latitude = this.latitude.toDouble(),
+    clickOwner = LocationItemClickOwner.FROM
 )
 
 sealed interface SavedPlacesUiState {
     data object Loading : SavedPlacesUiState
-    data class Success(val addresses: List<AddressItem>) : SavedPlacesUiState
+    data class Success(val addresses: List<LocationItem>) : SavedPlacesUiState
     data class Error(val message: String) : SavedPlacesUiState
 }

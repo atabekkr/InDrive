@@ -46,7 +46,6 @@ import com.aralhub.ui.model.args.SelectedLocations
 import com.aralhub.ui.sheets.ChangePaymentMethodModalBottomSheet
 import com.aralhub.ui.sheets.CommentToDriverModalBottomSheet
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
-import com.aralhub.ui.utils.ViewEx.disable
 import com.aralhub.ui.utils.ViewEx.enable
 import com.aralhub.ui.utils.hideKeyboard
 import com.aralhub.ui.utils.showKeyboardAndFocus
@@ -95,7 +94,9 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
     private var recommendedPrice: RecommendedPrice? = null
     private val rideOptionItemAdapter by lazy { RideOptionItemAdapter() }
     private var enabledOptionsIds: MutableList<Int> = mutableListOf()
+
     private val viewModel by viewModels<CreateOrderViewModel>()
+
     private var selectedLocations: SelectedLocations? = null
     private var locationManager: LocationManager? = null
     private lateinit var mapWindow: MapWindow
@@ -172,6 +173,10 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
         initViews()
         initListeners()
         initArgs()
+        fetchData()
+    }
+
+    private fun fetchData() {
         viewModel.setPaymentMethodType(PaymentMethodType.CASH)
         viewModel.getActivePaymentMethods()
         viewModel.getRideOptions()
@@ -389,7 +394,8 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
             enabledOptionsIds.addAll(rideOptionItemAdapter.currentList.filter { it.isEnabled }
                 .map { it.id })
             viewModel.createRide(
-                baseAmount = binding.etPrice.text.toString().filter { it.isDigit() }.replace(" ", "").toInt(),
+                baseAmount = binding.etPrice.text.toString().filter { it.isDigit() }
+                    .replace(" ", "").toInt(),
                 recommendedAmount = fakeRecommendedAmount,
                 selectedLocations = selectedLocations!!,
                 comment = comment,

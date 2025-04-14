@@ -40,7 +40,7 @@ class OfferItemAdapter :
             }
 
             Log.i("OfferItemAdapter", "Expiration time: ${offerItem.expiresAt}")
-            itemOfferBinding.btnAccept.setExpirationTime(getTime30SecondsAhead())
+            itemOfferBinding.btnAccept.setExpirationTime(offerItem.expiresAt)
 
             itemOfferBinding.apply {
                 tvDriverName.text = offerItem.driver.name
@@ -57,22 +57,6 @@ class OfferItemAdapter :
                     .into(itemOfferBinding.ivAvatar)
             }
         }
-    }
-
-
-    fun getTime30SecondsAhead(): String {
-        // Get current time as Instant
-        val currentTime = Instant.now()
-
-        // Add 30 seconds
-        val time30SecondsAhead = currentTime.plus(10, ChronoUnit.SECONDS)
-
-        // Format with explicit +00:00 timezone
-        val formatter = DateTimeFormatter
-            .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX")
-            .withZone(ZoneOffset.UTC)
-
-        return formatter.format(time30SecondsAhead)
     }
 
     fun removeItem(position: Int){

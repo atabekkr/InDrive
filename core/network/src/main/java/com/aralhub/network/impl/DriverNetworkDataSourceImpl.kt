@@ -1,6 +1,5 @@
 package com.aralhub.network.impl
 
-import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -87,7 +86,6 @@ class DriverNetworkDataSourceImpl @Inject constructor(private val api: DriverNet
         rideUUID: String,
         amount: Int
     ): NetworkResult<CreateOfferByDriverResponse?> {
-        Log.d("DriverNetworkDataSource", "createOffer: $rideUUID, $amount")
         return api.createOffer(rideUUID, amount).safeRequestServerResponseWithNullData()
     }
 

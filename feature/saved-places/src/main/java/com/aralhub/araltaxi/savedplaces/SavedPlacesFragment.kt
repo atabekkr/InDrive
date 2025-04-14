@@ -11,6 +11,7 @@ import com.aralhub.araltaxi.saved_places.R
 import com.aralhub.araltaxi.saved_places.databinding.FragmentSavedPlacesBinding
 import com.aralhub.araltaxi.savedplaces.navigation.FeatureSavedPlaceNavigation
 import com.aralhub.ui.adapter.AddressItemAdapter
+import com.aralhub.ui.model.AddressItem
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.ViewEx.hide
 import com.aralhub.ui.utils.ViewEx.show

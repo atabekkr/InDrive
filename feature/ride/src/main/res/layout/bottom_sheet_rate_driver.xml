@@ -1,154 +1,168 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_horizontal"
-    android:orientation="vertical"
-    android:paddingHorizontal="@dimen/padding_medium">
+    android:fitsSystemWindows="true">
 
-    <TextView
-        android:id="@+id/tv_title"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/label_rate_quality_of_service"
-        android:textAppearance="@style/TextAppearance.InDrive.Title.SubSection" />
-
-    <LinearLayout
-        android:id="@+id/layout_time"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/margin_small"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="top"
-        android:orientation="horizontal"
-        android:visibility="gone">
-
-        <View
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginTop="4dp"
-            android:background="@drawable/ic_baseline_timelapse" />
+        android:fillViewport="true"
+        android:isScrollContainer="false">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_medium">
 
             <TextView
-                android:id="@+id/tv_time"
+                android:id="@+id/tv_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="@dimen/padding_small"
-                android:textAppearance="@style/TextAppearance.InDrive.Text.TitleBody"
-                tools:text="0:25" />
+                android:gravity="center"
+                android:text="@string/label_rate_quality_of_service"
+                android:textAppearance="@style/TextAppearance.InDrive.Title.SubSection" />
 
-            <TextView
+            <LinearLayout
+                android:id="@+id/layout_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/margin_small"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="top"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <View
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/ic_baseline_timelapse" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="@dimen/padding_small"
+                        android:textAppearance="@style/TextAppearance.InDrive.Text.TitleBody"
+                        tools:text="0:25" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableEnd="@drawable/ic_mdi_question_mark_circle"
+                        android:drawablePadding="@dimen/padding_small"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="@dimen/padding_small"
+                        android:text="Biypul kútiw waqtı"
+                        android:textAppearance="@style/TextAppearance.InDrive.TitleSmall"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawableEnd="@drawable/ic_mdi_question_mark_circle"
-                android:drawablePadding="@dimen/padding_small"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="@dimen/padding_small"
-                android:text="Biypul kútiw waqtı"
-                android:textAppearance="@style/TextAppearance.InDrive.TitleSmall"
-                android:textSize="14sp" />
+                android:layout_margin="@dimen/margin_medium">
+
+                <ImageView
+                    android:id="@+id/iv_driver"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:contentDescription="@string/cd_driver_avatar"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:src="@tools:sample/avatars" />
+
+                <TextView
+                    android:id="@+id/tv_driver_rating"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_rating"
+                    android:foreground="@drawable/ripple_text"
+                    android:paddingHorizontal="4dp"
+                    android:textAppearance="@style/TextAppearance.InDrive.TitleSmall"
+                    android:textColor="@color/color_content_link"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="4.8 ★" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/tv_driver_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textAppearance="@style/TextAppearance.InDrive.Text.TitleBody"
+                tools:text="Babur" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/label_driver"
+                android:textAppearance="@style/TextAppearance.InDrive.TitleSmall" />
+
+            <RatingBar
+                android:id="@+id/rating_bar"
+                style="@style/Widget.AppCompat.RatingBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_small"
+                android:numStars="5"
+                android:progress="1"
+                android:progressTint="@color/color_interactive_control"
+                android:secondaryProgressTint="#E1E1E2" />
+
+            <EditText
+                android:id="@+id/et_comment"
+                style="@style/Widget.InDrive.EditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="importantForAutoFill"
+                android:gravity="top"
+                android:hint="@string/hint_comment_to_driver"
+                android:inputType="text|textMultiLine"
+                android:minLines="4"
+                android:textColor="@color/color_text_secondary" />
+
+            <LinearLayout
+                android:id="@+id/layout_online"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:foreground="@drawable/ripple_text"
+                android:orientation="horizontal"
+                android:paddingVertical="@dimen/padding_medium">
+
+                <Button
+                    android:id="@+id/btn_send"
+                    style="@style/Widget.InDrive.Button.Primary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_send" />
+            </LinearLayout>
+
 
         </LinearLayout>
+    </ScrollView>
 
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_medium">
-
-        <ImageView
-            android:id="@+id/iv_driver"
-            android:layout_width="64dp"
-            android:contentDescription="@string/cd_driver_avatar"
-            android:layout_height="64dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/avatars" />
-
-        <TextView
-            android:id="@+id/tv_driver_rating"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_rating"
-            android:foreground="@drawable/ripple_text"
-            android:paddingHorizontal="4dp"
-            android:textAppearance="@style/TextAppearance.InDrive.TitleSmall"
-            android:textColor="@color/color_content_link"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:text="4.8 ★" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <TextView
-        android:id="@+id/tv_driver_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        tools:text="Babur"
-        android:textAppearance="@style/TextAppearance.InDrive.Text.TitleBody" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:text="@string/label_driver"
-        android:textAppearance="@style/TextAppearance.InDrive.TitleSmall" />
-
-    <RatingBar
-        android:id="@+id/rating_bar"
-        style="@style/Widget.AppCompat.RatingBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_small"
-        android:numStars="5"
-        android:progressTint="@color/color_interactive_control"
-        android:secondaryProgressTint="#E1E1E2" />
-
-
-    <EditText
-        android:id="@+id/et_comment"
-        android:autofillHints="importantForAutoFill"
-        android:inputType="text|textMultiLine"
-        style="@style/Widget.InDrive.EditText"
-        android:layout_width="match_parent"
-        android:textColor="@color/color_text_secondary"
-        android:layout_height="wrap_content"
-        android:gravity="top"
-        android:hint="@string/hint_comment_to_driver"
-        android:minLines="4" />
-
-    <LinearLayout
-        android:id="@+id/layout_online"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:foreground="@drawable/ripple_text"
-        android:orientation="horizontal"
-        android:paddingVertical="@dimen/padding_medium">
-
-        <Button
-            android:id="@+id/btn_send"
-            style="@style/Widget.InDrive.Button.Primary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/label_send" />
-    </LinearLayout>
-
-
-</LinearLayout>
+</RelativeLayout>

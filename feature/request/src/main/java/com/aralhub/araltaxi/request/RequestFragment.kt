@@ -112,6 +112,7 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
     private val adapter = LocationItemAdapter()
     private val viewModel by viewModels<RequestViewModel>()
     private val requestViewModel2 by viewModels<RequestViewModel2>()
+    private val savedPlacesViewModel by viewModels<SavedAddressesViewModel>()
 
     // Variables to track latest states
     private var latestSearchRideState: SearchRideUiState? = null
@@ -160,6 +161,12 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
         displayProfile()
 
         askPermissions()
+
+        fetchData()
+    }
+
+    private fun fetchData() {
+        savedPlacesViewModel.getAllSavedAddresses()
     }
 
     private fun askPermissions() {
@@ -262,6 +269,15 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
                 is LogOutUiState.Error -> errorHandler.showToast(logOutUiState.message)
                 LogOutUiState.Loading -> {}
                 LogOutUiState.Success -> navigation.goToLogoFromRequestFragment()
+            }
+        }
+        observeState(savedPlacesViewModel.savedPlacesUiState) {
+            when (it) {
+                is SavedPlacesUiState.Error -> errorHandler.showToast(it.message)
+                SavedPlacesUiState.Loading -> {}
+                is SavedPlacesUiState.Success -> {
+                    adapter.submitList(it.addresses)
+                }
             }
         }
     }
