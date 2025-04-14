@@ -1,6 +1,5 @@
 package com.aralhub.araltaxi.driver.orders.orders
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aralhub.araltaxi.core.common.utils.rejectOfferState
@@ -29,7 +28,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -89,6 +87,8 @@ class OrdersViewModel @Inject constructor(
         }
     }
 
+    private val webSocketOrdersState =
+        MutableStateFlow<GetActiveOrdersUiState>(GetActiveOrdersUiState.Loading)
 
     init {
         startOrdersWebSocket()

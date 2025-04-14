@@ -35,13 +35,14 @@ data class ClientRideLocationsItemsCoordinates(
 
 fun WebSocketServerResponse<NetworkActiveOfferResponse>.toDomain(): ActiveOfferResponse =
     with(this) {
+        val roadPrice = if (data.updatedAmount != null) data.updatedAmount?.toInt() else data.baseAmount
         return ActiveOfferResponse(
             id = 1,
             uuid = data.uuid,
             name = data.passenger.userFullName,
             recommendedPrice = data.recommendedAmount.recommendedAmount.toString(),
             avatar = data.passenger.avatar ?: "https://randomuser.me/api/portraits/men/8.jpg",
-            roadPrice = data.baseAmount.toString(),
+            roadPrice = roadPrice.toString(),
             pickUpDistance = distanceToClient.distance,
             roadDistance = data.distance.totalDistance.toDouble(),
             paymentType = data.paymentMethod.id,

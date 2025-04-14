@@ -204,14 +204,16 @@ class OrderModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_sh
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         rejectOfferState.onEach {
-            if (!orderRejectedByClientModalBottomSheet.isAdded) {
-                orderRejectedByClientModalBottomSheet.arguments = arguments
-                orderRejectedByClientModalBottomSheet.showNow(
-                    parentFragmentManager,
-                    orderRejectedByClientModalBottomSheet.tag
-                )
+            lifecycleScope.launchWhenResumed {
+                if (!orderRejectedByClientModalBottomSheet.isAdded) {
+                    orderRejectedByClientModalBottomSheet.arguments = arguments
+                    orderRejectedByClientModalBottomSheet.show(
+                        childFragmentManager,
+                        orderRejectedByClientModalBottomSheet.tag
+                    )
+                }
+                orderLoadingModalBottomSheet.dismissAllowingStateLoss()
             }
-            orderLoadingModalBottomSheet.dismissAllowingStateLoss()
         }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
