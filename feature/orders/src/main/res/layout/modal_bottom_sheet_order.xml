@@ -94,9 +94,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:maxLines="1"
             android:textAppearance="@style/TextAppearance.InDrive.Text.TitleBody"
             android:textSize="22sp"
-            android:maxLines="1"
             tools:text="10 000 som" />
 
         <TextView
@@ -105,13 +105,12 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="end"
-            android:textSize="22sp"
             android:textAppearance="@style/TextAppearance.InDrive.TitleSmall"
             android:textColor="@color/color_text_primary"
+            android:textSize="22sp"
             tools:text="7 km" />
 
     </LinearLayout>
-
 
     <LinearLayout
         android:id="@+id/layout_from_location"
@@ -197,6 +196,62 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layout_luggage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_small"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="@dimen/padding_small"
+            android:text="Bagaj bar"
+            android:textAppearance="@style/TextAppearance.InDrive.BodyLarge"
+            android:textSize="16sp" />
+
+        <View
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/ic_luggage"
+            android:clickable="true"
+            android:foreground="@drawable/ripple_round" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_comment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="@dimen/padding_small"
+            android:text="Kommentariy"
+            android:textAppearance="@style/TextAppearance.InDrive.BodyLarge"
+            android:textSize="16sp" />
+
+        <View
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/ic_chevron_right"
+            android:clickable="true"
+            android:foreground="@drawable/ripple_round" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -204,9 +259,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:layout_marginTop="16dp"
             android:padding="@dimen/padding_small">
 
             <TextView
@@ -263,35 +318,35 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
+            android:layout_height="wrap_content">
+
             <Button
                 android:id="@+id/btn_accept_offer"
                 style="@style/Widget.InDrive.Button.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cornerRadius="10dp"
-                android:foreground="@drawable/ripple_text"
                 android:layout_marginHorizontal="@dimen/margin_small"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="@dimen/margin_small"
-                android:text="Qabıllaw" />
+                android:foreground="@drawable/ripple_text"
+                android:text="Qabıllaw"
+                app:cornerRadius="10dp" />
 
             <Button
                 android:id="@+id/btn_send_offer"
                 style="@style/Widget.InDrive.Button.Variant"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_small"
                 android:layout_marginTop="16dp"
-                app:cornerRadius="10dp"
-                android:paddingEnd="12dp"
-                android:paddingStart="46dp"
-                android:visibility="gone"
+                android:layout_marginBottom="@dimen/margin_small"
                 android:drawableEnd="@drawable/ic_round_send"
                 android:foreground="@drawable/ripple_text"
-                android:layout_marginHorizontal="@dimen/margin_small"
-                android:layout_marginBottom="@dimen/margin_small"
-                android:text="Usınistı jollaw" />
+                android:paddingStart="46dp"
+                android:paddingEnd="12dp"
+                android:text="Usınistı jollaw"
+                android:visibility="gone"
+                app:cornerRadius="10dp" />
         </FrameLayout>
 
     </LinearLayout>

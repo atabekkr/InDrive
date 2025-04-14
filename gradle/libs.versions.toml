@@ -29,6 +29,7 @@ lifecycleRuntimeAndroid = "2.8.7"
 playServicesLocation = "21.3.0"
 kotlinParcelizePlugin = "1.8.10"
 lingver = "1.3.0"
+appUpdate = "2.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -63,6 +64,7 @@ chucker-no-op = { group = "com.github.chuckerteam.chucker", name = "library-no-o
 androidx-lifecycle-runtime-android = { group = "androidx.lifecycle", name = "lifecycle-runtime-android", version.ref = "lifecycleRuntimeAndroid" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 lingver = { group = "com.github.YarikSOffice", name = "lingver", version.ref = "lingver" }
+check-app-update = { group = "com.google.android.play", name = "app-update", version.ref = "appUpdate" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

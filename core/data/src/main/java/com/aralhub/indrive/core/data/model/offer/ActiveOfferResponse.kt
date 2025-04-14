@@ -20,7 +20,9 @@ data class ActiveOfferResponse(
     val paymentType: Int,
     val pickUpAddress: String?,
     val destinationAddress: String? = null,
-    val locations: List<ClientRideLocationsItems>
+    val locations: List<ClientRideLocationsItems>,
+    val comment: String,
+    val hasLuggage: Boolean
 )
 
 data class ClientRideLocationsItems(
@@ -56,7 +58,9 @@ fun WebSocketServerResponse<NetworkActiveOfferResponse>.toDomain(): ActiveOfferR
                     ),
                     it.name
                 )
-            }
+            },
+            comment = data.comment,
+            hasLuggage = data.options.options.any { it.id == 1 }
         )
     }
 
@@ -82,6 +86,8 @@ fun NetworkActiveRideByDriverResponse.toActiveOfferDomain(): ActiveOfferResponse
                     ),
                     it.name
                 )
-            }
+            },
+            comment = "comment",
+            hasLuggage = true
         )
     }

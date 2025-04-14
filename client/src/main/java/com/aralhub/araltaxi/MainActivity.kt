@@ -1,6 +1,8 @@
 package com.aralhub.araltaxi
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -11,13 +13,25 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.aralhub.araltaxi.client.BuildConfig
 import com.aralhub.araltaxi.client.R
+import com.aralhub.araltaxi.client.databinding.ActivityMainBinding
 import com.aralhub.araltaxi.core.common.sharedpreference.ClientSharedPreference
 import com.aralhub.araltaxi.navigation.Navigator
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.InstallStateUpdatedListener
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
+    private val binding by lazy {
+        ActivityMainBinding.inflate(layoutInflater)
+    }
 
     @Inject
     lateinit var navigator: Navigator
@@ -25,11 +39,19 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var localStorage: ClientSharedPreference
 
+    companion object {
+        private const val MY_REQUEST_CODE = 100
+    }
+
+    private var appUpdateManager: AppUpdateManager? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(com.aralhub.ui.R.style.Theme_InDrive)
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        checkForAppUpdate()
 
         setPadding()
 
@@ -77,6 +99,75 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         navigator.bind(findNavController(R.id.main_nav_host))
+    }
+
+    private fun checkForAppUpdate() {
+        appUpdateManager = AppUpdateManagerFactory.create(this)
+
+        // Returns an intent object that you use to check for an update.
+        val appUpdateInfoTask = appUpdateManager?.appUpdateInfo
+
+        // Checks that the platform will allow the specified type of update.
+        appUpdateInfoTask?.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                // This example applies an immediate update. To apply a flexible update
+                // instead, pass in AppUpdateType.FLEXIBLE
+                && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+            ) {
+                // Request the update.
+                appUpdateManager?.startUpdateFlowForResult(
+                    // Pass the intent that is returned by 'getAppUpdateInfo()'.
+                    appUpdateInfo,
+                    // an activity result launcher registered via registerForActivityResult
+                    // Or pass 'AppUpdateType.FLEXIBLE' to newBuilder() for
+                    // flexible updates.
+                    AppUpdateType.IMMEDIATE,
+                    this,
+                    MY_REQUEST_CODE
+                )
+            }
+        }
+        // Before starting an update, register a listener for updates.
+        appUpdateManager?.registerListener(listener)
+    }
+
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == MY_REQUEST_CODE) {
+            if (resultCode != RESULT_OK) {
+                Log.w("MainActivity", "Update flow failed! Result code: $resultCode")
+            }
+        }
+    }
+
+    private val listener = InstallStateUpdatedListener { state ->
+        if (state.installStatus() == InstallStatus.DOWNLOADED) {
+            // After the update is downloaded, show a notification
+            // and request user confirmation to restart the app.
+            popupSnackbarForCompleteUpdate()
+        }
+
+    }
+
+    // Displays the snackbar notification and call to action.
+    private fun popupSnackbarForCompleteUpdate() {
+        Snackbar.make(
+            binding.root,
+            "Jańa ǵana jańalanıw júklendi.",
+            Snackbar.LENGTH_INDEFINITE
+        ).apply {
+            setAction("RESTART") { appUpdateManager?.completeUpdate() }
+            setActionTextColor(resources.getColor(com.aralhub.ui.R.color.color_interactive_control))
+            show()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // When status updates are no longer needed, unregister the listener.
+        appUpdateManager?.unregisterListener(listener)
     }
 
     override fun onPause() {

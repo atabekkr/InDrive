@@ -31,6 +31,8 @@ fun ActiveOfferResponse.asUI() = with(this) {
                     it.coordinates.latitude.toDouble()
                 ), it.name
             )
-        }
+        },
+        comment = comment,
+        hasLuggage = hasLuggage
     )
 }

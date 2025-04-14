@@ -20,7 +20,7 @@ data class NetworkActiveOfferResponse(
     @SerializedName("pick_up_address")
     val clientPickUpAddress: String,
     val locations: Locations,
-    val comment: String?,
+    val comment: String,
     @SerializedName("payment_method")
     val paymentMethod: ClientRideResponsePaymentMethod,
     val options: ClientRideResponseOptions,

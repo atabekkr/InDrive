@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Aydawshıǵa kommentariy"
-            android:textColor="@color/color_interactive_control"
+            android:textColor="@color/color_text_primary"
             android:gravity="top"
             android:minLines="4"/>
     </LinearLayout>

@@ -65,7 +65,7 @@ class OfferItemAdapter :
         val currentTime = Instant.now()
 
         // Add 30 seconds
-        val time30SecondsAhead = currentTime.plus(30, ChronoUnit.SECONDS)
+        val time30SecondsAhead = currentTime.plus(10, ChronoUnit.SECONDS)
 
         // Format with explicit +00:00 timezone
         val formatter = DateTimeFormatter

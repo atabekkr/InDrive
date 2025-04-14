@@ -116,25 +116,25 @@
                             android:layout_height="wrap_content"
                             android:ellipsize="end"
                             android:gravity="center"
-                            tools:text="5000"
                             android:maxEms="5"
                             android:maxLength="9"
                             android:maxLines="1"
                             android:textAppearance="@style/TextAppearance.InDrive.BodyLarge.Dark"
                             android:textColorHint="@color/color_gray_3"
-                            android:textSize="26sp" />
+                            android:textSize="26sp"
+                            tools:text="5000" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:gravity="bottom"
                             android:layout_marginBottom="4dp"
+                            android:gravity="bottom"
                             android:maxLines="1"
-                            android:textSize="16sp"
                             android:paddingHorizontal="@dimen/padding_small"
                             android:text="som"
                             android:textAppearance="@style/TextAppearance.InDrive.BodyLarge"
-                            android:textColor="@color/color_content_tertiary" />
+                            android:textColor="@color/color_content_tertiary"
+                            android:textSize="16sp" />
 
                     </LinearLayout>
 

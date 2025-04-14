@@ -7,16 +7,19 @@ import android.text.Editable
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.araltaxi.core.common.utils.rejectOfferState
 import com.aralhub.araltaxi.driver.orders.R
 import com.aralhub.araltaxi.driver.orders.databinding.ModalBottomSheetOrderBinding
 import com.aralhub.araltaxi.driver.orders.orders.CreateOfferUiState
 import com.aralhub.araltaxi.driver.orders.orders.OfferViewModel
+import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.ui.dialog.ErrorMessageDialog
 import com.aralhub.ui.dialog.LoadingDialog
 import com.aralhub.ui.model.OrderItem
 import com.aralhub.ui.utils.MoneyFormatter
+import com.aralhub.ui.utils.ViewEx.show
+import com.aralhub.ui.utils.setOnSafeClickListener
+import com.aralhub.ui.utils.showSnackBar
 import com.aralhub.ui.utils.viewBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -39,6 +42,7 @@ class OrderModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_sh
 
     private val orderLoadingModalBottomSheet = OrderLoadingModalBottomSheet()
     private val orderRejectedByClientModalBottomSheet = OrderRejectedByClientModalBottomSheet()
+    private val commentModalBottomSheet = CommentModalBottomSheet()
 
     private val offerViewModel by activityViewModels<OfferViewModel>()
 
@@ -93,25 +97,33 @@ class OrderModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_sh
         } else {
             arguments?.getParcelable("OrderDetail")
         }
-        tvPrice.text = getString(com.aralhub.ui.R.string.standard_uzs_price, order?.roadPrice)
-        etPrice.setText(getString(com.aralhub.ui.R.string.standard_uzs_price, order?.roadPrice))
-        tvClientName.text = order?.name
-        tvRecommendPrice.text = getString(
-            R.string.recommend_price,
-            getString(com.aralhub.ui.R.string.standard_uzs_price, order?.recommendedPrice)
-        )
-        tvDistance.text = order?.roadDistance
-        tvDistanceToClient.text = order?.pickUpDistance
-        tvFromLocation.text = order?.pickUpAddress
-        tvToLocation.text = order?.destinationAddress
-        baseAmount = order?.roadPrice?.toInt() ?: 0
-        order?.paymentType?.resId?.let { ivPaymentMethod.setImageResource(it) }
-        Glide.with(binding.ivAvatar.context)
-            .load(order?.avatar)
-            .centerCrop()
-            .placeholder(com.aralhub.ui.R.drawable.ic_user)
-            .apply(RequestOptions.circleCropTransform())
-            .into(binding.ivAvatar)
+        order?.let { order ->
+            tvPrice.text = getString(com.aralhub.ui.R.string.standard_uzs_price, order?.roadPrice)
+            etPrice.setText(getString(com.aralhub.ui.R.string.standard_uzs_price, order?.roadPrice))
+            tvClientName.text = order?.name
+            tvRecommendPrice.text = getString(
+                R.string.recommend_price,
+                getString(com.aralhub.ui.R.string.standard_uzs_price, order?.recommendedPrice)
+            )
+            tvDistance.text = order?.roadDistance
+            tvDistanceToClient.text = order?.pickUpDistance
+            tvFromLocation.text = order?.pickUpAddress
+            tvToLocation.text = order?.destinationAddress
+            baseAmount = order?.roadPrice?.toInt() ?: 0
+            order?.paymentType?.resId?.let { ivPaymentMethod.setImageResource(it) }
+
+            if (order.comment.isNotEmpty()) binding.layoutComment.show()
+            if (order.hasLuggage) layoutLuggage.show()
+
+            Glide.with(binding.ivAvatar.context)
+                .load(order?.avatar)
+                .centerCrop()
+                .placeholder(com.aralhub.ui.R.drawable.ic_user)
+                .apply(RequestOptions.circleCropTransform())
+                .into(binding.ivAvatar)
+        } ?: run {
+            showSnackBar("Error occurred")
+        }
     }
 
     private fun setupListeners() {
@@ -145,6 +157,16 @@ class OrderModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_sh
         }
         binding.llPickUpAddress.setOnClickListener { onAddressClick(order) }
         binding.llDestinationAddress.setOnClickListener { onAddressClick(order) }
+
+        binding.layoutComment.setOnSafeClickListener {
+            val bundle = Bundle()
+            bundle.putString("Comment", order?.comment)
+            commentModalBottomSheet.arguments = bundle
+            commentModalBottomSheet.show(
+                childFragmentManager,
+                commentModalBottomSheet.tag
+            )
+        }
     }
 
     private fun sendOffer() {

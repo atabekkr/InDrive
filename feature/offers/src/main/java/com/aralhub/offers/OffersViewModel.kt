@@ -71,7 +71,7 @@ class OffersViewModel @Inject constructor(
     private fun startExpirationChecker() = viewModelScope.launch {
         while (true) {
             delay(1000L) // Check every second, adjust as needed
-            val currentTime = System.currentTimeMillis()
+            val currentTime = System.currentTimeMillis() + 9 * 60 * 1000 + 40 * 1000
             val hasExpiredOffers = offers.removeIf { offer ->
                 val expiresAtMillis = convertIsoToMillis(offer.expiresAt)
                 expiresAtMillis <= currentTime

@@ -19,6 +19,8 @@ data class OrderItem(
     val destinationAddress: String? = null,
     val locations: List<ClientRideLocationsUI>,
     val isPriceIncreased: Boolean = false,
+    val comment: String,
+    val hasLuggage: Boolean
 ) : Parcelable
 
 @Parcelize
