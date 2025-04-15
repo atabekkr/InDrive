@@ -146,7 +146,7 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
     private fun moveCamera(point: Point) {
         map?.move(
             CameraPosition(point, 17.0f, 0f, 0f),
-            Animation(Animation.Type.SMOOTH, 1f),
+            Animation(Animation.Type.SMOOTH, 0.5f),
             null
         )
     }

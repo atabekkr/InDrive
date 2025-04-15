@@ -9,14 +9,14 @@ import javax.inject.Inject
 class DriverOfferRepositoryImpl @Inject constructor(
     private val driverNetworkDataSource: DriverNetworkDataSource
 ) : DriverOfferRepository {
-    override suspend fun createRide(rideUUID: String, amount: Int): Result<String?> {
+    override suspend fun createRide(rideUUID: String, amount: Int): Result<String> {
         driverNetworkDataSource.createOffer(rideUUID, amount).let {
             return when (it) {
                 is NetworkResult.Error -> {
                     Result.Error(it.message)
                 }
                 is NetworkResult.Success -> {
-                    Result.Success(it.data?.rideUUID)
+                    Result.Success(it.data.expiresAt)
                 }
             }
         }

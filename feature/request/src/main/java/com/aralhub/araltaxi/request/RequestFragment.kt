@@ -37,6 +37,8 @@ import com.aralhub.ui.sheets.LoadingModalBottomSheet
 import com.aralhub.ui.sheets.LogoutModalBottomSheet
 import com.aralhub.ui.utils.GlideEx.displayAvatar
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
+import com.aralhub.ui.utils.ViewEx.hide
+import com.aralhub.ui.utils.ViewEx.show
 import com.aralhub.ui.utils.hideKeyboard
 import com.aralhub.ui.utils.showKeyboardAndFocus
 import com.aralhub.ui.utils.viewBinding
@@ -109,7 +111,12 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
 
     @Inject
     lateinit var errorHandler: ErrorHandler
+
     private val adapter = LocationItemAdapter()
+    private val savedPlacesAdapter = LocationItemAdapter()
+
+    private var savedPlaceClickOwner = LocationItemClickOwner.FROM
+
     private val viewModel by viewModels<RequestViewModel>()
     private val requestViewModel2 by viewModels<RequestViewModel2>()
     private val savedPlacesViewModel by viewModels<SavedAddressesViewModel>()
@@ -236,6 +243,7 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
                 is SuggestionsUiState.Error -> errorHandler.showToast(suggestionsUiState.message)
                 SuggestionsUiState.Loading -> {}
                 is SuggestionsUiState.Success -> {
+                    binding.bottomSheetSearchAddress.recyclerSavedAddresses.hide()
                     adapter.submitList(suggestionsUiState.suggestions)
                 }
             }
@@ -269,14 +277,15 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
                 is LogOutUiState.Error -> errorHandler.showToast(logOutUiState.message)
                 LogOutUiState.Loading -> {}
                 LogOutUiState.Success -> navigation.goToLogoFromRequestFragment()
-            }
+             }
         }
         observeState(savedPlacesViewModel.savedPlacesUiState) {
             when (it) {
                 is SavedPlacesUiState.Error -> errorHandler.showToast(it.message)
                 SavedPlacesUiState.Loading -> {}
                 is SavedPlacesUiState.Success -> {
-                    adapter.submitList(it.addresses)
+                    binding.bottomSheetSearchAddress.recyclerSavedAddresses.show()
+                    savedPlacesAdapter.submitList(it.addresses)
                 }
             }
         }
@@ -305,6 +314,7 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
     @SuppressLint("SetTextI18n")
     private fun initViews() {
         binding.bottomSheetSearchAddress.recyclerViewAddress.adapter = adapter
+        binding.bottomSheetSearchAddress.recyclerSavedAddresses.adapter = savedPlacesAdapter
         setUpBottomSheet()
         searchAddressBottomSheetBehavior =
             BottomSheetBehavior.from(binding.bottomSheetSearchAddress.bottomSheetSearchAddress)
@@ -361,9 +371,11 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
         }
 
         binding.layoutFromLocation.setOnClickListener {
+            savedPlaceClickOwner = LocationItemClickOwner.FROM
             showFullScreenBottomSheet(locationItemClickOwner = LocationItemClickOwner.FROM)
         }
         binding.layoutToLocation.setOnClickListener {
+            savedPlaceClickOwner = LocationItemClickOwner.TO
             showFullScreenBottomSheet(locationItemClickOwner = LocationItemClickOwner.TO)
         }
 
@@ -504,6 +516,37 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
     private fun initAdapterListener() {
         adapter.setOnItemClickListener {
             when (it.clickOwner) {
+                LocationItemClickOwner.FROM -> {
+                    requestViewModel2.setFromLocation(
+                        SelectedLocation(
+                            name = it.title,
+                            longitude = it.longitude,
+                            latitude = it.latitude,
+                            locationType = LocationType.FROM
+                        )
+                    )
+                    adapter.submitList(null)
+                }
+
+                LocationItemClickOwner.TO -> {
+                    binding.tvEndLocation.text = it.title
+                    endLocationName = it.title
+                    requestViewModel2.setToLocation(
+                        SelectedLocation(
+                            name = it.title,
+                            longitude = it.longitude,
+                            latitude = it.latitude,
+                            locationType = LocationType.TO
+                        )
+                    )
+                    adapter.submitList(null)
+                }
+            }
+            searchAddressBottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        savedPlacesAdapter.setOnItemClickListener {
+            when (savedPlaceClickOwner) {
                 LocationItemClickOwner.FROM -> {
                     requestViewModel2.setFromLocation(
                         SelectedLocation(

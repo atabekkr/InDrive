@@ -74,7 +74,7 @@ interface DriverNetworkApi {
     suspend fun createOffer(
         @Path("ride_uuid") rideUUID: String,
         @Query("amount") amount: Int
-    ): Response<ServerResponse<CreateOfferByDriverResponse?>>
+    ): Response<ServerResponse<CreateOfferByDriverResponse>>
 
     @GET("/websocket/get_active_ride_by_driver")
     suspend fun getActiveRideByDriver(): Response<ServerResponse<NetworkActiveRideByDriverResponse?>>

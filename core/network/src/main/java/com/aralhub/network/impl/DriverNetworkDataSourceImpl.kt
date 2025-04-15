@@ -85,7 +85,7 @@ class DriverNetworkDataSourceImpl @Inject constructor(private val api: DriverNet
     override suspend fun createOffer(
         rideUUID: String,
         amount: Int
-    ): NetworkResult<CreateOfferByDriverResponse?> {
+    ): NetworkResult<CreateOfferByDriverResponse> {
         return api.createOffer(rideUUID, amount).safeRequestServerResponseWithNullData()
     }
 

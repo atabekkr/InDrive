@@ -3,6 +3,7 @@ package com.aralhub.offers
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aralhub.araltaxi.core.common.utils.convertIsoToMillis
 import com.aralhub.araltaxi.core.domain.client.ClientAcceptOfferUseCase
 import com.aralhub.araltaxi.core.domain.client.ClientDeclineOfferUseCase
 import com.aralhub.araltaxi.core.domain.client.ClientGetOffersUseCase
@@ -79,16 +80,6 @@ class OffersViewModel @Inject constructor(
             if (hasExpiredOffers) {
                 _offersUiState.emit(OffersUiState.Success(offers.map { offer -> offer.asOfferItem() }))
             }
-        }
-    }
-
-    private fun convertIsoToMillis(isoTime: String): Long {
-        return try {
-            val formatter = java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
-            val instant = java.time.Instant.from(formatter.parse(isoTime))
-            instant.toEpochMilli()
-        } catch (e: Exception) {
-            System.currentTimeMillis() // Return current time if parsing fails
         }
     }
 

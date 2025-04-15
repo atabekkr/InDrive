@@ -10,6 +10,7 @@ import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.araltaxi.ride.ActiveRideUiState
 import com.aralhub.araltaxi.ride.CancelRideUiState
 import com.aralhub.araltaxi.ride.RideViewModel
+import com.aralhub.araltaxi.ride.navigation.sheet.FeatureRideNavigation
 import com.aralhub.ui.adapter.CancelItemAdapter
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.viewBinding
@@ -25,6 +26,9 @@ class ReasonCancelFragment: BottomSheetDialogFragment(R.layout.fragment_reason_c
     private val rideViewModel by activityViewModels<RideViewModel>()
     @Inject lateinit var errorHandler: ErrorHandler
     private var rideId = -1
+
+    @Inject
+    lateinit var navigation: FeatureRideNavigation
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -57,6 +61,7 @@ class ReasonCancelFragment: BottomSheetDialogFragment(R.layout.fragment_reason_c
                         reasonId?.let { id ->
                             rideViewModel.cancelRideWithReason(rideId, id)
                         } ?: run {
+                            navigation.goBackToCreateOfferFromRide()
                             dismissAllowingStateLoss()
                         }
                     } else {
@@ -72,6 +77,7 @@ class ReasonCancelFragment: BottomSheetDialogFragment(R.layout.fragment_reason_c
                 CancelRideUiState.Loading -> {}
                 CancelRideUiState.Success -> {
                     dismissAllowingStateLoss()
+                    navigation.goBackToCreateOfferFromRide()
                 }
             }
         }

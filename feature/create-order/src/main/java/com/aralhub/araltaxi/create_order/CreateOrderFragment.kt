@@ -385,18 +385,16 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
 
         binding.btnSendOffer.setOnClickListener {
 
-            val fakeRecommendedAmount = RecommendedAmount(
-                7000,
-                10000,
-                70000
-            )
-
             enabledOptionsIds.addAll(rideOptionItemAdapter.currentList.filter { it.isEnabled }
                 .map { it.id })
             viewModel.createRide(
                 baseAmount = binding.etPrice.text.toString().filter { it.isDigit() }
                     .replace(" ", "").toInt(),
-                recommendedAmount = fakeRecommendedAmount,
+                recommendedAmount = RecommendedAmount(
+                    minAmount = recommendedPrice?.minAmount ?: 0,
+                    maxAmount = recommendedPrice?.maxAmount ?: 0,
+                    recommendedAmount = recommendedPrice?.recommendedAmount ?: 0
+                ),
                 selectedLocations = selectedLocations!!,
                 comment = comment,
                 paymentId = viewModel.paymentMethod.value.id,
@@ -688,15 +686,17 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
     }
 
     private fun drawDrivingRoutes(drivingRoutes: MutableList<DrivingRoute>) {
-        val route = drivingRoutes[0]
+        val route = drivingRoutes.getOrNull(0)
         mapObjects?.clear()
-        mapObjects?.addPolyline(route.geometry)
-        val firstPoint = route.geometry.points.first()
-        val lastPoint = route.geometry.points.last()
-        addRouteFromPointMarker(firstPoint)
-        addRouteToPointMarker(lastPoint)
-        showFullRoute(route)
-        drivingSession.cancel()
+        route?.let {
+            mapObjects?.addPolyline(route.geometry)
+            val firstPoint = route.geometry.points.first()
+            val lastPoint = route.geometry.points.last()
+            addRouteFromPointMarker(firstPoint)
+            addRouteToPointMarker(lastPoint)
+            showFullRoute(route)
+            drivingSession.cancel()
+        }
     }
 
     private fun addRouteFromPointMarker(point: Point) {

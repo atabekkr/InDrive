@@ -11,3 +11,13 @@ fun isGPSEnabled(mContext: Context): Boolean {
     val locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 }
+
+fun convertIsoToMillis(isoTime: String): Long {
+    return try {
+        val formatter = java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        val instant = java.time.Instant.from(formatter.parse(isoTime))
+        instant.toEpochMilli()
+    } catch (e: Exception) {
+        System.currentTimeMillis() // Return current time if parsing fails
+    }
+}

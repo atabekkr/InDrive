@@ -2,9 +2,12 @@ package com.aralhub.araltaxi.driver.orders.orders
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aralhub.araltaxi.core.common.utils.convertIsoToMillis
 import com.aralhub.araltaxi.core.domain.driver.offer.CreateOfferUseCase
 import com.aralhub.indrive.core.data.result.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -25,9 +28,26 @@ class OfferViewModel @Inject constructor(
                     is Result.Error -> _createOfferUiState.value =
                         (CreateOfferUiState.Error(result.message))
 
-                    is Result.Success -> _createOfferUiState.value =
-                        (CreateOfferUiState.Success(result.data))
+                    is Result.Success -> {
+                        startExpirationChecker(result.data)
+                        _createOfferUiState.value =
+                            (CreateOfferUiState.Success(result.data))
+                    }
                 }
+            }
+        }
+    }
+
+    var dismissOfferWaitingTimeBottomSheet = MutableSharedFlow<Unit>()
+    private fun startExpirationChecker(expiresAt: String) = viewModelScope.launch {
+        while (true) {
+            delay(1000L) // Check every second, adjust as needed
+            val currentTime = System.currentTimeMillis()
+            val expiresAtMillis = convertIsoToMillis(expiresAt)
+            val dismissOrderLoadingDialog = expiresAtMillis <= currentTime
+            if (dismissOrderLoadingDialog) {
+                dismissOfferWaitingTimeBottomSheet.emit(Unit)
+                return@launch
             }
         }
     }
@@ -35,6 +55,6 @@ class OfferViewModel @Inject constructor(
 
 sealed interface CreateOfferUiState {
     data object Loading : CreateOfferUiState
-    data class Success(val rideId: String?) : CreateOfferUiState
+    data class Success(val expiresAt: String?) : CreateOfferUiState
     data class Error(val message: String) : CreateOfferUiState
 }

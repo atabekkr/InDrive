@@ -1,6 +1,5 @@
 package com.aralhub.araltaxi.request
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aralhub.araltaxi.core.domain.address.GetAllSavedAddressesUseCase
@@ -24,7 +23,6 @@ class SavedAddressesViewModel @Inject constructor(
     val savedPlacesUiState = _savedPlacesUiState.asStateFlow()
 
     fun getAllSavedAddresses() {
-        Log.i("SavedPlacesViewModel", "getAllSavedAddresses")
         viewModelScope.launch {
             _savedPlacesUiState.value = getAllSavedAddressesUseCase().fold(
                 onSuccess = {
