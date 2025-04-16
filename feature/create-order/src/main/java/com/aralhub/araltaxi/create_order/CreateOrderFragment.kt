@@ -566,7 +566,8 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
         }
 
         binding.tvDecrease500.setOnClickListener {
-            val price = Integer.parseInt(binding.etPrice.text.toString().replace(" ", ""))
+            var price = binding.etPrice.text.toString().filter { it.isDigit() }.toIntOrNull()
+            if (price == null) price = 0
             if (price - 500 >= minimumPrice) {
                 val editable = Editable.Factory.getInstance().newEditable("${price - 500}")
                 binding.etPrice.text = editable
@@ -575,9 +576,10 @@ class CreateOrderFragment : Fragment(R.layout.fragment_create_order) {
             }
         }
         binding.tvIncrease500.setOnClickListener {
-            val price = Integer.parseInt(binding.etPrice.text.toString().replace(" ", ""))
-            if (price + 500 <= maximumPrice) {
-                val editable = Editable.Factory.getInstance().newEditable("${price + 500}")
+            var price = binding.etPrice.text.toString().filter { it.isDigit() }.toIntOrNull()
+            if (price == null) price = 0
+            if (price!! + 500 <= maximumPrice) {
+                val editable = Editable.Factory.getInstance().newEditable("${price!! + 500}")
                 binding.etPrice.text = editable
             } else {
                 errorHandler.showToast("Maximum price: $maximumPrice")

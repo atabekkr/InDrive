@@ -11,12 +11,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.araltaxi.core.common.permission.PermissionHelper
 import com.aralhub.araltaxi.core.common.utils.MapStyles
 import com.aralhub.araltaxi.core.common.utils.loadJsonFromAssets
 import com.aralhub.araltaxi.select_location.databinding.FragmentSelectLocationBinding
 import com.aralhub.offers.utils.updateMapStyle
+import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.ui.utils.FloatLandAnimation
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.ViewEx.disable
@@ -130,10 +130,11 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
             mapWindow?.addSizeChangedListener(sizeChangedListener)
             map?.addCameraListener(cameraListener)
             updateFocusInfo()
+
+            map?.isRotateGesturesEnabled = false
         }
 
         val mapkit = MapKitFactory.getInstance()
-        MapKitFactory.setLocale("ru")
         userLocationLayer = mapkit.createUserLocationLayer(binding.mapView.mapWindow)
 
         userLocationLayer?.isVisible = true

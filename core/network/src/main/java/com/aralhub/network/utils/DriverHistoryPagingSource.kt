@@ -26,7 +26,7 @@ class DriverHistoryPagingSource(private val api: DriverNetworkApi) :
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, RideHistoryNetwork> {
         val position = params.key ?: STARTING_PAGE_INDEX
-        return when (val result = api.getRideHistory(position, params.loadSize).safeRequestServerResponse()) {
+        return when (val result = api.getDriverRideHistory(position, params.loadSize).safeRequestServerResponse()) {
             is NetworkResult.Error -> LoadResult.Error(Exception(result.toString()))
             is NetworkResult.Success -> {
                 LoadResult.Page(

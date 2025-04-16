@@ -21,6 +21,7 @@ import com.aralhub.network.models.location.NetworkSendLocationRequestWithoutType
 import com.aralhub.network.models.offer.CreateOfferByDriverResponse
 import com.aralhub.network.models.offer.NetworkActiveOfferResponse
 import com.aralhub.network.models.ride.NetworkWaitAmount
+import com.aralhub.network.models.ride.RideHistoryDetailsNetwork
 import com.aralhub.network.models.ride.RideHistoryNetwork
 import com.aralhub.network.requests.auth.NetworkDriverAuthRequest
 import com.aralhub.network.requests.logout.NetworkLogoutRequest
@@ -123,5 +124,9 @@ class DriverNetworkDataSourceImpl @Inject constructor(private val api: DriverNet
             enablePlaceholders = false
         ),
             pagingSourceFactory = { DriverHistoryPagingSource(api) }).flow
+    }
+
+    override suspend fun getHistoryRideDetails(rideId: Int): NetworkResult<RideHistoryDetailsNetwork> {
+        return api.getHistoryRideDetails(rideId).safeRequestServerResponse()
     }
 }

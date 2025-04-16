@@ -96,4 +96,14 @@ class DriverRepositoryImpl @Inject constructor(
                 pagingData.map { it.toDomain() }
             }
     }
+
+
+    override suspend fun getHistoryRideDetails(rideId: Int): Result<RideHistory> {
+        return driverNetworkDataSource.getHistoryRideDetails(rideId).let {
+            when (it) {
+                is NetworkResult.Error -> Result.Error(it.message)
+                is NetworkResult.Success -> Result.Success(it.data.toDomain())
+            }
+        }
+    }
 }

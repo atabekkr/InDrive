@@ -84,7 +84,7 @@ class ClientNetworkDataSourceImpl @Inject constructor(private val api: ClientNet
         return api.getCardInfo(driverId).safeRequestServerResponse()
     }
 
-    val NETWORK_PAGE_SIZE = 10
+    val NETWORK_PAGE_SIZE = 5
     override suspend fun getRideHistory(): Flow<PagingData<RideHistoryNetwork>> {
         return Pager(config = PagingConfig(
             pageSize = NETWORK_PAGE_SIZE,

@@ -6,21 +6,20 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class RideHistoryUI(
-    val amount: Int,
-    val waitAmount: Int,
+    val rideId: Int,
+    val ridePrice: Int,
     val locations: List<ClientRideLocationsUI>,
     val paymentType: PaymentType,
-    val distance: Double,
     val status: String,
+    val userName: String,
     val createdAt: String
 ) : Parcelable
-
 
 fun RideHistory.asUI(): RideHistoryUI =
     with(this) {
         RideHistoryUI(
-            amount = amount,
-            waitAmount = waitAmount,
+            rideId = rideId,
+            ridePrice = ridePrice,
             locations = locations.map {
                 ClientRideLocationsUI(
                     name = it.name,
@@ -30,9 +29,9 @@ fun RideHistory.asUI(): RideHistoryUI =
                     )
                 )
             },
-            distance = distance,
-            paymentType = PaymentType.CARD,
+            paymentType = if (paymentMethodId == 1) PaymentType.CASH else PaymentType.CARD,
             status = status,
+            userName = userName,
             createdAt = createdAt
         )
 

@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
+import com.aralhub.araltaxi.core.domain.driver.GetRideHistoryDetailsUseCase
 import com.aralhub.araltaxi.core.domain.ridehistory.GetRideHistoryUseCase
+import com.aralhub.indrive.core.data.result.Result
 import com.aralhub.ui.model.RideHistoryUI
 import com.aralhub.ui.model.asUI
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RideHistoryViewModel @Inject constructor(
-    private val useCase: GetRideHistoryUseCase
+    private val useCase: GetRideHistoryUseCase,
+    private val rideHistoryDetailsUseCase: GetRideHistoryDetailsUseCase
 ) : ViewModel() {
 
     private val _rideHistoryFlow = MutableStateFlow<PagingData<RideHistoryUI>>(PagingData.empty())
@@ -38,4 +41,29 @@ class RideHistoryViewModel @Inject constructor(
                 }
         }
     }
+
+    private val _rideHistoryDetailsResult = MutableStateFlow<RideDetailsUiState>(RideDetailsUiState.Idle)
+    val rideHistoryDetailsResult: StateFlow<RideDetailsUiState> = _rideHistoryDetailsResult
+    fun getRideHistoryDetails(rideId: Int) {
+        viewModelScope.launch {
+            _rideHistoryDetailsResult.value = RideDetailsUiState.Loading
+            rideHistoryDetailsUseCase(rideId).let { result ->
+                when (result) {
+                    is Result.Error -> {
+                        _rideHistoryDetailsResult.value = RideDetailsUiState.Error(result.message)
+                    }
+                    is Result.Success -> {
+                        _rideHistoryDetailsResult.value = RideDetailsUiState.Success(result.data.asUI())
+                    }
+                }
+            }
+        }
+    }
+}
+
+sealed interface RideDetailsUiState {
+    data object Idle : RideDetailsUiState
+    data object Loading : RideDetailsUiState
+    data class Success(val data: RideHistoryUI) : RideDetailsUiState
+    data class Error(val message: String) : RideDetailsUiState
 }

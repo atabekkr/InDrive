@@ -15,7 +15,9 @@ import com.aralhub.araltaxi.history.driver.databinding.FragmentHistoryBinding
 import com.aralhub.ui.adapter.HistoryAdapter
 import com.aralhub.ui.dialog.ErrorMessageDialog
 import com.aralhub.ui.dialog.LoadingDialog
+import com.aralhub.ui.model.RideHistoryUI
 import com.aralhub.ui.sheets.RideHistoryDetailsBottomSheet
+import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.ViewEx.hide
 import com.aralhub.ui.utils.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,12 +68,8 @@ class HistoryFragment : Fragment(R.layout.fragment_history) {
             findNavController().navigateUp()
         }
         adapter.setOnItemClickListener {
-            rideHistoryDetailsBottomSheet.arguments = Bundle().apply {
-                putParcelable("RideHistoryDetails", it)
-            }
-            rideHistoryDetailsBottomSheet.show(
-                childFragmentManager,
-                rideHistoryDetailsBottomSheet.tag
+            viewModel.getRideHistoryDetails(
+                it.rideId
             )
         }
     }
@@ -80,8 +78,8 @@ class HistoryFragment : Fragment(R.layout.fragment_history) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.rideHistoryFlow.collectLatest {
-                    adapter.submitData(it)
                     binding.tvNotFound.hide()
+                    adapter.submitData(it)
                     dismissLoading()
                 }
             }
@@ -101,8 +99,8 @@ class HistoryFragment : Fragment(R.layout.fragment_history) {
                     }
 
                     if (refreshState is LoadState.Loading) {
-                         showLoading()
-                     }
+                        showLoading()
+                    }
                     if (refreshState is LoadState.NotLoading) {
                         dismissLoading()
                     }
@@ -110,6 +108,28 @@ class HistoryFragment : Fragment(R.layout.fragment_history) {
             }
         }
 
+        observeState(viewModel.rideHistoryDetailsResult) { result ->
+            when (result) {
+                is RideDetailsUiState.Error -> showErrorDialog(result.message)
+                RideDetailsUiState.Idle -> {}
+                RideDetailsUiState.Loading -> showLoading()
+                is RideDetailsUiState.Success -> {
+                    dismissLoading()
+                    showOrderDetails(result.data)
+                }
+            }
+        }
+
+    }
+
+    private fun showOrderDetails(rideHistoryUI: RideHistoryUI) {
+        rideHistoryDetailsBottomSheet.arguments = Bundle().apply {
+            putParcelable("RideHistoryDetails", rideHistoryUI)
+        }
+        rideHistoryDetailsBottomSheet.show(
+            childFragmentManager,
+            rideHistoryDetailsBottomSheet.tag
+        )
     }
 
     private fun showErrorDialog(errorMessage: String?) {

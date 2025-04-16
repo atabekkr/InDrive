@@ -26,7 +26,7 @@ class HistoryAdapter : PagingDataAdapter<RideHistoryUI, HistoryAdapter.HistoryIt
 
             binding.tvPrice.text = binding.root.context.getString(
                 com.aralhub.ui.R.string.standard_uzs_price,
-                (item.amount + item.waitAmount).toString()
+                item.ridePrice.toString()
             )
 
             val rideInfo = StringBuilder()

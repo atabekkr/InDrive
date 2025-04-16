@@ -16,6 +16,7 @@ import com.aralhub.network.models.location.NetworkSendLocationRequestWithoutType
 import com.aralhub.network.models.offer.CreateOfferByDriverResponse
 import com.aralhub.network.models.offer.NetworkActiveOfferResponse
 import com.aralhub.network.models.ride.NetworkWaitAmount
+import com.aralhub.network.models.ride.RideHistoryDetailsNetwork
 import com.aralhub.network.models.ride.RideHistoryNetwork
 import com.aralhub.network.requests.auth.NetworkDriverAuthRequest
 import com.aralhub.network.requests.logout.NetworkLogoutRequest
@@ -97,7 +98,15 @@ interface DriverNetworkApi {
     @GET("/ride/{ride_id}/get_wait_amount")
     suspend fun getWaitAmount(@Path("ride_id") rideId: Int): Response<ServerResponse<NetworkWaitAmount>>
 
-    @GET("/ride/get_rides_history/")
-    suspend fun getRideHistory(@Query("page") page: Int, @Query("page_size")pageSize: Int): Response<ServerResponse<List<RideHistoryNetwork>>>
+    @GET("/ride/get_rides_history")
+    suspend fun getDriverRideHistory(
+        @Query("page") page: Int,
+        @Query("page_size") pageSize: Int
+    ): Response<ServerResponse<List<RideHistoryNetwork>>>
+
+    @GET("/ride/get_ride_info/{ride_id}")
+    suspend fun getHistoryRideDetails(
+        @Path("ride_id") rideId: Int
+    ): Response<ServerResponse<RideHistoryDetailsNetwork>>
 
 }

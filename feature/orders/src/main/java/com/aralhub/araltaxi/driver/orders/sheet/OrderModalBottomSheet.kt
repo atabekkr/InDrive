@@ -131,8 +131,8 @@ class OrderModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_sh
         }
         binding.tvDecrease500.setOnClickListener {
             updateUI()
-            val price = Integer.parseInt(binding.etPrice.text.toString().filter { it.isDigit() }
-                .replace(" ", ""))
+            var price = binding.etPrice.text.toString().filter { it.isDigit() }.toIntOrNull()
+            if (price == null) price = 0
             if (price - 500 >= minimumPrice) {
                 val editable = Editable.Factory.getInstance().newEditable("${price - 500}")
                 binding.etPrice.text = editable
@@ -142,10 +142,10 @@ class OrderModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_sh
         }
         binding.tvIncrease500.setOnClickListener {
             updateUI()
-            val price = Integer.parseInt(binding.etPrice.text.toString().filter { it.isDigit() }
-                .replace(" ", ""))
-            if (price + 500 <= maximumPrice) {
-                val editable = Editable.Factory.getInstance().newEditable("${price + 500}")
+            var price = binding.etPrice.text.toString().filter { it.isDigit() }.toIntOrNull()
+            if (price == null) price = 0
+            if (price!! + 500 <= maximumPrice) {
+                val editable = Editable.Factory.getInstance().newEditable("${price!! + 500}")
                 binding.etPrice.text = editable
             } else {
                 errorHandler.showToast("Maximum price: $maximumPrice")
