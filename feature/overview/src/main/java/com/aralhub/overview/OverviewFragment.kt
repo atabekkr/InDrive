@@ -2,6 +2,7 @@ package com.aralhub.overview
 
 import android.Manifest
 import android.content.Context
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -28,6 +29,11 @@ import com.aralhub.ui.dialog.ErrorMessageDialog
 import com.aralhub.ui.dialog.LoadingDialog
 import com.aralhub.ui.utils.GlideEx
 import com.aralhub.ui.utils.viewBinding
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.Priority
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -282,4 +288,30 @@ class OverviewFragment : Fragment(R.layout.fragment_overview) {
         dismissErrorDialog()
         dismissLoading()
     }
+
+    private fun showGPSDialog() {
+        val locationRequest = LocationRequest.create().apply {
+            priority = Priority.PRIORITY_HIGH_ACCURACY
+        }
+
+        val builder = LocationSettingsRequest.Builder()
+            .addLocationRequest(locationRequest)
+            .setAlwaysShow(true) // 👈 this ensures the dialog appears
+
+        val settingsClient = LocationServices.getSettingsClient(requireActivity())
+        val task = settingsClient.checkLocationSettings(builder.build())
+
+        task.addOnFailureListener { exception ->
+            if (exception is ResolvableApiException) {
+                try {
+                    // Show system dialog
+                    exception.startResolutionForResult(requireActivity(), REQUEST_GPS_CODE)
+                } catch (sendEx: IntentSender.SendIntentException) {
+                    sendEx.printStackTrace()
+                }
+            }
+        }
+    }
+
+    private val REQUEST_GPS_CODE = 1001
 }

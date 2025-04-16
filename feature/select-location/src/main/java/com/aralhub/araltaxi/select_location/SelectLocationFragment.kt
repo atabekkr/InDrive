@@ -133,6 +133,7 @@ class SelectLocationFragment : Fragment(R.layout.fragment_select_location) {
         }
 
         val mapkit = MapKitFactory.getInstance()
+        MapKitFactory.setLocale("ru")
         userLocationLayer = mapkit.createUserLocationLayer(binding.mapView.mapWindow)
 
         userLocationLayer?.isVisible = true
