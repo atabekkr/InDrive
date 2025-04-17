@@ -34,7 +34,7 @@ class ClientRideNetworkDataSourceImpl(
 ) : ClientRideNetworkDataSource {
 
     private var session: WebSocketSession? = null
-    private val _rideStatusFlow = MutableSharedFlow<ClientWebSocketEventRideMessage>(replay = 1)
+    private val _rideStatusFlow = MutableSharedFlow<ClientWebSocketEventRideMessage>()
     private val rideStatusFlow = _rideStatusFlow.asSharedFlow()
 
     // Coroutine scope for the collection
@@ -46,6 +46,7 @@ class ClientRideNetworkDataSourceImpl(
         if (!isInitialized) {
             networkScope.launch {
                 try {
+                    Log.i("WebSocketLogClient", "Received text: Salem berdik")
                     session = client.webSocketSession { url(RIDE_SOCKET_URL) }
                     isInitialized = true
 

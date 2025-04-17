@@ -10,15 +10,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ClientRideRepositoryImpl @Inject constructor(private val clientRideNetworkDataSource: ClientRideNetworkDataSource): ClientRideRepository {
-    private val _rideStatusFlow = MutableSharedFlow<RideStatus>(replay = 1)
-    private val rideStatusFlow = _rideStatusFlow.asSharedFlow()
 
     // Coroutine scope for the collection
     private val repositoryScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -26,6 +22,7 @@ class ClientRideRepositoryImpl @Inject constructor(private val clientRideNetwork
     override suspend fun getRideStatus(): Flow<RideStatus> = callbackFlow {
         val job = repositoryScope.launch {
             clientRideNetworkDataSource.getRide().collect { event ->
+                Log.i("ClientRideRepository", "Event: $event")
                 val status = when(event) {
                     is ClientWebSocketEventRideMessage.DriverOnTheWay -> RideStatus.DriverOnTheWay(event.message)
                     is ClientWebSocketEventRideMessage.DriverWaitingClientMessage -> RideStatus.DriverWaitingClient(

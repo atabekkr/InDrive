@@ -24,6 +24,7 @@ import com.aralhub.indrive.core.data.result.fold
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -43,8 +44,8 @@ class RideViewModel @Inject constructor(
     private val createPassengerReviewUseCase: CreatePassengerReviewUseCase
 ) : ViewModel() {
 
-    private val _rideStateUiState = MutableSharedFlow<RideStateUiState>()
-    val rideStateUiState = _rideStateUiState.asSharedFlow()
+    private val _rideStateUiState = MutableStateFlow<RideStateUiState>(RideStateUiState.Idle)
+    val rideStateUiState: StateFlow<RideStateUiState> = _rideStateUiState.asStateFlow()
 
     init {
         getClientRideState()
@@ -104,7 +105,6 @@ class RideViewModel @Inject constructor(
 
     private fun getClientRideState() = viewModelScope.launch {
         getClientRideStatusUseCase().collectLatest {
-            Log.e("RideViewModel", "getClientRideState: $it")
             _rideStateUiState.emit(RideStateUiState.Success(it))
         }
     }
@@ -171,6 +171,11 @@ class RideViewModel @Inject constructor(
             }
         )
 
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        setRideStateIdle()
     }
 
 }

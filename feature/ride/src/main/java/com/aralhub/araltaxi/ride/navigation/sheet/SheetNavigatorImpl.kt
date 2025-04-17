@@ -1,5 +1,6 @@
 package com.aralhub.araltaxi.ride.navigation.sheet
 
+import android.util.Log
 import androidx.navigation.NavController
 import com.aralhub.araltaxi.client.ride.R
 import javax.inject.Inject
@@ -23,6 +24,7 @@ internal class SheetNavigatorImpl @Inject constructor() : SheetNavigator,
     }
 
     override fun goToDriverIsWaiting() {
+        Log.i("MyFab", "goToDriverIsWaiting: $navController")
         navController?.navigate(R.id.driverIsWaitingBottomSheet)
     }
 

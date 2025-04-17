@@ -2,7 +2,6 @@ package com.aralhub.araltaxi.ride
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -121,12 +120,12 @@ internal class RideFragment : Fragment(R.layout.fragment_ride) {
                 }
             }
         }
-        observeState(rideViewModel.rideStateUiState) { rideStateUiState ->
+        observeState(rideViewModel.rideStateUiState)
+        { rideStateUiState ->
             when (rideStateUiState) {
                 is RideStateUiState.Error -> {}
                 RideStateUiState.Loading -> {}
                 is RideStateUiState.Success -> {
-                    Log.e("RideFragment", rideStateUiState.rideState.toString())
                     when (rideStateUiState.rideState) {
                         is RideStatus.DriverOnTheWay -> {
                             bottomSheetNavigation.goToWaitingForDriver()
@@ -168,7 +167,7 @@ internal class RideFragment : Fragment(R.layout.fragment_ride) {
         val navHostFragment =
             childFragmentManager.findFragmentById(R.id.ride_nav_host) as NavHostFragment
         val navController = navHostFragment.navController
-        navController.let { navigator.bind(navController) }
+        navigator.bind(navController)
     }
 
     private fun setUpMapView() {
@@ -187,13 +186,9 @@ internal class RideFragment : Fragment(R.layout.fragment_ride) {
         super.onStop()
     }
 
-    override fun onPause() {
-        navigator.unbind()
-        super.onPause()
-    }
-
     override fun onDestroyView() {
         navigator.unbind()
+        rideViewModel.setRideStateIdle()
         super.onDestroyView()
     }
 

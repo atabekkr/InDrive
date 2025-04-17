@@ -21,11 +21,12 @@ import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.StringUtils
 import com.aralhub.ui.utils.ViewEx.hide
 import com.aralhub.ui.utils.viewBinding
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class RideBottomSheet : Fragment(R.layout.bottom_sheet_ride) {
+class RideBottomSheet : BottomSheetDialogFragment(R.layout.bottom_sheet_ride) {
 
     @Inject
     lateinit var featureRideBottomSheetNavigation: FeatureRideBottomSheetNavigation

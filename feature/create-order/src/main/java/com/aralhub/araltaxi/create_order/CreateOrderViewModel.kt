@@ -46,7 +46,6 @@ class CreateOrderViewModel @Inject constructor(
     private var _recommendedPriceUiState = MutableSharedFlow<RecommendedPriceUiState>()
     val recommendedPriceUiState = _recommendedPriceUiState.asSharedFlow()
     fun getRecommendedPrice(geopoints: List<GeoPoint>) = viewModelScope.launch {
-        Log.i("CreateOrderViewModel", "getRecommendedPrice $geopoints")
         getRecommendedPriceUseCase.invoke(geopoints).let {
             _recommendedPriceUiState.emit(RecommendedPriceUiState.Loading)
             when (it) {
