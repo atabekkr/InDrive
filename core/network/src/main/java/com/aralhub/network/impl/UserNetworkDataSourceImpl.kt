@@ -13,6 +13,7 @@ import com.aralhub.network.requests.refresh.NetworkRefreshTokenRequest
 import com.aralhub.network.requests.verify.NetworkVerifyRequest
 import com.aralhub.network.utils.ex.MultipartEx
 import com.aralhub.network.utils.ex.NetworkEx.safeRequest
+import com.aralhub.network.utils.ex.NetworkEx.safeRequestEmpty
 import com.aralhub.network.utils.ex.NetworkEx.safeRequestServerResponse
 import java.io.File
 import javax.inject.Inject
@@ -46,7 +47,7 @@ class UserNetworkDataSourceImpl @Inject constructor(private val api: UserNetwork
         return api.userPhoto(MultipartEx.getMultipartFromFile(file)).safeRequest()
     }
 
-    override suspend fun deleteUserProfile(): NetworkResult<Unit> {
-        return api.deleteUserProfile().safeRequestServerResponse()
+    override suspend fun deleteUserProfile(): NetworkResult<ServerResponseEmpty> {
+        return api.deleteUserProfile().safeRequest()
     }
 }

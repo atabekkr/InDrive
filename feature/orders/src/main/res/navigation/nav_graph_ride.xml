@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_ride.xml"
+    app:startDestination="@id/goingToPickUpModalBottomSheet">
+
+    <dialog
+        android:id="@+id/goingToPickUpModalBottomSheet"
+        android:name="com.aralhub.araltaxi.driver.orders.sheet.GoingToPickUpModalBottomSheet"
+        android:label="GoingToPickUpModalBottomSheet"
+        tools:layout="@layout/modal_bottom_sheet_going_to_pick_up" />
+</navigation>

@@ -17,6 +17,6 @@ interface UserNetworkDataSource {
     suspend fun getUserMe(): NetworkResult<NetworkClient>
     suspend fun userLogout(refreshToken: String): NetworkResult<ServerResponseEmpty>
     suspend fun userPhoto(file: File): NetworkResult<ServerResponseEmpty>
-    suspend fun deleteUserProfile(): NetworkResult<Unit>
+    suspend fun deleteUserProfile(): NetworkResult<ServerResponseEmpty>
     suspend fun userRefresh(data: NetworkRefreshTokenRequest): NetworkResult<NetworkAuthToken>
 }

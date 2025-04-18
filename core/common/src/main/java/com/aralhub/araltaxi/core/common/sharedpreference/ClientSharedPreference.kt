@@ -2,7 +2,7 @@ package com.aralhub.araltaxi.core.common.sharedpreference
 
 import android.content.SharedPreferences
 
-class ClientSharedPreference(preference: SharedPreferences) {
+class ClientSharedPreference(val preference: SharedPreferences) {
 
     var userId by IntPreference(preference)
 
@@ -19,5 +19,9 @@ class ClientSharedPreference(preference: SharedPreferences) {
     var appVersion by StringPreference(preference)
 
     var languageIndex by IntPreference(preference, 0)
+
+    fun clear() {
+        preference.edit().clear().apply()
+    }
 
 }

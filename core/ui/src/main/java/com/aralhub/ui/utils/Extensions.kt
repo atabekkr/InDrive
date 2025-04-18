@@ -38,23 +38,11 @@ fun View.showKeyboardAndFocus() {
 }
 
 fun Fragment.showSnackBar(msg: String) {
-//    Snackbar.make(
-//        requireView(),
-//        msg,
-//        Snackbar.LENGTH_SHORT
-//    ).show()
-
-    val snackbar =
-        Snackbar.make(this.requireView(), "This is a top Snackbar", Snackbar.LENGTH_SHORT)
-
-    // Move Snackbar to the top
-    val snackbarView = snackbar.view
-    val params = snackbarView.layoutParams as FrameLayout.LayoutParams
-    params.gravity = Gravity.TOP
-    snackbarView.layoutParams = params
-
-    snackbar.show()
-
+    Snackbar.make(
+        requireView(),
+        msg,
+        Snackbar.LENGTH_SHORT
+    ).show()
 }
 
 fun displayTopSnackBarFeedback(view: View?, message: String?, context: Context?) {

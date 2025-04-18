@@ -2,6 +2,7 @@ package com.aralhub.araltaxi.request
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.location.Location
@@ -30,6 +31,8 @@ import com.aralhub.araltaxi.request.utils.BottomSheetBehaviorDrawerListener
 import com.aralhub.araltaxi.request.utils.updateMapStyle
 import com.aralhub.ui.adapter.location.LocationItemAdapter
 import com.aralhub.ui.components.ErrorHandler
+import com.aralhub.ui.dialog.ErrorMessageDialog
+import com.aralhub.ui.dialog.LoadingDialog
 import com.aralhub.ui.model.LocationItemClickOwner
 import com.aralhub.ui.model.args.LocationType
 import com.aralhub.ui.model.args.SelectedLocation
@@ -111,6 +114,7 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
 
     @Inject
     lateinit var errorHandler: ErrorHandler
+    private var loadingDialog: LoadingDialog? = null
 
     private val adapter = LocationItemAdapter()
     private val savedPlacesAdapter = LocationItemAdapter()
@@ -135,6 +139,11 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
 
     private val handler = Handler(Looper.getMainLooper())
     private var isUpdating = false
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        loadingDialog = LoadingDialog(context)
+    }
 
     override fun onStart() {
         super.onStart()
@@ -274,10 +283,21 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
         }
         observeState(viewModel.logOutUiState) { logOutUiState ->
             when (logOutUiState) {
-                is LogOutUiState.Error -> errorHandler.showToast(logOutUiState.message)
-                LogOutUiState.Loading -> {}
-                LogOutUiState.Success -> navigation.goToLogoFromRequestFragment()
-             }
+                is LogOutUiState.Error -> {
+                    dismissLoading()
+                    errorHandler.showToast(logOutUiState.message)
+                }
+
+                LogOutUiState.Loading -> {
+                    showLoading()
+                }
+
+                LogOutUiState.Success -> {
+                    dismissLoading()
+                    clientSharedPreference.clear()
+                    navigation.goToLogoFromRequestFragment()
+                }
+            }
         }
         observeState(savedPlacesViewModel.savedPlacesUiState) {
             when (it) {
@@ -664,7 +684,7 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
         if (searchState == null || activeState == null ||
             (searchState is SearchRideUiState.Loading || activeState is ActiveRideUiState.Loading)
         ) {
-            showLoadingDialog()
+            showLoading()
             return
         }
 
@@ -673,11 +693,11 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
         // 2. Both are Error
         when {
             searchState is SearchRideUiState.Success || activeState is ActiveRideUiState.Success -> {
-                hideLoadingDialog()
+                dismissLoading()
             }
 
             searchState is SearchRideUiState.Error && activeState is ActiveRideUiState.Error -> {
-                hideLoadingDialog()
+                dismissLoading()
             }
         }
     }
@@ -709,20 +729,6 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
         displayAvatar(clientSharedPreference.avatar, imageView)
     }
 
-    private fun showLoadingDialog() {
-        LoadingModalBottomSheet.show(childFragmentManager)
-    }
-
-    private fun hideLoadingDialog() {
-        LoadingModalBottomSheet.hide(childFragmentManager)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        LoadingModalBottomSheet.hide(childFragmentManager)
-        endLocationName = null
-    }
-
     private fun showGPSDialog() {
         val locationRequest = LocationRequest.create().apply {
             priority = Priority.PRIORITY_HIGH_ACCURACY
@@ -748,6 +754,20 @@ class RequestFragment : Fragment(R.layout.fragment_request) {
     }
 
     private val REQUEST_GPS_CODE = 1001
+
+    private fun showLoading() {
+        loadingDialog?.show()
+    }
+
+    private fun dismissLoading() {
+        loadingDialog?.dismiss()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        endLocationName = null
+        dismissLoading()
+    }
 
 
 }

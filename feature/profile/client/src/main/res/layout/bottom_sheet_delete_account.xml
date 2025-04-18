@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/padding_small"
+    android:paddingBottom="@dimen/padding_small">
+
+    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+        style="@style/Widget.InDrive.BottomSheet.DragHandle"
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:padding="0dp"
+        android:paddingBottom="0dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Akkaunttı óshiriw"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.InDrive.Text.Title"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bul ámeldi orınlaǵannan soń, onı artqa qaytarıp bolmaydı: akkaunt maǵlıwmatlarıńız benen birge saparlarıńız tariyxı da óshiriledi."
+        android:gravity="center"
+        android:layout_marginVertical="16dp"
+        android:textColor="@color/color_content_secondary"
+        android:textAppearance="@style/TextAppearance.InDrive.Text"/>
+
+    <Button
+        android:id="@+id/btn_delete"
+        style="@style/Widget.InDrive.Button.Variant"
+        android:layout_width="match_parent"
+        android:text="Sonda da, óshiriw"
+        android:backgroundTint="@color/color_status_error"
+        android:layout_marginVertical="@dimen/margin_small"
+        android:textColor="@color/white"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/btn_back"
+        style="@style/Widget.InDrive.Button.Variant"
+        android:layout_width="match_parent"
+        android:text="Artqa"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>
