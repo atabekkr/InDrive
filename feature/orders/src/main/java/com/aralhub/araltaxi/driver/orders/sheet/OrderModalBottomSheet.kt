@@ -16,6 +16,7 @@ import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.ui.dialog.ErrorMessageDialog
 import com.aralhub.ui.dialog.LoadingDialog
 import com.aralhub.ui.model.OrderItem
+import com.aralhub.ui.utils.GlideEx
 import com.aralhub.ui.utils.MoneyFormatter
 import com.aralhub.ui.utils.ViewEx.show
 import com.aralhub.ui.utils.setOnSafeClickListener
@@ -111,12 +112,10 @@ class OrderModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_sh
             if (order.comment.isNotEmpty()) binding.layoutComment.show()
             if (order.hasLuggage) layoutLuggage.show()
 
-            Glide.with(binding.ivAvatar.context)
-                .load(order?.avatar)
-                .centerCrop()
-                .placeholder(com.aralhub.ui.R.drawable.ic_user)
-                .apply(RequestOptions.circleCropTransform())
-                .into(binding.ivAvatar)
+            GlideEx.displayAvatar(
+                order.avatar,
+                binding.ivAvatar
+            )
         } ?: run {
             showSnackBar("Error occurred")
         }

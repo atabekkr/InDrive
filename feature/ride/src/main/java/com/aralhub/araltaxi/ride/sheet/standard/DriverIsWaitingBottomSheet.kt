@@ -100,7 +100,7 @@ class DriverIsWaitingBottomSheet : Fragment(R.layout.bottom_sheet_driver_is_wait
     private fun displayActiveRide(activeRide: ActiveRide) {
         binding.tvTitle.text = getString(com.aralhub.ui.R.string.label_driver_is_waiting)
         binding.tvDriverName.text = activeRide.driver.fullName
-        displayAvatar("https://araltaxi.aralhub.uz/${activeRide.driver.photoUrl}", binding.ivDriver)
+        displayAvatar("${activeRide.driver.photoUrl}", binding.ivDriver)
         Log.i("Vehicle", "${activeRide.driver.vehicleType}")
         Log.i("Vehicle", "${activeRide.driver.vehicleNumber}")
         binding.tvCarInfo.text = StringUtils.getBoldSpanString(
@@ -113,6 +113,11 @@ class DriverIsWaitingBottomSheet : Fragment(R.layout.bottom_sheet_driver_is_wait
         binding.btnCall.setOnClickListener {
             sendPhoneNumberToDial(activeRide.driver.phoneNumber)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        rideTimer?.stopTimer()
     }
 
 }

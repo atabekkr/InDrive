@@ -21,14 +21,14 @@ class AddSMSViewModel @Inject constructor(private val useCase: ClientVerifyPhone
         _addSMSUiState.emit(useCase(phone = phone, code = code).let {
             when (it) {
                 is Result.Error -> AddSMSUiState.Error(message = it.message)
-                is Result.Success -> AddSMSUiState.Success
+                is Result.Success -> AddSMSUiState.Success(isSignedUp = it.data)
             }
         })
     }
 }
 
 sealed interface AddSMSUiState {
-    data object Success : AddSMSUiState
+    data class Success(val isSignedUp: Boolean) : AddSMSUiState
     data class Error(val message: String) : AddSMSUiState
     data object Loading : AddSMSUiState
 }

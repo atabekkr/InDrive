@@ -249,7 +249,7 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
                                     result.data.id,
                                     RideStatus.DRIVER_ON_THE_WAY.status
                                 )
-                                orderModalBottomSheet.dismissAllowingStateLoss()
+                                orderModalBottomSheet.dismissAllowingStateLoss() //todo crash in this field
                                 viewModel.disconnect()
                             }
 

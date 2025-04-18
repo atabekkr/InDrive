@@ -159,8 +159,8 @@ class RideViewModel @Inject constructor(
     }
 
     private val _createReviewUiState =
-        MutableStateFlow<CreateReviewUiState>(CreateReviewUiState.Loading)
-    val createReviewUiState = _createReviewUiState.asStateFlow()
+        MutableSharedFlow<CreateReviewUiState>()
+    val createReviewUiState = _createReviewUiState.asSharedFlow()
     fun createReview(review: PassengerReview) = viewModelScope.launch {
         _createReviewUiState.emit(
             createPassengerReviewUseCase(review).let {

@@ -20,7 +20,7 @@
         android:textAppearance="@style/TextAppearance.InDrive.Text.Title" />
 
     <TextView
-        android:id="@+id/tv_time"
+        android:id="@+id/tv_payment_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/padding_small"

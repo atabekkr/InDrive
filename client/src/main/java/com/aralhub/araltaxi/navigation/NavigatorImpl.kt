@@ -1,6 +1,7 @@
 package com.aralhub.araltaxi.navigation
 
 import android.os.Bundle
+import android.util.Log
 import androidx.navigation.NavController
 import com.aralhub.araltaxi.client.R
 import com.aralhub.araltaxi.create_order.CreateOrderFragment
@@ -43,6 +44,10 @@ class NavigatorImpl @Inject constructor() : Navigator, FeatureClientAuthNavigati
 
     override fun goToRequestFromAddName() {
         navController?.navigate(R.id.action_addNameFragment_to_requestFragment)
+    }
+
+    override fun goToRequestFromVerify() {
+        navController?.navigate(R.id.action_addSmsFragment_to_requestFragment)
     }
 
     override fun goToAddSMSCode(phone: String) {
@@ -171,6 +176,7 @@ class NavigatorImpl @Inject constructor() : Navigator, FeatureClientAuthNavigati
 
 
     override fun goBackToCreateOfferFromRide() {
+        Log.i("RateDriver", "called: $navController")
         navController?.navigateUp()
     }
 

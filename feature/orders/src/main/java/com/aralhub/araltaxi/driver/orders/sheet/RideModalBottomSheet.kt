@@ -11,6 +11,7 @@ import com.aralhub.araltaxi.driver.orders.R
 import com.aralhub.araltaxi.driver.orders.databinding.ModalBottomSheetRideBinding
 import com.aralhub.araltaxi.driver.orders.utils.sendPhoneNumberToDial
 import com.aralhub.ui.model.OrderItem
+import com.aralhub.ui.utils.GlideEx
 import com.aralhub.ui.utils.viewBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -79,12 +80,10 @@ class RideModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_she
         tvFromLocation.text = order?.pickUpAddress
         tvToLocation.text = order?.destinationAddress
         order?.paymentType?.resId?.let { ivPaymentMethod.setImageResource(it) }
-        Glide.with(binding.ivAvatar.context)
-            .load(order?.avatar)
-            .centerCrop()
-            .placeholder(com.aralhub.ui.R.drawable.ic_user)
-            .apply(RequestOptions.circleCropTransform())
-            .into(binding.ivAvatar)
+        GlideEx.displayAvatar(
+            order?.avatar.toString(),
+            binding.ivAvatar
+        )
     }
 
     private fun openYandexNavigator(context: Context, latitude: Double, longitude: Double) {

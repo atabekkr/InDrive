@@ -9,4 +9,6 @@ data class NetworkAuthToken(
     val refreshToken: String,
     @SerializedName("token_type")
     val tokenType: String,
+    @SerializedName("is_signed_up")
+    val isSignedUp: Boolean
 )

@@ -8,12 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aralhub.ui.databinding.ItemOfferBinding
 import com.aralhub.ui.model.OfferItem
 import com.aralhub.ui.model.OfferItemDiffCallback
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
+import com.aralhub.ui.utils.GlideEx
 
 class OfferItemAdapter :
     ListAdapter<OfferItem, OfferItemAdapter.ViewHolder>(OfferItemDiffCallback) {
@@ -49,17 +44,15 @@ class OfferItemAdapter :
                 tvTime.text = offerItem.timeToArrive
                 tvCar.text = offerItem.driver.carName
 
-                Glide.with(itemOfferBinding.ivAvatar.context)
-                    .load(offerItem.driver.avatar)
-                    .centerCrop()
-                    .placeholder(com.aralhub.ui.R.drawable.ic_user)
-                    .apply(RequestOptions.circleCropTransform())
-                    .into(itemOfferBinding.ivAvatar)
+                GlideEx.displayAvatar(
+                    offerItem.driver.avatar,
+                    itemOfferBinding.ivAvatar,
+                )
             }
         }
     }
 
-    fun removeItem(position: Int){
+    fun removeItem(position: Int) {
         val currentList = currentList.toMutableList()
         currentList.removeAt(position)
         submitList(currentList)

@@ -15,8 +15,7 @@ import javax.inject.Inject
 class ClientAuthRepositoryImpl @Inject constructor(
     private val localStorage: ClientSharedPreference,
     private val clientNetworkDataSource: UserNetworkDataSource
-) :
-    ClientAuthRepository {
+) : ClientAuthRepository {
 
     override suspend fun clientAuth(phone: String): Result<Boolean> {
         clientNetworkDataSource.userAuth(NetworkUserAuthRequest(phone)).let {
@@ -39,7 +38,7 @@ class ClientAuthRepositoryImpl @Inject constructor(
                     localStorage.refresh = it.data.refreshToken
                     localStorage.isLogin = true
                     localStorage.phoneNumber = phone
-                    Result.Success(data = true)
+                    Result.Success(data = it.data.isSignedUp)
                 }
             }
         }

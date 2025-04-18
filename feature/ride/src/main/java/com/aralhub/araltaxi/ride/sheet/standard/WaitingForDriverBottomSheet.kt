@@ -8,7 +8,6 @@ import androidx.fragment.app.activityViewModels
 import com.aralhub.araltaxi.client.ride.R
 import com.aralhub.araltaxi.client.ride.databinding.BottomSheetWaitingForDriverBinding
 import com.aralhub.araltaxi.ride.ActiveRideUiState
-import com.aralhub.araltaxi.ride.CancelRideUiState
 import com.aralhub.araltaxi.ride.RideViewModel
 import com.aralhub.araltaxi.ride.navigation.sheet.FeatureRideBottomSheetNavigation
 import com.aralhub.araltaxi.ride.navigation.sheet.FeatureRideNavigation
@@ -31,8 +30,10 @@ class WaitingForDriverBottomSheet : Fragment(R.layout.bottom_sheet_waiting_for_d
 
     @Inject
     lateinit var errorHandler: ErrorHandler
+
     @Inject
     lateinit var featureRideBottomSheetNavigation: FeatureRideBottomSheetNavigation
+
     @Inject
     lateinit var navigation: FeatureRideNavigation
 
@@ -76,9 +77,7 @@ class WaitingForDriverBottomSheet : Fragment(R.layout.bottom_sheet_waiting_for_d
     private fun displayActiveRide(activeRide: ActiveRide) {
         binding.btnCall.setOnClickListener {}
         binding.tvDriverName.text = activeRide.driver.fullName
-        displayAvatar("https://araltaxi.aralhub.uz/${activeRide.driver.photoUrl}", binding.ivDriver)
-        Log.i("Vehicle", "${activeRide.driver.vehicleType}")
-        Log.i("Vehicle", "${activeRide.driver.vehicleNumber}")
+        displayAvatar("${activeRide.driver.photoUrl}", binding.ivDriver)
         binding.tvCarInfo.text = StringUtils.getBoldSpanString(
             fullText = "${activeRide.driver.vehicleType}, ${activeRide.driver.vehicleNumber}",
             boldText = activeRide.driver.vehicleNumber

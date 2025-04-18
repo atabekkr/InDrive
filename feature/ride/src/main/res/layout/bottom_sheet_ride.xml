@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginTop="8dp"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:layout_marginTop="8dp"
     android:paddingHorizontal="@dimen/padding_medium">
 
     <TextView
@@ -65,7 +65,9 @@
         android:id="@+id/tv_car_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginTop="20dp"
+        android:textSize="16sp"
+        android:textColor="@color/color_text_primary"
         android:textAppearance="@style/TextAppearance.InDrive.BodyLarge"
         tools:text="Chevrolet Cobalt, 95 A 123 WE" />
 
@@ -74,66 +76,6 @@
         android:layout_height="wrap_content"
         android:text="@string/label_car"
         android:textAppearance="@style/TextAppearance.InDrive.TitleSmall" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:baselineAligned="false"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <View
-                android:id="@+id/btn_cancel"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:background="@drawable/bg_cancel_button"
-                android:clickable="true"
-                android:foreground="@drawable/ripple_round" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="@dimen/padding_small"
-                android:text="@string/label_cancel_trip"
-                android:textAppearance="@style/TextAppearance.InDrive.TitleSmall" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <View
-                android:id="@+id/btn_call"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:background="@drawable/bg_call_button"
-                android:clickable="true"
-                android:foreground="@drawable/ripple_round" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="@dimen/padding_small"
-                android:text="@string/label_call"
-                android:textAppearance="@style/TextAppearance.InDrive.TitleSmall" />
-
-        </LinearLayout>
-
-    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/layout_money"

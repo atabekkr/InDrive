@@ -69,8 +69,11 @@ class AddSMSFragment : Fragment(R.layout.fragment_add_sms) {
                     showLoading()
                 }
 
-                AddSMSUiState.Success -> {
-                    navigateToAddName()
+                is AddSMSUiState.Success -> {
+                    if (state.isSignedUp)
+                        navigateToRequest()
+                    else
+                        navigateToAddName()
                 }
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -78,6 +81,10 @@ class AddSMSFragment : Fragment(R.layout.fragment_add_sms) {
 
     private fun navigateToAddName() {
         navigator.goToAddName()
+    }
+
+    private fun navigateToRequest() {
+        navigator.goToRequestFromVerify()
     }
 
     private fun displayError(errorMessage: String) {

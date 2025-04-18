@@ -249,6 +249,7 @@ class OrdersViewModel @Inject constructor(
 
     fun setIdleState() {
         webSocketOrdersState.value = GetActiveOrdersUiState.Idle
+        existingOrdersState.value = GetActiveOrdersUiState.Idle
     }
 
     override fun onCleared() {

@@ -15,8 +15,9 @@ import com.aralhub.araltaxi.ride.ActiveRideUiState
 import com.aralhub.araltaxi.ride.GetDriverCardUiState
 import com.aralhub.araltaxi.ride.RideViewModel
 import com.aralhub.araltaxi.ride.navigation.sheet.FeatureRideBottomSheetNavigation
+import com.aralhub.indrive.core.data.model.payment.PaymentMethodType
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
-import com.aralhub.ui.utils.ViewEx.enable
+import com.aralhub.ui.utils.ViewEx.hide
 import com.aralhub.ui.utils.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -41,20 +42,33 @@ class RideFinishedBottomSheet : Fragment(R.layout.bottom_sheet_ride_finished) {
 
     private fun initObservers() {
         observeState(rideViewModel.activeRideState) { activeRideUiState ->
-            when(activeRideUiState){
+            when (activeRideUiState) {
                 is ActiveRideUiState.Error -> {}
                 ActiveRideUiState.Loading -> {}
                 is ActiveRideUiState.Success -> {
-                    Log.e("RideFinishedBottomSheet", activeRideUiState.activeRide.locations.points.getOrNull(1)?.name.toString())
                     rideViewModel.getDriverCard(activeRideUiState.activeRide.driver.driverId)
-                    val commonPrice = getString(com.aralhub.ui.R.string.standard_uzs_price, "${activeRideUiState.activeRide.amount + activeRideUiState.activeRide.waitAmount}")
+                    val commonPrice = getString(
+                        com.aralhub.ui.R.string.standard_uzs_price,
+                        "${activeRideUiState.activeRide.amount + activeRideUiState.activeRide.waitAmount}"
+                    )
                     binding.tvTotalMoney.text = commonPrice
+
+                    when (activeRideUiState.activeRide.paymentMethod.id) {
+                        PaymentMethodType.CARD.id -> {
+                            binding.tvPaymentLabel.text =
+                                "Ótinish, kelisilgen jol haqın naq pulda tikkeley aydawshınıń ózine tóleń."
+                        }
+
+                        PaymentMethodType.CASH.id -> {
+                            binding.layoutPlasticCard.hide()
+                        }
+                    }
                 }
             }
         }
 
-        observeState(rideViewModel.getDriverCardUiState){ getDriverCardUiState ->
-            when(getDriverCardUiState){
+        observeState(rideViewModel.getDriverCardUiState) { getDriverCardUiState ->
+            when (getDriverCardUiState) {
                 is GetDriverCardUiState.Error -> {}
                 GetDriverCardUiState.Loading -> {}
                 is GetDriverCardUiState.Success -> {

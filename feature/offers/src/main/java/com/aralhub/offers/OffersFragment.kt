@@ -9,12 +9,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
 import com.aralhub.araltaxi.client.offers.R
 import com.aralhub.araltaxi.client.offers.databinding.FragmentOffersBinding
-import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.araltaxi.core.common.utils.MapStyles
 import com.aralhub.araltaxi.core.common.utils.loadJsonFromAssets
 import com.aralhub.offers.navigation.FeatureOffersNavigation
 import com.aralhub.offers.navigation.sheet.SheetNavigator
 import com.aralhub.ui.adapter.OfferItemAdapter
+import com.aralhub.ui.components.ErrorHandler
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.ViewEx.hide
 import com.aralhub.ui.utils.ViewEx.show
@@ -133,10 +133,7 @@ class OffersFragment : Fragment(R.layout.fragment_offers) {
             when (declineOfferUiState) {
                 is DeclineOfferUiState.Error -> errorHandler.showToast(declineOfferUiState.message)
                 DeclineOfferUiState.Loading -> {}
-                is DeclineOfferUiState.Success -> {
-                    //  offerItemAdapter.removeItem(declineOfferUiState.position)
-                    errorHandler.showToast("Offer declined")
-                }
+                is DeclineOfferUiState.Success -> {}
             }
         }
     }

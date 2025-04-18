@@ -121,13 +121,13 @@ data class ClientRideResponsePaymentMethod(
 )
 
 data class ClientRideResponsePassenger(
-    @SerializedName("user_id")
+    @SerializedName("id")
     val userId: Int,
     @SerializedName("full_name")
     val userFullName: String,
-    @SerializedName("user_rating")
+    @SerializedName("rating")
     val userRating: Number,
-    @SerializedName("user_photo")
+    @SerializedName("photo")
     val avatar: String?
 )
 

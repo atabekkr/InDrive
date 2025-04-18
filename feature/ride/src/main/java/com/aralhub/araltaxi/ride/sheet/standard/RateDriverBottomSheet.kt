@@ -1,21 +1,21 @@
 package com.aralhub.araltaxi.ride.sheet.standard
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.aralhub.araltaxi.client.ride.R
 import com.aralhub.araltaxi.client.ride.databinding.BottomSheetRateDriverBinding
 import com.aralhub.araltaxi.ride.ActiveRideUiState
 import com.aralhub.araltaxi.ride.CreateReviewUiState
 import com.aralhub.araltaxi.ride.RideViewModel
-import com.aralhub.araltaxi.ride.navigation.sheet.FeatureRideBottomSheetNavigation
 import com.aralhub.araltaxi.ride.navigation.sheet.FeatureRideNavigation
 import com.aralhub.araltaxi.ride.utils.FragmentEx.loadAvatar
 import com.aralhub.indrive.core.data.model.review.PassengerReview
-import com.aralhub.indrive.core.data.model.review.Review
+import com.aralhub.ui.dialog.LoadingDialog
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
+import com.aralhub.ui.utils.showSnackBar
 import com.aralhub.ui.utils.viewBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,6 +31,13 @@ class RateDriverBottomSheet : BottomSheetDialogFragment(R.layout.bottom_sheet_ra
 
     @Inject
     lateinit var navigation: FeatureRideNavigation
+
+    private var loadingDialog: LoadingDialog? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        loadingDialog = LoadingDialog(context)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -49,28 +56,52 @@ class RateDriverBottomSheet : BottomSheetDialogFragment(R.layout.bottom_sheet_ra
     }
 
     private fun initObservers() {
-        observeState(rideViewModel.activeRideState){ activeRideUiState ->
-            when(activeRideUiState){
+        observeState(rideViewModel.activeRideState) { activeRideUiState ->
+            when (activeRideUiState) {
                 is ActiveRideUiState.Error -> {}
                 ActiveRideUiState.Loading -> {}
                 is ActiveRideUiState.Success -> {
                     driverId = activeRideUiState.activeRide.driver.driverId
                     rideId = activeRideUiState.activeRide.id
                     Log.i("RateDriver", "${activeRideUiState.activeRide}")
-                    loadAvatar("https://araltaxi.aralhub.uz/${activeRideUiState.activeRide.driver.photoUrl}", binding.ivDriver)
+                    loadAvatar(
+                        "https://araltaxi.aralhub.uz/${activeRideUiState.activeRide.driver.photoUrl}",
+                        binding.ivDriver
+                    )
                     binding.tvDriverName.text = activeRideUiState.activeRide.driver.fullName
                 }
             }
         }
 
-        observeState(rideViewModel.createReviewUiState){ createReviewUiState ->
-            when(createReviewUiState){
-                is CreateReviewUiState.Error -> {}
-                CreateReviewUiState.Loading -> {}
+        observeState(rideViewModel.createReviewUiState) { createReviewUiState ->
+            when (createReviewUiState) {
+                is CreateReviewUiState.Error -> {
+                    dismissLoading()
+                    showSnackBar(createReviewUiState.message)
+                }
+
+                CreateReviewUiState.Loading -> {
+                    showLoading()
+                }
+
                 is CreateReviewUiState.Success -> {
+                    dismissLoading()
                     navigation.goBackToCreateOfferFromRide()
                 }
             }
         }
+    }
+
+    private fun showLoading() {
+        loadingDialog?.show()
+    }
+
+    private fun dismissLoading() {
+        loadingDialog?.dismiss()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        dismissLoading()
     }
 }

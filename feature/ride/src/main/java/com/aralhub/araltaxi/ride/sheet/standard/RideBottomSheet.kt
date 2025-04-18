@@ -3,7 +3,6 @@ package com.aralhub.araltaxi.ride.sheet.standard
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.aralhub.araltaxi.client.ride.R
 import com.aralhub.araltaxi.client.ride.databinding.BottomSheetRideBinding
@@ -11,8 +10,6 @@ import com.aralhub.araltaxi.ride.ActiveRideUiState
 import com.aralhub.araltaxi.ride.RideViewModel
 import com.aralhub.araltaxi.ride.navigation.sheet.FeatureRideBottomSheetNavigation
 import com.aralhub.araltaxi.ride.navigation.sheet.FeatureRideNavigation
-import com.aralhub.araltaxi.ride.sheet.modal.CancelTripFragment
-import com.aralhub.araltaxi.ride.utils.FragmentEx.sendPhoneNumberToDial
 import com.aralhub.indrive.core.data.model.payment.PaymentMethodType
 import com.aralhub.indrive.core.data.model.ride.ActiveRide
 import com.aralhub.ui.components.ErrorHandler
@@ -20,6 +17,7 @@ import com.aralhub.ui.utils.GlideEx.displayAvatar
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.StringUtils
 import com.aralhub.ui.utils.ViewEx.hide
+import com.aralhub.ui.utils.showSnackBar
 import com.aralhub.ui.utils.viewBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,6 +28,7 @@ class RideBottomSheet : BottomSheetDialogFragment(R.layout.bottom_sheet_ride) {
 
     @Inject
     lateinit var featureRideBottomSheetNavigation: FeatureRideBottomSheetNavigation
+
     @Inject
     lateinit var navigation: FeatureRideNavigation
 
@@ -48,15 +47,10 @@ class RideBottomSheet : BottomSheetDialogFragment(R.layout.bottom_sheet_ride) {
     }
 
     private fun initListeners() {
-        binding.btnCancel.setOnClickListener {
-            currentRideId.let { rideId ->
-                CancelTripFragment().show(childFragmentManager, CancelTripFragment.TAG)
-            }
-        }
         observeState(rideViewModel.activeRideState) { activeRideState ->
             when (activeRideState) {
                 is ActiveRideUiState.Error -> {
-                    Log.i("RideBottomSheet", "initObservers: Error ${activeRideState.message}")
+                    showSnackBar(activeRideState.message)
                 }
 
                 ActiveRideUiState.Loading -> {
@@ -75,7 +69,7 @@ class RideBottomSheet : BottomSheetDialogFragment(R.layout.bottom_sheet_ride) {
         observeState(rideViewModel.activeRideState) { activeRideState ->
             when (activeRideState) {
                 is ActiveRideUiState.Error -> {
-                    Log.i("RideBottomSheet", "initObservers: Error ${activeRideState.message}")
+                    showSnackBar(activeRideState.message)
                 }
 
                 ActiveRideUiState.Loading -> {
@@ -85,7 +79,6 @@ class RideBottomSheet : BottomSheetDialogFragment(R.layout.bottom_sheet_ride) {
                 is ActiveRideUiState.Success -> {
                     currentRideId = activeRideState.activeRide.id
                     displayActiveRide(activeRideState.activeRide)
-                    Log.i("RideBottomSheet", "initObservers: Success ${activeRideState.activeRide}")
                 }
             }
         }
@@ -94,7 +87,6 @@ class RideBottomSheet : BottomSheetDialogFragment(R.layout.bottom_sheet_ride) {
 
     private fun displayActiveRide(activeRide: ActiveRide) {
         binding.tvTitle.hide()
-        binding.btnCall.setOnClickListener {}
         binding.tvPrice.text = activeRide.amount.toString()
         binding.tvPaymentMethod.text = when (activeRide.paymentMethod.type) {
             PaymentMethodType.CARD -> getString(com.aralhub.ui.R.string.label_online_payment)
@@ -107,7 +99,7 @@ class RideBottomSheet : BottomSheetDialogFragment(R.layout.bottom_sheet_ride) {
             }
         )
         binding.tvDriverName.text = activeRide.driver.fullName
-        displayAvatar("https://araltaxi.aralhub.uz/${activeRide.driver.photoUrl}", binding.ivDriver)
+        displayAvatar(activeRide.driver.photoUrl.toString(), binding.ivDriver)
         Log.i("Vehicle", "${activeRide.driver.vehicleType}")
         Log.i("Vehicle", "${activeRide.driver.vehicleNumber}")
         binding.tvCarInfo.text = StringUtils.getBoldSpanString(
@@ -118,9 +110,6 @@ class RideBottomSheet : BottomSheetDialogFragment(R.layout.bottom_sheet_ride) {
             activeRide.locations.points[activeRide.locations.points.size - 1].name
         binding.tvDriverRating.text =
             getString(com.aralhub.ui.R.string.label_driver_rating, activeRide.driver.rating)
-        binding.btnCall.setOnClickListener {
-            sendPhoneNumberToDial(activeRide.driver.phoneNumber)
-        }
     }
 
 }

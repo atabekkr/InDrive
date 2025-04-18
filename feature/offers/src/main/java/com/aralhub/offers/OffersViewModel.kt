@@ -165,7 +165,7 @@ private fun Offer.asOfferItem(): OfferItem {
             name = driver.fullName,
             carName = driver.vehicleType.kk,
             rating = driver.rating,
-            avatar = "https://araltaxi.aralhub.uz/${driver.photoUrl}"
+            avatar = driver.photoUrl
         ),
         offeredPrice = amount.toInt().toString(),
         timeToArrive = "0",

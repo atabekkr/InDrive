@@ -8,6 +8,7 @@ import com.aralhub.ui.utils.setOnSafeClickListener
 import com.aralhub.ui.R
 import com.aralhub.ui.databinding.ItemOrderBinding
 import com.aralhub.ui.model.OrderItem
+import com.aralhub.ui.utils.GlideEx
 import com.aralhub.ui.utils.ViewEx.hide
 import com.aralhub.ui.utils.ViewEx.show
 import com.bumptech.glide.Glide
@@ -42,12 +43,10 @@ class OrderItemAdapter :
                 onItemClickListener?.invoke(orderItem)
             }
 
-            Glide.with(binding.ivAvatar.context)
-                .load(orderItem.avatar)
-                .centerCrop()
-                .placeholder(R.drawable.ic_user)
-                .apply(RequestOptions.circleCropTransform())
-                .into(binding.ivAvatar)
+            GlideEx.displayAvatar(
+                orderItem.avatar,
+                binding.ivAvatar
+            )
 
             if (orderItem.isPriceIncreased)
                 binding.layoutUpdatedPrice.show()
