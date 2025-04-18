@@ -7,6 +7,7 @@ import com.aralhub.network.models.driver.NetworkDriverCard
 import com.aralhub.network.models.location.NetworkLocationPoint
 import com.aralhub.network.models.price.NetworkRecommendedPrice
 import com.aralhub.network.models.price.NetworkStandardPrice
+import com.aralhub.network.models.ride.ClientRideHistoryDetailsNetwork
 import com.aralhub.network.models.ride.NetworkRideActive
 import com.aralhub.network.models.ride.NetworkRideSearch
 import com.aralhub.network.models.ride.NetworkWaitAmount
@@ -41,4 +42,5 @@ interface ClientNetworkDataSource {
     suspend fun getDriverCard(driverId: Int): NetworkResult<NetworkDriverCard>
 
     suspend fun getRideHistory(): Flow<PagingData<RideHistoryNetwork>>
+    suspend fun getHistoryRideDetails(rideId: Int): NetworkResult<ClientRideHistoryDetailsNetwork>
 }

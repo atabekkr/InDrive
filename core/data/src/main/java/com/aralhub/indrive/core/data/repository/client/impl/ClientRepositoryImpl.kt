@@ -35,6 +35,7 @@ import com.aralhub.indrive.core.data.repository.client.ClientRepository
 import com.aralhub.indrive.core.data.result.Result
 import com.aralhub.network.ClientNetworkDataSource
 import com.aralhub.araltaxi.core.common.sharedpreference.ClientSharedPreference
+import com.aralhub.indrive.core.data.model.ride.ClientRideHistory
 import com.aralhub.indrive.core.data.model.ride.RideHistory
 import com.aralhub.network.models.NetworkResult
 import com.aralhub.network.models.location.NetworkLocationPoint
@@ -360,6 +361,15 @@ class ClientRepositoryImpl @Inject constructor(private val localStorage: ClientS
             .map { pagingData ->
                 pagingData.map { it.toDomain() }
             }
+    }
+
+    override suspend fun getHistoryRideDetails(rideId: Int): Result<ClientRideHistory> {
+        return dataSource.getHistoryRideDetails(rideId).let {
+            when (it) {
+                is NetworkResult.Error -> Result.Error(it.message)
+                is NetworkResult.Success -> Result.Success(it.data.toDomain())
+            }
+        }
     }
 
 }

@@ -1,6 +1,6 @@
 package com.aralhub.araltaxi.driver.orders.navigation
 
-import com.aralhub.ui.model.OrderItem
+import com.aralhub.ui.model.args.ShowRideRouteArg
 
 interface FeatureOrdersNavigation {
     fun goToProfileFromOrders()
@@ -9,5 +9,5 @@ interface FeatureOrdersNavigation {
     fun goToChangeLanguageFromOrders()
     fun goToRevenueFromOrders()
     fun goToLogoFromOrders()
-    fun goToMapFromOrders(order: OrderItem)
+    fun goToMapFromOrders(item: ShowRideRouteArg)
 }

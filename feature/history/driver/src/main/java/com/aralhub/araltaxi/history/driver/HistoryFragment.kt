@@ -2,6 +2,7 @@ package com.aralhub.araltaxi.history.driver
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -12,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.aralhub.araltaxi.history.driver.databinding.FragmentHistoryBinding
+import com.aralhub.araltaxi.history.driver.navigation.FeatureHistoryNavigation
 import com.aralhub.ui.adapter.HistoryAdapter
 import com.aralhub.ui.dialog.ErrorMessageDialog
 import com.aralhub.ui.dialog.LoadingDialog
@@ -22,7 +24,10 @@ import com.aralhub.ui.utils.ViewEx.hide
 import com.aralhub.ui.utils.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HistoryFragment : Fragment(R.layout.fragment_history) {
@@ -37,6 +42,9 @@ class HistoryFragment : Fragment(R.layout.fragment_history) {
 
     private var errorDialog: ErrorMessageDialog? = null
     private var loadingDialog: LoadingDialog? = null
+
+    @Inject
+    lateinit var navigation: FeatureHistoryNavigation
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -108,7 +116,7 @@ class HistoryFragment : Fragment(R.layout.fragment_history) {
             }
         }
 
-        observeState(viewModel.rideHistoryDetailsResult) { result ->
+        viewModel.rideHistoryDetailsResult.onEach { result ->
             when (result) {
                 is RideDetailsUiState.Error -> showErrorDialog(result.message)
                 RideDetailsUiState.Idle -> {}
@@ -118,18 +126,30 @@ class HistoryFragment : Fragment(R.layout.fragment_history) {
                     showOrderDetails(result.data)
                 }
             }
-        }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
 
     }
 
     private fun showOrderDetails(rideHistoryUI: RideHistoryUI) {
-        rideHistoryDetailsBottomSheet.arguments = Bundle().apply {
-            putParcelable("RideHistoryDetails", rideHistoryUI)
+        try {
+            if (!rideHistoryDetailsBottomSheet.isAdded) {
+                rideHistoryDetailsBottomSheet.arguments = Bundle().apply {
+                    putParcelable("RideHistoryDetails", rideHistoryUI)
+                }
+                rideHistoryDetailsBottomSheet.show(
+                    childFragmentManager,
+                    rideHistoryDetailsBottomSheet.tag
+                )
+            }
+
+            rideHistoryDetailsBottomSheet.setOnShowRouteClickListener { item ->
+                navigation.goToMapFromHistoryDetails(
+                    item
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("HistoryFragment", "showOrderDetails: ", e)
         }
-        rideHistoryDetailsBottomSheet.show(
-            childFragmentManager,
-            rideHistoryDetailsBottomSheet.tag
-        )
     }
 
     private fun showErrorDialog(errorMessage: String?) {

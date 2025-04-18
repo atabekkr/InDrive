@@ -11,6 +11,8 @@ import com.aralhub.indrive.core.data.result.Result
 import com.aralhub.ui.model.RideHistoryUI
 import com.aralhub.ui.model.asUI
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -42,18 +44,21 @@ class RideHistoryViewModel @Inject constructor(
         }
     }
 
-    private val _rideHistoryDetailsResult = MutableStateFlow<RideDetailsUiState>(RideDetailsUiState.Idle)
-    val rideHistoryDetailsResult: StateFlow<RideDetailsUiState> = _rideHistoryDetailsResult
+    private val _rideHistoryDetailsResult = MutableSharedFlow<RideDetailsUiState>()
+    val rideHistoryDetailsResult: Flow<RideDetailsUiState> = _rideHistoryDetailsResult
     fun getRideHistoryDetails(rideId: Int) {
         viewModelScope.launch {
-            _rideHistoryDetailsResult.value = RideDetailsUiState.Loading
+            _rideHistoryDetailsResult.emit(RideDetailsUiState.Loading)
             rideHistoryDetailsUseCase(rideId).let { result ->
                 when (result) {
                     is Result.Error -> {
-                        _rideHistoryDetailsResult.value = RideDetailsUiState.Error(result.message)
+                        _rideHistoryDetailsResult.emit(RideDetailsUiState.Error(result.message))
                     }
+
                     is Result.Success -> {
-                        _rideHistoryDetailsResult.value = RideDetailsUiState.Success(result.data.asUI())
+                        _rideHistoryDetailsResult.emit(
+                            RideDetailsUiState.Success(result.data.asUI())
+                        )
                     }
                 }
             }

@@ -1,27 +1,31 @@
 package com.aralhub.araltaxi.navigation
 
+import android.os.Bundle
 import androidx.navigation.NavController
 import com.aralhub.araltaxi.client.R
 import com.aralhub.araltaxi.create_order.CreateOrderFragment
 import com.aralhub.araltaxi.create_order.navigation.FeatureCreateOrderNavigation
+import com.aralhub.araltaxi.history.client.navigation.FeatureHistoryNavigation
 import com.aralhub.araltaxi.profile.client.navigation.FeatureProfileNavigation
-import com.aralhub.client.clientauth.addsms.AddSMSFragment
-import com.aralhub.client.clientauth.navigation.FeatureClientAuthNavigation
 import com.aralhub.araltaxi.request.navigation.FeatureRequestNavigation
 import com.aralhub.araltaxi.ride.navigation.sheet.FeatureRideNavigation
 import com.aralhub.araltaxi.savedplaces.editsavedplace.EditSavedPlaceFragment
 import com.aralhub.araltaxi.savedplaces.navigation.FeatureSavedPlaceNavigation
 import com.aralhub.araltaxi.savedplaces.saveaddress.SaveAddressFragment
 import com.aralhub.araltaxi.select_location.SelectLocationFragment
+import com.aralhub.client.clientauth.addsms.AddSMSFragment
+import com.aralhub.client.clientauth.navigation.FeatureClientAuthNavigation
 import com.aralhub.offers.navigation.FeatureOffersNavigation
 import com.aralhub.ui.model.args.SelectedLocations
+import com.aralhub.ui.model.args.ShowRideRouteArg
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class NavigatorImpl @Inject constructor() : Navigator, FeatureClientAuthNavigation,
     FeatureRequestNavigation, FeatureOffersNavigation, FeatureProfileNavigation,
-    FeatureSavedPlaceNavigation, FeatureCreateOrderNavigation, FeatureRideNavigation {
+    FeatureSavedPlaceNavigation, FeatureCreateOrderNavigation, FeatureRideNavigation,
+    FeatureHistoryNavigation {
 
     private var navController: NavController? = null
 
@@ -168,5 +172,14 @@ class NavigatorImpl @Inject constructor() : Navigator, FeatureClientAuthNavigati
 
     override fun goBackToCreateOfferFromRide() {
         navController?.navigateUp()
+    }
+
+    override fun goToMapFromHistoryDetails(item: ShowRideRouteArg) {
+        val bundle = Bundle()
+        bundle.putParcelable("HistoryDetail", item)
+        navController?.navigate(
+            R.id.action_historyFragment_to_showOrderRouteFragment,
+            bundle
+        )
     }
 }

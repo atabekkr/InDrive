@@ -194,7 +194,11 @@
     <fragment
         android:id="@+id/historyFragment"
         android:name="com.aralhub.araltaxi.history.client.HistoryFragment"
-        tools:layout="@layout/fragment_history" />
+        tools:layout="@layout/fragment_history" >
+        <action
+            android:id="@+id/action_historyFragment_to_showOrderRouteFragment"
+            app:destination="@id/showOrderRouteFragment" />
+    </fragment>
     <fragment
         android:id="@+id/savedPlacesFragment"
         android:name="com.aralhub.araltaxi.savedplaces.SavedPlacesFragment"
@@ -226,5 +230,10 @@
         android:name="com.aralhub.araltaxi.language.client.ChangeLanguageFragment"
         android:label="ChangeLanguageFragment"
         tools:layout="@layout/fragment_change_language" />
+    <fragment
+        android:id="@+id/showOrderRouteFragment"
+        android:name="com.aralhub.araltaxi.show_ride_route.ShowOrderRouteFragment"
+        tools:layout="@layout/fragment_show_order_route"
+        android:label="ShowOrderRouteFragment" />
 
 </navigation>

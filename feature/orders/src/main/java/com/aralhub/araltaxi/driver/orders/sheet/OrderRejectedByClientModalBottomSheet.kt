@@ -32,7 +32,7 @@ class OrderRejectedByClientModalBottomSheet :
 
     private fun initUI() {
         val offerAmount = arguments?.getString("OfferAmount")
-        binding.tvOfferAmount.text = getString(R.string.not_confirmed_desc, offerAmount)
+        binding.tvOfferAmount.text = getString(com.aralhub.ui.R.string.not_confirmed_desc, offerAmount)
     }
 
     private fun initListeners() {

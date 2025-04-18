@@ -102,11 +102,11 @@
             app:popUpToInclusive="true"
             app:destination="@id/logoFragment"/>
         <action
-            android:id="@+id/action_ordersFragment_to_showOrderRouteFragment"
-            app:destination="@id/showOrderRouteFragment" />
-        <action
             android:id="@+id/action_ordersFragment_to_changeLanguageFragment"
             app:destination="@id/changeLanguageFragment" />
+        <action
+            android:id="@+id/action_ordersFragment_to_showOrderRouteFragment"
+            app:destination="@id/showOrderRouteFragment" />
 
     </fragment>
 
@@ -123,7 +123,11 @@
     <fragment
         android:id="@+id/historyFragment"
         android:name="com.aralhub.araltaxi.history.driver.HistoryFragment"
-        tools:layout="@layout/fragment_history"/>
+        tools:layout="@layout/fragment_history">
+        <action
+            android:id="@+id/action_historyFragment_to_showOrderRouteFragment"
+            app:destination="@id/showOrderRouteFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/revenueFragment"
@@ -131,16 +135,13 @@
         tools:layout="@layout/fragment_revenue"/>
 
     <fragment
-        android:id="@+id/showOrderRouteFragment"
-        android:name="com.aralhub.araltaxi.driver.orders.orders.ShowOrderRouteFragment"
-        tools:layout="@layout/fragment_show_order_route">
-        <argument
-            android:name="order"
-            app:argType="com.aralhub.ui.model.OrderItem" />
-    </fragment>
-    <fragment
         android:id="@+id/changeLanguageFragment"
         android:name="com.aralhub.araltaxi.language.driver.ChangeLanguageFragment"
         android:label="ChangeLanguageFragment" />
+    <fragment
+        android:id="@+id/showOrderRouteFragment"
+        android:name="com.aralhub.araltaxi.show_ride_route.ShowOrderRouteFragment"
+        tools:layout="@layout/fragment_show_order_route"
+        android:label="ShowOrderRouteFragment" />
 
 </navigation>

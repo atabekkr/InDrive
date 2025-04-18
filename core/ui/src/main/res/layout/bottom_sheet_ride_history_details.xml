@@ -111,7 +111,7 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/btn_navigator"
+        android:id="@+id/btn_show_route"
         style="@style/Widget.InDrive.Button.Variant"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

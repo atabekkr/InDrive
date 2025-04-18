@@ -40,6 +40,7 @@ import com.aralhub.ui.adapter.OrderItemAdapter
 import com.aralhub.ui.dialog.ErrorMessageDialog
 import com.aralhub.ui.dialog.LoadingDialog
 import com.aralhub.ui.model.OrderItem
+import com.aralhub.ui.model.args.ShowRideRouteArg
 import com.aralhub.ui.utils.GlideEx
 import com.aralhub.ui.utils.LifecycleOwnerEx.observeState
 import com.aralhub.ui.utils.setOnSafeClickListener
@@ -373,8 +374,11 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
             }
         }
         orderModalBottomSheet.setOnAddressClickListener { order: OrderItem? ->
+            val item = ShowRideRouteArg(
+                locations = order?.locations ?: emptyList()
+            )
             navigation.goToMapFromOrders(
-                order ?: return@setOnAddressClickListener
+                item
             )
         }
 

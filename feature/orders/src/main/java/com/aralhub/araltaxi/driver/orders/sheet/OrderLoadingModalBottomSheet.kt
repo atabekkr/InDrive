@@ -33,7 +33,7 @@ class OrderLoadingModalBottomSheet :
 
     private fun initUI() {
         val offerAmount = arguments?.getString("OfferAmount")
-        binding.tvOfferAmount.text = getString(R.string.driver_offer_loading, offerAmount)
+        binding.tvOfferAmount.text = getString(com.aralhub.ui.R.string.driver_offer_loading, offerAmount)
     }
 
     companion object {

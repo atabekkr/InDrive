@@ -54,6 +54,7 @@ dependencies {
     implementation project(':feature:select-location')
     implementation project(':feature:create-order')
     implementation project(':feature:language:client')
+    implementation project(':feature:show-ride-route')
     implementation project(':core:network')
 
     implementation libs.androidx.core.ktx

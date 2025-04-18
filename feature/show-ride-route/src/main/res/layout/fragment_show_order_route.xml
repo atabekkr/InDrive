@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <com.yandex.mapkit.mapview.MapView
+        android:id="@+id/map_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/layout_bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_bottom_sheet"
+        android:clickable="true"
+        android:fitsSystemWindows="false"
+        android:focusable="true"
+        android:orientation="vertical"
+        android:paddingTop="0dp"
+        app:layout_behavior="@string/bottom_sheet_behavior"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:paddingBottomSystemWindowInsets="true"
+        app:paddingTopSystemWindowInsets="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_small"
+            android:paddingBottom="@dimen/padding_small"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+                style="@style/Widget.InDrive.BottomSheet.DragHandle"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:padding="0dp"
+                android:paddingBottom="0dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/route"
+                android:textAppearance="@style/TextAppearance.InDrive.Text.TitleBody"
+                android:textSize="26sp" />
+
+            <LinearLayout
+                android:id="@+id/layout_from_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="@dimen/margin_small"
+                android:gravity="top"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/ic_from_location" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_from_location"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:paddingHorizontal="@dimen/padding_small"
+                        android:textAppearance="@style/TextAppearance.InDrive.BodyLarge"
+                        android:textColor="@color/color_content_primary_text"
+                        android:textSize="16sp"
+                        tools:text="Uy" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="@dimen/padding_small"
+                        android:text="@string/label_pick_up_location"
+                        android:textAppearance="@style/TextAppearance.InDrive.TitleSmall" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_to_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:gravity="top"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/layout_to_location_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/ic_material_symbols_radio_button_checked" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_to_location"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:paddingHorizontal="@dimen/padding_small"
+                        android:textAppearance="@style/TextAppearance.InDrive.BodyLarge"
+                        android:textColor="@color/color_content_primary_text"
+                        android:textSize="16sp"
+                        tools:text="Uy" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="@dimen/padding_small"
+                        android:text="@string/label_address_location"
+                        android:textAppearance="@style/TextAppearance.InDrive.TitleSmall" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_close"
+                style="@style/Widget.InDrive.Button.Variant"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="20dp"
+                android:text="@string/label_close" />
+
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

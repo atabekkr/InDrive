@@ -98,7 +98,7 @@ class OrderModalBottomSheet : BottomSheetDialogFragment(R.layout.modal_bottom_sh
             etPrice.setText(getString(com.aralhub.ui.R.string.standard_uzs_price, order?.roadPrice))
             tvClientName.text = order?.name
             tvRecommendPrice.text = getString(
-                R.string.recommend_price,
+                com.aralhub.ui.R.string.recommend_price,
                 getString(com.aralhub.ui.R.string.standard_uzs_price, order?.recommendedPrice)
             )
             tvDistance.text = order?.roadDistance

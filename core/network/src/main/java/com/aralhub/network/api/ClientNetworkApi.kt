@@ -5,9 +5,11 @@ import com.aralhub.network.models.ServerResponseEmpty
 import com.aralhub.network.models.driver.NetworkDriverCard
 import com.aralhub.network.models.price.NetworkRecommendedPrice
 import com.aralhub.network.models.price.NetworkStandardPrice
+import com.aralhub.network.models.ride.ClientRideHistoryDetailsNetwork
 import com.aralhub.network.models.ride.NetworkRideActive
 import com.aralhub.network.models.ride.NetworkRideSearch
 import com.aralhub.network.models.ride.NetworkWaitAmount
+import com.aralhub.network.models.ride.RideHistoryDetailsNetwork
 import com.aralhub.network.models.ride.RideHistoryNetwork
 import com.aralhub.network.requests.price.NetworkRecommendedRidePriceRequest
 import com.aralhub.network.requests.ride.NetworkClientRideRequest
@@ -70,5 +72,10 @@ interface ClientNetworkApi {
 
     @GET("/ride/get_rides_history/")
     suspend fun getRideHistory(@Query("page") page: Int, @Query("page_size")pageSize: Int): Response<ServerResponse<List<RideHistoryNetwork>>>
+
+    @GET("/ride/get_ride_info/{ride_id}")
+    suspend fun getHistoryRideDetails(
+        @Path("ride_id") rideId: Int
+    ): Response<ServerResponse<ClientRideHistoryDetailsNetwork>>
 
 }

@@ -1,4 +1,4 @@
-package com.aralhub.araltaxi.driver.orders.orders
+package com.aralhub.araltaxi.show_ride_route
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -15,11 +15,10 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.aralhub.araltaxi.driver.orders.R
-import com.aralhub.araltaxi.driver.orders.databinding.FragmentShowOrderRouteBinding
-import com.aralhub.araltaxi.driver.orders.utils.updateMapStyle
+import com.aralhub.araltaxi.show_ride_route.databinding.FragmentShowOrderRouteBinding
 import com.aralhub.ui.model.ClientRideLocationsCoordinatesUI
-import com.aralhub.ui.model.OrderItem
+import com.aralhub.ui.model.args.ShowRideRouteArg
+import com.aralhub.ui.utils.showSnackBar
 import com.aralhub.ui.utils.viewBinding
 import com.google.android.gms.location.LocationServices
 import com.yandex.mapkit.Animation
@@ -45,12 +44,9 @@ import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
-@AndroidEntryPoint
 class ShowOrderRouteFragment : Fragment(R.layout.fragment_show_order_route),
     DrivingSession.DrivingRouteListener {
 
@@ -96,21 +92,25 @@ class ShowOrderRouteFragment : Fragment(R.layout.fragment_show_order_route),
     }
 
     private fun setupUI() {
-        val order = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getParcelable("OrderDetail", OrderItem::class.java)
+        val item = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getParcelable("HistoryDetail", ShowRideRouteArg::class.java)
         } else {
-            arguments?.getParcelable("OrderDetail")
+            arguments?.getParcelable("HistoryDetail")
         }
 
-        binding.tvFromLocation.text = order?.pickUpAddress
-        binding.tvToLocation.text = order?.destinationAddress
 
-        val startPoint = order?.locations?.getOrNull(0)?.coordinates
+        val pickUpAddress = item?.locations?.getOrNull(0)?.name
+        val destinationAddress = item?.locations?.getOrNull(1)?.name
+
+        binding.tvFromLocation.text = pickUpAddress
+        binding.tvToLocation.text = destinationAddress
+
+        val startPoint = item?.locations?.getOrNull(0)?.coordinates
             ?: ClientRideLocationsCoordinatesUI(
                 latitude = 42.39235517584616,
                 longitude = 59.63039641031781
             )
-        val endPoint = order?.locations?.getOrNull(1)?.coordinates
+        val endPoint = item?.locations?.getOrNull(1)?.coordinates
             ?: ClientRideLocationsCoordinatesUI(
                 latitude = 42.42427044556464,
                 longitude = 59.640008538840675
@@ -118,7 +118,7 @@ class ShowOrderRouteFragment : Fragment(R.layout.fragment_show_order_route),
         routeStartLocation = Point(startPoint.latitude, startPoint.longitude)
         routeEndLocation = Point(endPoint.latitude, endPoint.longitude)
         viewLifecycleOwner.lifecycleScope.launch {
-            delay(1000)
+            delay(500)
             submitRouteRequest()
         }
     }
@@ -148,7 +148,7 @@ class ShowOrderRouteFragment : Fragment(R.layout.fragment_show_order_route),
     }
 
     private fun updateMapStyle(zoom: Float) {
-        binding.mapView.mapWindow.map.updateMapStyle(zoom, requireContext())
+//        binding.mapView.mapWindow.map.updateMapStyle(zoom, requireContext())
     }
 
     private fun addPointMarkerToRoute(point: Point, resId: Int) {
@@ -202,7 +202,7 @@ class ShowOrderRouteFragment : Fragment(R.layout.fragment_show_order_route),
                 this
             )
         } else {
-            Timber.d("Marshrut sızıw ımkani bolmadı")
+            showSnackBar("Marshrut sızıw ımkani bolmadı")
         }
     }
 
@@ -213,8 +213,8 @@ class ShowOrderRouteFragment : Fragment(R.layout.fragment_show_order_route),
             mapObjects?.addPolyline(drivingRoute!!.geometry)
             val p1 = drivingRoute!!.geometry.points.first()
             val p2 = drivingRoute!!.geometry.points.last()
-            addPointMarkerToRoute(p1!!, R.drawable.ic_pickup_marker)
-            addPointMarkerToRoute(p2!!, R.drawable.ic_destination_marker)
+            addPointMarkerToRoute(p1!!, com.aralhub.ui.R.drawable.ic_pickup_marker)
+            addPointMarkerToRoute(p2!!, com.aralhub.ui.R.drawable.ic_destination_marker)
             showFullRoute(drivingRoute!!)
         }
     }
@@ -251,7 +251,7 @@ class ShowOrderRouteFragment : Fragment(R.layout.fragment_show_order_route),
             if (result[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
                 moveCamera()
             } else {
-                Timber.d("Permission denied")
+                showSnackBar("Permission denied")
             }
         }
     }
@@ -315,8 +315,8 @@ class ShowOrderRouteFragment : Fragment(R.layout.fragment_show_order_route),
 
     override fun onDestroyView() {
         super.onDestroyView()
-        drivingRouter=null
-        drivingRoute=null
+        drivingRouter = null
+        drivingRoute = null
     }
 
 }

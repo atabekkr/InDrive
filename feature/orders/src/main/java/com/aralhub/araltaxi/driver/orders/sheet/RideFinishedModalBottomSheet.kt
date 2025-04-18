@@ -42,7 +42,10 @@ class RideFinishedModalBottomSheet :
 
     private fun setupUI() {
         rideCompletedUI?.let {
-            binding.tvTitle.text = getString(R.string.ride_completed_income_text, getString(com.aralhub.ui.R.string.standard_uzs_price, it.totalAmount.toString()))
+            binding.tvTitle.text = getString(
+                com.aralhub.ui.R.string.ride_completed_income_text,
+                getString(com.aralhub.ui.R.string.standard_uzs_price, it.totalAmount.toString())
+            )
             binding.tvTotalAmount.text =
                 getString(com.aralhub.ui.R.string.standard_uzs_price, it.totalAmount.toString())
             binding.tvWaitingAmount.text =
@@ -53,7 +56,10 @@ class RideFinishedModalBottomSheet :
             binding.tvTotalDistance.text = roadDistanceValue
             binding.ivPaymentMethod.setImageResource(it.paymentMethodId.resId)
             binding.tvPaymentMethod.text = it.paymentMethodId.title
-            binding.tvPaymentMethodDesc.text = getString(com.aralhub.ui.R.string.label_trip_ended_description_payment_cash, it.paymentMethodId.title)
+            binding.tvPaymentMethodDesc.text = getString(
+                com.aralhub.ui.R.string.label_trip_ended_description_payment_cash,
+                it.paymentMethodId.title
+            )
         }
     }
 

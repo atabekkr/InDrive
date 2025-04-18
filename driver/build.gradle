@@ -54,6 +54,7 @@ dependencies {
     implementation project(':feature:history:driver')
     implementation project(':feature:revenue')
     implementation project(':feature:language:driver')
+    implementation project(':feature:show-ride-route')
 
     //Service
     implementation project(':services')

@@ -7,6 +7,7 @@ import com.aralhub.indrive.core.data.model.client.GeoPoint
 import com.aralhub.indrive.core.data.model.client.RecommendedPrice
 import com.aralhub.indrive.core.data.model.driver.DriverCard
 import com.aralhub.indrive.core.data.model.ride.ActiveRide
+import com.aralhub.indrive.core.data.model.ride.ClientRideHistory
 import com.aralhub.indrive.core.data.model.ride.RideHistory
 import com.aralhub.indrive.core.data.model.ride.SearchRide
 import com.aralhub.indrive.core.data.model.ride.StandardPrice
@@ -29,4 +30,5 @@ interface ClientRepository {
     suspend fun getStandardPrice(): Result<StandardPrice>
     suspend fun getDriverCard(driverId: Int): Result<DriverCard>
     suspend fun getRideHistory(): Flow<PagingData<RideHistory>>
+    suspend fun getHistoryRideDetails(rideId: Int): Result<ClientRideHistory>
 }
